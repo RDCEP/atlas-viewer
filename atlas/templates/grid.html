@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body>
+<div id="wrapper">
+  <header id="main_nav">
+    <nav>
+      <ul id="top_nav" class="clearfix">
+        <li><a href="/">ATLAS</a></li>
+        <li id="menu_scenario"><a href>Scenarios</a><ul>
+          <li><a href class="data-ajax" data-type="scenario" data-value="0">Default</a></li>
+          <li><a href class="data-ajax" data-type="scenario" data-value="1">Fullharm</a></li>
+          <li><a href class="data-ajax" data-type="scenario" data-value="2">Fullharm_pm</a></li>
+          <li><a href class="data-ajax" data-type="scenario" data-value="3">Harmnon</a></li>
+        </ul></li>
+        <li id="menu_irrigation"><a href>Irrigation</a><ul>
+          <li><a href class="data-ajax" data-type="irrigation" data-value="0">Irrigated</a></li>
+          <li><a href class="data-ajax" data-type="irrigation" data-value="1">Rainfed</a></li>
+          <li><a href class="data-ajax" data-type="irrigation" data-value="2">Sum</a></li>
+        </ul></li>
+        <li id="menu_time"><a href>Year</a>
+          <div>
+            <input id="time_select" type="range" min="0" max="33" step="1" value="0">
+            <label>1979</label>
+          </div>
+        </li>
+
+        <li><a href>Glossary</a></li>
+        <li><a href>Documentation</a></li>
+      </ul>
+    </nav>
+  </header>
+  <div id="corner_legend">
+    <dl>
+      <dt>Scenario: </dt><dd data-type="scenario">Full harm</dd>
+      <dt>Irrigation: </dt><dd data-type="irrigation">Irrigated</dd>
+      <dt>Year: </dt><dd data-type="time">1979</dd>
+    </dl>
+  </div>
+  <div id="map">
+    <span id="hover_legend"></span>
+  </div>
+</div>
+<script>
+  Options = window.Options || {};
+  Options.var = '{{ var }}';
+  Options.lat = {{ lat }};
+  Options.lon = {{ lon }};
+</script>
+<script src="{{ url_for('static', filename='js/vendor/d3.v3.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/vendor/d3.geo.projection.v0.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/vendor/topojson.v1.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/vendor/queue.v1.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/grid.js') }}?3" charset="utf-8" ></script>
+<script>
+</script>
+</body>
+</html>

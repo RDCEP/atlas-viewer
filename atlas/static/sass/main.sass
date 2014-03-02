@@ -1,0 +1,196 @@
+@mixin columns($c, $g)
+  -moz-column-count: $c /* Firefox */
+  -webkit-column-count: $c /* Safari and Chrome */
+  column-count: $c
+  -moz-column-gap: $g
+  -webkit-column-gap: $g
+  column-gap: $g
+
+*
+  margin: 0
+  padding: 0
+body, html
+  height: 100%
+body
+  background-color: #eeeeee
+  font-family: Helveltica, Arial, sans-serif
+  color: #222222
+  overflow: hidden
+a
+  text-decoration: none
+  color: #666666
+  &:hover
+    color: #ccc !important
+h1, h2
+  margin-bottom: .5em
+line, path
+  fill: black
+  stroke: black
+  stroke-width: 0.5
+#wrapper
+  height: 100%
+  width: 100%
+#map
+  height: 100%
+  width: 100%
+  background-color: #eeeeee
+#sphere
+  fill: #C6EAFB
+.world-path
+  fill: white
+  stroke: #666
+path
+  stroke: black
+  stroke-width: 1px
+
+//MENUS
+#main_nav, #title_legend_wrap
+  width: 100%
+  position: fixed
+  top: 0
+  z-index: 999
+  -webkit-transform: translateZ(0)
+  a
+    display:  inline-block
+  nav
+    background-color: black
+    opacity: .8
+    padding: .75em 0
+#title_legend_wrap
+  position: absolute
+  top: 2.5em
+  background-color: #ffffff
+  opacity: .8
+  height: 2em
+  z-index: -1
+#top_nav
+  width: 960px
+  margin: 0 auto
+  line-height: 1em
+  position: relative
+  z-index: 999
+  & > li
+    border: none
+    display: inline-block
+    padding: 0 0 0 15px
+    margin: 0
+#top_nav > li + li
+  position: relative
+  ul
+    //@include columns(2, 2em)
+    border: none
+    position: absolute
+    top: 100%
+    left: 0
+    background-color: black
+    z-index: 1000
+    padding: 0 1em
+    height: 0
+    margin: 0
+  li
+    margin-bottom: .5em
+    height: 0
+    font-size: .8em
+    overflow: hidden
+    &.active
+      position: absolute
+      height: auto
+      font-size: .75em
+      font-weight: bold
+      top: 1.5em
+      a
+        color: black
+  &:hover ul
+    display: block
+    height: auto
+    padding: .75em 1em .5em
+    li
+      height: auto
+      &.active
+        position: static
+        font-size: .8em
+        font-weight: normal
+        a
+          color: inherit
+#menu_glossary
+  margin-left: 2em!important
+#menu_time
+  position: relative
+  div
+    height: 0
+    position: absolute
+    top: 100%
+    left: 0
+    background-color: black
+    z-index: 1000
+    padding: 0 1em
+    //height: 50px
+  input
+    height: 0
+    overflow: hidden
+  label
+    position: absolute
+    height: auto
+    font-size: .75em
+    font-weight: bold
+    top: 1.5em
+    color: black
+  &:hover div
+    height: auto
+    padding: .75em 1em .5em
+    input
+      height: auto
+    .active
+      position: static
+      font-weight: normal
+      color: #cccccc
+#title_legend
+  background-color: #ffffff
+.world-boundary
+  stroke: #eeeeee
+  stroke-width: .5
+  fill: #cccccc
+  &.active
+    stroke: red
+    stroke-width: 3px
+.grid-boundary
+  fill: transparent
+  stroke: transparent
+  stroke-width: 0
+.data-line
+  stroke: red
+  stroke-width: 2px
+  fill: transparent
+.axis text
+  font-size: .75em
+  font-weight: bold
+  letter-spacing: .02em
+  fill: #545454
+#corner_legend
+  position: absolute
+  top: 50px
+  left: 20px
+  font-size: .8em
+  dt
+    font-weight: bold
+#hover_legend
+  background-color: black
+  opacity: .8
+  padding: .5em
+  color: white
+  display: none
+  position: absolute
+  font-size: .8em
+  pointer-events: none
+.y.axis line
+  stroke-dasharray: 2,2
+  fill: transparent
+  stroke-width: .5
+  stroke: #999999
+#graph_cursor
+  stroke: #999999
+  stroke-width: 1
+.domain
+  stroke: transparent
+  fill: transparent
+
