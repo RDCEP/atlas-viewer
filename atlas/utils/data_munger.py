@@ -4,20 +4,21 @@ import json
 import numpy as np
 import pandas as pd
 import pycountry
-from atlas.constants import SCEN, IRR
+from atlas.constants import MODELS, DATASETS, SCENARIOS, IRRIGATION, \
+    CROPS, VARIABLES
 
 
 class DataMunger():
-  def __init__(self, scen, irr, var='yield', adm=0, crop='whe'):
+  def __init__(self, model=0, dataset=0, scenario=0, irr=0, crop=5,
+               var=0, adm=0):
     self.time = 0
-    self._var = var
     self._adm = adm
-    self._crop= crop
-    self._irr = IRR[irr]
-    self._scen = SCEN[scen]
-    self.start_year = 1979
-    self.end_year = 2012
-    self.model = 'wfdei'
+    self._crop= CROPS[crop]
+    self._model = MODELS[model]
+    self._dataset= DATASETS[dataset]
+    self._scenario = SCENARIOS[scenario]
+    self._irrigation = IRRIGATION[irr]
+    self._var = VARIABLES[self._model[1]][var]
 
   @property
   def gadm0_meta(self):
@@ -57,7 +58,6 @@ class DataMunger():
     """
     Add GADM level 1 information to level 1 map outlines from Natural Earth.
     """
-
     gadm = pd.DataFrame.from_csv('./gadm1.meta.csv', index_col=4)
     gadm.index = np.arange(len(gadm))
     with open('../static/topojson/ne1_s0001.json') as f:
@@ -96,7 +96,8 @@ class DataMunger():
         region['properties']['adm0'] = '{0}'.format(id0)
         region['properties']['adm'] = '{0}'.format(id0)
       except:
-        print(props)
+        pass
+        # print(props)
     with open('../static/topojson/atlas_gadm0.json', 'w') as f:
       f.write(json.dumps(ne))
     return ne
@@ -115,8 +116,9 @@ class DataMunger():
   def aggr_to_np(self, var):
     d = netCDF4.Dataset(os.path.join(
       '..', 'data', 'netcdf', 'gadm01_aggr',
-      'papsim_wfdei.cru_hist_{}_annual_{}_{}.nc4'.format(
-        self._crop, self.start_year, self.end_year
+      '{}_{}_hist_{}_annual_{}_{}.nc4'.format(
+          self._model[1], self._dataset[1], self._crop, self._dataset[2],
+          self._dataset[3]
       )
     ))
     _v = d.variables['{}_gadm{}'.format(var, self._adm)][:]
@@ -145,9 +147,10 @@ class DataMunger():
     d = netCDF4.Dataset(
       os.path.join(
         '..', 'data', 'netcdf', 'south_asia',
-        'SA_papsim_wfdei.cru_hist_{}_{}_{}_{}_annual_{}_{}.nc4'.format(
-          self._scen[1], self._irr[1], var, self._crop,
-          self.start_year, self.end_year)))
+        'SA_{}_{}_hist_{}_{}_{}_{}_annual_{}_{}.nc4'.format(
+            self._model[1], self._dataset[1], self._scenario[1],
+            self._irrigation[1], var, self._crop,
+            self._dataset[2], self._dataset[3])))
     lat = d.variables['lat'][:]
     lon = d.variables['lon'][:]
     _v = d.variables['{}_{}'.format(var, self._crop)][:]
@@ -211,26 +214,8 @@ class DataMunger():
 
 
 if __name__ == '__main__':
-  VARS = ['aet', 'anth-day', 'gsprcp', 'initr', 'leach', 'maty-day',
-      'pirrww', 'plant-day', 'sco2', 'sn2o', 'sumt', 'yield']
-  IRRS = [0, 1]
-
-
-
-  for irr in IRRS:
-    for v in VARS:
-      pass
-      # damn = DataMunger(1, irr, crop='whe', var=v)
-      # damn.grid_to_json(v)
-
-  for v in VARS:
-    if v != 'yield':
-      pass
-      # damn = DataMunger(1, 1, crop='whe', var='yield', adm=1)
-      # damn.aggr_to_json(v)
-
-  damn = DataMunger(1, 1, crop='whe', var='yield')
-  # damn.grid_to_json('yield', var2='aet')
+  damn = DataMunger(model=0, dataset=0, scenario=0, irr=0, crop=5, var=11)
+  damn._adm = 0
 
   print(damn.__class__.__name__)
   print(damn.add_gadm0_codes_to_ne0_json())
