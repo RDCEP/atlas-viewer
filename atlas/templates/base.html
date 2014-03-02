@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body>
+<div id="wrapper">
+  <header id="main_nav">
+    <nav>
+      <ul id="top_nav" class="clearfix">
+        <li><a href="/">ATLAS</a></li>
+        <li id="menu_crop"><a href>Crop</a><ul>
+          <li><a class="data-ajax" href>Maize</a></li>
+          <li><a class="data-ajax" href>Millet</a></li>
+          <li><a class="data-ajax" href>Rice</a></li>
+          <li><a class="data-ajax" href>Sorghum</a></li>
+          <li><a class="data-ajax" href>Soybean</a></li>
+          <li class="active"><a class="data-ajax" href>Wheat</a></li>
+        </ul></li>
+        <li id="menu_model"><a href>Model</a><ul>
+          <li class="active"><a class="data-ajax" href>pAPSIM</a></li>
+          <li><a class="data-ajax" href>pDSSAT</a></li>
+          <li><a class="data-ajax" href>EPIC</a></li>
+        </ul></li>
+        <li id="menu_climate"><a href>Climate</a></li>
+        <li id="menu_scenario"><a href>Scenarios</a><ul>
+          <li class="active"><a href class="data-ajax" data-type="scenario" data-value="0">Default</a></li>
+          <li><a href class="data-ajax" data-type="scenario" data-value="1">Fullharm</a></li>
+          <li><a href class="data-ajax" data-type="scenario" data-value="2">Fullharm_pm</a></li>
+          <li><a href class="data-ajax" data-type="scenario" data-value="3">Harmnon</a></li>
+        </ul></li>
+        <li id="menu_irrigation"><a href>Irrigation</a><ul>
+          <li class="active"><a href class="data-ajax" data-type="irrigation" data-value="0">Irrigated</a></li>
+          <li><a href class="data-ajax" data-type="irrigation" data-value="1">Rainfed</a></li>
+          <li><a href class="data-ajax" data-type="irrigation" data-value="2">Sum</a></li>
+        </ul></li>
+        <li id="menu_time"><a href>Year</a>
+          <div>
+            <input id="time_select" type="range" min="0" max="33" step="1" value="0">
+            <label class="active">1979</label>
+          </div>
+        </li>
+        <li id="menu_variable"><a href>Variable</a><ul>
+          <li><a class="data-ajax" href>aet</a></li>
+          <li class="active"><a class="data-ajax" href>yield</a></li>
+        </ul></li>
+        <li id="menu_glossary"><a href>Glossary</a></li>
+        <li id="menu_documentation"><a href>Documentation</a></li>
+      </ul>
+    </nav>
+    <div id="title_legend_wrap">
+    </div>
+  </header>
+  <div id="map"></div>
+</div>
+<script>
+{% block jsoptions %}
+  Options = window.Options || {};
+  Options.var = '{{ var }}';
+{% endblock %}
+</script>
+<script src="{{ url_for('static', filename='js/vendor/d3.v3.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/vendor/d3.geo.projection.v0.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/vendor/topojson.v1.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/vendor/queue.v1.min.js') }}"></script>
+{% block bodyjs %}
+<script src="{{ url_for('static', filename='js/atlas_000.js') }}?3" charset="utf-8" ></script>
+{% endblock %}
+</body>
+</html>
