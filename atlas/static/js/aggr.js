@@ -9,6 +9,7 @@
     globe_scale = (height - 100) / 2,
     plate_scale = (width - 100) / 6,
     sens = .2,
+
     _scen = 0,
     _irr = 0,
     _time = 0,
