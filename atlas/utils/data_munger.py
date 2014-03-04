@@ -201,12 +201,19 @@ class DataMunger():
                             },
                         })
             var = '{}_{}'.format(var, var2) if var2 is not None else var
-            with open('../static/json/grid/{}/{}{}.{}_{}_{}.json'.format(
-                    # directory, prefix, lo0, la0, var, self._crop[2]), 'w') as f:
-                    directory, prefix,
-                    str(int(min_lon)).replace('-', 'w') if min_lon < 0 else 'e{}'.format(int(min_lon)),
-                    str(int(min_lat)).replace('-', 's') if min_lat < 0 else 'n{}'.format(int(min_lat)),
-                    var, self._crop[2]), 'w') as f:
+            path = os.path.join(
+                '..', 'static', 'json', 'grid', directory, '{}.{}'.format(
+                    str(int(min_lon)).replace('-', 'w')
+                    if min_lon < 0 else 'e{}'.format(int(min_lon)),
+                    str(int(min_lat)).replace('-', 's')
+                    if min_lat < 0 else 'n{}'.format(int(min_lat)),
+                ))
+            if not os.path.exists(path):
+                os.makedirs(path)
+            with open(os.path.join(path, '{}{}_{}_{}_{}_{}_{}.json'.format(
+                    prefix, self._model[1], self._dataset[1],
+                    self._scenario[1], self._irrigation[1],
+                    var, self._crop[2])), 'w') as f:
                 f.write(
                     json.dumps(
                         {
@@ -284,7 +291,7 @@ class DataMunger():
 
 
 if __name__ == '__main__':
-        damn = DataMunger(model=0, dataset=0, scenario=1, irr=0, crop=5, var=11)
+        damn = DataMunger(model=0, dataset=0, scenario=0, irr=1, crop=5, var=11)
         damn._adm = 1
         damn.grid_to_tile_json('yield', directory='full_global')
         # print(damn.__class__.__name__)

@@ -51,6 +51,11 @@
   Options.var = '{{ var }}';
   Options.lat = {{ lat }};
   Options.lon = {{ lon }};
+  Options.model = '{{ model }}';
+  Options.dataset = '{{ dataset }}';
+  Options.scenario = '{{ scenario }}';
+  Options.irrigation = '{{ irrigation }}';
+  Options.crop = '{{ crop }}';
   lat1 = parseInt((Math.floor((Options.lat + 90) / step) - 4.5) * step);
   lon1 = parseInt(Math.floor(Options.lon / step) * step);
   lat0 = lat1 - step;
