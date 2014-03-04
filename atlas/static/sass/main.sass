@@ -1,3 +1,8 @@
+$top_font: .9em
+$top_pad: .75
+$bottom_font: .9em
+$bottom_pad: .75em
+
 @mixin columns($c, $g)
   -moz-column-count: $c /* Firefox */
   -webkit-column-count: $c /* Safari and Chrome */
@@ -58,12 +63,13 @@ path
     padding: .75em 0
 #title_legend_wrap
   position: absolute
-  top: 2.5em
+  top: 2.3em
   background-color: #ffffff
   opacity: .8
-  height: 2em
+  height: 1.8em
   z-index: -1
 #top_nav
+  font-size: .9em
   width: 960px
   margin: 0 auto
   line-height: 1em
@@ -74,44 +80,55 @@ path
     display: inline-block
     padding: 0 0 0 15px
     margin: 0
-#top_nav > li + li
-  position: relative
-  ul
-    //@include columns(2, 2em)
-    border: none
-    position: absolute
-    top: 100%
-    left: 0
-    background-color: black
-    z-index: 1000
-    padding: 0 1em
-    height: 0
-    margin: 0
-  li
-    margin-bottom: .5em
-    height: 0
-    font-size: .8em
-    overflow: hidden
-    &.active
-      position: absolute
-      height: auto
-      font-size: .75em
-      font-weight: bold
-      top: 1.5em
-      a
-        color: black
-  &:hover ul
-    display: block
-    height: auto
-    padding: .75em 1em .5em
-    li
-      height: auto
-      &.active
-        position: static
-        font-size: .8em
-        font-weight: normal
-        a
-          color: inherit
+    & + li
+      position: relative
+      ul
+        //@include columns(2, 2em)
+        border: none
+        position: absolute
+        top: 100%
+        left: 0
+        background-color: black
+        z-index: 999
+        padding: 0 1em
+        height: 0
+        margin: 0
+      li
+        margin-bottom: .5em
+        //position: relative
+        height: 0
+        font-size: 1em
+        overflow: hidden
+        &.active
+          position: absolute
+          height: auto
+          font-size: .8em
+          font-weight: bold
+          top: 1.65em
+          a
+            color: black
+        &:hover
+          overflow: visible
+          height: auto
+      &:hover ul
+        display: block
+        height: auto
+        padding: .75em 1em .5em
+        li
+          height: auto
+          position: relative
+          &.active
+            position: static
+            font-size: 1em
+            font-weight: normal
+            a
+              color: #cccccc
+        ul
+          position: absolute
+          left: 100%
+          top: -.81em
+#menu_comparison
+  padding-right: 1em!important
 #menu_glossary
   margin-left: 2em!important
 #menu_time
@@ -124,16 +141,15 @@ path
     background-color: black
     z-index: 1000
     padding: 0 1em
-    //height: 50px
   input
     height: 0
     overflow: hidden
   label
     position: absolute
     height: auto
-    font-size: .75em
+    font-size: .8em
     font-weight: bold
-    top: 1.5em
+    top: 1.65em
     color: black
   &:hover div
     height: auto
