@@ -156,17 +156,21 @@
 
   };
 
+  var dir = '/static/json/grid/full_global/',
+    json_file = Options.model+'_'+Options.dataset+'_'+Options.scenario+'_';
+  json_file += Options.irrigation+'_'+Options.var+'_'+Options.crop+'.json';
+
   queue()
     .defer(d3.json, '/static/topojson/atlas_gadm1.json')
-    .defer(d3.json, '/static/json/grid/full_global/'+Options.lon0+'.'+Options.lat0+'_'+Options.var+'_whe.json')
-    .defer(d3.json, '/static/json/grid/full_global/'+Options.lon0+'.'+Options.lat1+'_'+Options.var+'_whe.json')
-    .defer(d3.json, '/static/json/grid/full_global/'+Options.lon0+'.'+Options.lat2+'_'+Options.var+'_whe.json')
-    .defer(d3.json, '/static/json/grid/full_global/'+Options.lon1+'.'+Options.lat0+'_'+Options.var+'_whe.json')
-    .defer(d3.json, '/static/json/grid/full_global/'+Options.lon1+'.'+Options.lat1+'_'+Options.var+'_whe.json')
-    .defer(d3.json, '/static/json/grid/full_global/'+Options.lon1+'.'+Options.lat2+'_'+Options.var+'_whe.json')
-    .defer(d3.json, '/static/json/grid/full_global/'+Options.lon2+'.'+Options.lat0+'_'+Options.var+'_whe.json')
-    .defer(d3.json, '/static/json/grid/full_global/'+Options.lon2+'.'+Options.lat1+'_'+Options.var+'_whe.json')
-    .defer(d3.json, '/static/json/grid/full_global/'+Options.lon2+'.'+Options.lat2+'_'+Options.var+'_whe.json')
+    .defer(d3.json, dir+Options.lon0+'.'+Options.lat0+'/'+json_file)
+    .defer(d3.json, dir+Options.lon0+'.'+Options.lat1+'/'+json_file)
+    .defer(d3.json, dir+Options.lon0+'.'+Options.lat2+'/'+json_file)
+    .defer(d3.json, dir+Options.lon1+'.'+Options.lat0+'/'+json_file)
+    .defer(d3.json, dir+Options.lon1+'.'+Options.lat1+'/'+json_file)
+    .defer(d3.json, dir+Options.lon1+'.'+Options.lat2+'/'+json_file)
+    .defer(d3.json, dir+Options.lon2+'.'+Options.lat0+'/'+json_file)
+    .defer(d3.json, dir+Options.lon2+'.'+Options.lat1+'/'+json_file)
+    .defer(d3.json, dir+Options.lon2+'.'+Options.lat2+'/'+json_file)
     .awaitAll(atlas);
 
   var ajax_opts = d3.selectAll('.data-ajax');

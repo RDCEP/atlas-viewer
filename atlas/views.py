@@ -58,20 +58,55 @@ def south_asia_grid(var):
         var=session['var'],
     )
 
-@mod.route('/grid/<lon>/<lat>/<var>')
-@mod.route('/grid/<lon>/<lat>/', defaults={'var': 'yield'})
-@mod.route('/grid/<lon>/', defaults={'var': 'yield', 'lat': 0})
-@mod.route('/grid/', defaults={'var': 'yield', 'lon': 0, 'lat':0, })
-def grid_view(lon, lat, var):
+@mod.route('/grid/<lon>/<lat>/<model>/<dataset>/<scenario>/<irrigation>' +
+           '/<crop>/<var>/<compare>/')
+@mod.route('/grid/<lon>/<lat>/<model>/<dataset>/<scenario>/<irrigation>' +
+           '/<crop>/<var>/',
+           defaults={'compare': None, })
+@mod.route('/grid/<lon>/<lat>/<model>/<dataset>/<scenario>/<irrigation>' +
+            '/<crop>/',
+           defaults={'compare': None, 'var': 'yield', })
+@mod.route('/grid/<lon>/<lat>/<model>/<dataset>/<scenario>/',
+           defaults={'compare': None, 'var': 'yield', 'irrigation': 'noirr',
+                     'crop': 'whe', })
+@mod.route('/grid/<lon>/<lat>/<model>/<dataset>/',
+           defaults={'compare': None, 'var': 'yield', 'irrigation': 'noirr',
+                     'crop': 'whe', 'scenario': 'fullharm', })
+@mod.route('/grid/<lon>/<lat>/<model>/',
+           defaults={'compare': None, 'var': 'yield', 'irrigation': 'noirr',
+                     'crop': 'whe', 'scenario': 'fullharm',
+                     'dataset': 'wfdei.cru', })
+@mod.route('/grid/<lon>/<lat>/',
+           defaults={'compare': None, 'var': 'yield', 'irrigation': 'noirr',
+                     'crop': 'whe', 'scenario': 'fullharm',
+                     'dataset': 'wfdei.cru', 'model': 'papsim', })
+@mod.route('/grid/',
+           defaults={'compare': None, 'var': 'yield', 'irrigation': 'noirr',
+                     'crop': 'whe', 'scenario': 'fullharm',
+                     'dataset': 'wfdei.cru', 'model': 'papsim',
+                     'lon': 0, 'lat': 0})
+def grid_view(lon, lat, model, dataset, scenario, irrigation, crop, var, compare):
     initial_session()
     session['var'] = var
     session['lon'] = lon
     session['lat'] = lat
+    session['model'] = model
+    session['dataset'] = dataset
+    session['irrigation'] = irrigation
+    session['scenario'] = scenario
+    session['crop'] = crop
+    session['compare'] = compare
     return render_template(
         'grid/grid.html',
-            var=session['var'],
-            lon=session['lon'],
-            lat=session['lat'],
+        var=session['var'],
+        lon=session['lon'],
+        lat=session['lat'],
+        model=session['model'],
+        dataset=session['dataset'],
+        irrigation=session['irrigation'],
+        scenario=session['scenario'],
+        compare=session['compare'],
+        crop=session['crop'],
     )
 
 @mod.route('/update/<_data_type>/adm/<_adm>/var/<_var>/type/<_type>/value/<_value>', methods=['POST',])
