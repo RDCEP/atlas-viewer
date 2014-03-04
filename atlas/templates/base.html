@@ -12,17 +12,21 @@
       <ul id="top_nav" class="clearfix">
         <li><a href="/">ATLAS</a></li>
         <li id="menu_crop"><a href>Crop</a><ul>
-          <li><a class="data-ajax" href>Maize</a></li>
-          <li><a class="data-ajax" href>Millet</a></li>
-          <li><a class="data-ajax" href>Rice</a></li>
-          <li><a class="data-ajax" href>Sorghum</a></li>
-          <li><a class="data-ajax" href>Soybean</a></li>
-          <li class="active"><a class="data-ajax" href>Wheat</a></li>
+          <li><a href class="data-ajax" data-type="crop" data-value="0">Maize</a></li>
+          <li><a href class="data-ajax" data-type="crop" data-value="1">Millet</a></li>
+          <li><a href class="data-ajax" data-type="crop" data-value="2">Rice</a></li>
+          <li><a href class="data-ajax" data-type="crop" data-value="3">Sorghum</a></li>
+          <li><a href class="data-ajax" data-type="crop" data-value="4">Soybean</a></li>
+          <li class="active"><a href class="data-ajax" data-type="crop" data-value="5">Wheat</a></li>
         </ul></li>
         <li id="menu_model"><a href>Model</a><ul>
-          <li class="active"><a class="data-ajax" href>pAPSIM</a></li>
-          <li><a class="data-ajax" href>pDSSAT</a></li>
-          <li><a class="data-ajax" href>EPIC</a></li>
+          <li class="active"><a href class="data-ajax" data-type="model" data-value="0">pAPSIM</a></li>
+          <li><a href class="data-ajax" data-type="model" data-value="1">pDSSAT</a></li>
+          <li><a href class="data-ajax" data-type="model" data-value="2">EPIC</a></li>
+        </ul></li>
+        <li id="menu_dataset"><a href>Dataset</a><ul>
+          <li class="active"><a href class="data-ajax" data-type="dataset" data-value="0">WFDEI</a></li>
+          <li><a href class="data-ajax" data-type="dataset" data-value="1">AgMERRA</a></li>
         </ul></li>
         <li id="menu_climate"><a href>Climate</a></li>
         <li id="menu_scenario"><a href>Scenarios</a><ul>
@@ -43,8 +47,50 @@
           </div>
         </li>
         <li id="menu_variable"><a href>Variable</a><ul>
-          <li><a class="data-ajax" href>aet</a></li>
-          <li class="active"><a class="data-ajax" href>yield</a></li>
+          <li><a href class="data-ajax" data-type="variable" data-value="0">aet</a></li>
+          <li><a href class="data-ajax" data-type="variable" data-value="1">anthday</a></li>
+          <li><a href class="data-ajax" data-type="variable" data-value="2">gsprcp</a></li>
+          <li><a href class="data-ajax" data-type="variable" data-value="3">initr</a></li>
+          <li><a href class="data-ajax" data-type="variable" data-value="4">leach</a></li>
+          <li><a href class="data-ajax" data-type="variable" data-value="5">matyday</a></li>
+          <li><a href class="data-ajax" data-type="variable" data-value="6">pirrww</a></li>
+          <li><a href class="data-ajax" data-type="variable" data-value="7">plantday</a></li>
+          <li><a href class="data-ajax" data-type="variable" data-value="8">sco2</a></li>
+          <li><a href class="data-ajax" data-type="variable" data-value="9">sn2o</a></li>
+          <li><a href class="data-ajax" data-type="variable" data-value="10">sumt</a></li>
+          <li class="active"><a href class="data-ajax" data-type="variable" data-value="11">yield</a></li>
+        </ul></li>
+        <li id="menu_comparison"><a href>+</a><ul>
+          <li id="menu_model_compare"><a href>Model</a><ul>
+            <li><a class="data-ajax" href>pAPSIM</a></li>
+            <li><a class="data-ajax" href>pDSSAT</a></li>
+            <li><a class="data-ajax" href>EPIC</a></li>
+          </ul></li>
+          <li id="menu_scenario_compare"><a href>Scenarios</a><ul>
+            <li><a href class="data-ajax" data-type="scenario" data-value="0">Default</a></li>
+            <li><a href class="data-ajax" data-type="scenario" data-value="1">Fullharm</a></li>
+            <li><a href class="data-ajax" data-type="scenario" data-value="2">Fullharm_pm</a></li>
+            <li><a href class="data-ajax" data-type="scenario" data-value="3">Harmnon</a></li>
+          </ul></li>
+          <li id="menu_irrigation_compare"><a href>Irrigation</a><ul>
+            <li><a href class="data-ajax" data-type="irrigation" data-value="0">Irrigated</a></li>
+            <li><a href class="data-ajax" data-type="irrigation" data-value="1">Rainfed</a></li>
+            <li><a href class="data-ajax" data-type="irrigation" data-value="2">Sum</a></li>
+          </ul></li>
+          <li id="menu_variable"><a href>Variable</a><ul>
+            <li><a class="data-ajax" href>aet</a></li>
+            <li><a class="data-ajax" href>anthday</a></li>
+            <li><a class="data-ajax" href>gsprcp</a></li>
+            <li><a class="data-ajax" href>initr</a></li>
+            <li><a class="data-ajax" href>leach</a></li>
+            <li><a class="data-ajax" href>matyday</a></li>
+            <li><a class="data-ajax" href>pirrww</a></li>
+            <li><a class="data-ajax" href>plantday</a></li>
+            <li><a class="data-ajax" href>sco2</a></li>
+            <li><a class="data-ajax" href>sn2o</a></li>
+            <li><a class="data-ajax" href>sumt</a></li>
+            <li><a class="data-ajax" href>yield</a></li>
+          </ul></li>
         </ul></li>
         <li id="menu_glossary"><a href>Glossary</a></li>
         <li id="menu_documentation"><a href>Documentation</a></li>
