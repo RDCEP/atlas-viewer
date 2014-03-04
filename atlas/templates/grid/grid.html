@@ -46,10 +46,24 @@
   </div>
 </div>
 <script>
+  step = 20;
   Options = window.Options || {};
   Options.var = '{{ var }}';
   Options.lat = {{ lat }};
   Options.lon = {{ lon }};
+  lat1 = parseInt((Math.floor((Options.lat + 90) / step) - 4.5) * step);
+  lon1 = parseInt(Math.floor(Options.lon / step) * step);
+  lat0 = lat1 - step;
+  lon0 = lon1 - step;
+  lat2 = lat1 + step;
+  lon2 = lon1 + step;
+  Options.lat1 = (lat1 < 0) ? 's'+Math.abs(lat1) : 'n'+lat1;
+  Options.lat0 = (lat0 < 0) ? 's'+Math.abs(lat0) : 'n'+lat0;
+  Options.lat2 = (lat2 < 0) ? 's'+Math.abs(lat2) : 'n'+lat2;
+  Options.lon1 = (lon1 < 0) ? 'w'+Math.abs(lon1) : 'e'+lon1;
+  Options.lon0 = (lon0 < 0) ? 'w'+Math.abs(lon0) : 'e'+lon0;
+  Options.lon2 = (lon2 < 0) ? 'w'+Math.abs(lon2) : 'e'+lon2;
+
 </script>
 <script src="{{ url_for('static', filename='js/vendor/d3.v3.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/vendor/d3.geo.projection.v0.min.js') }}"></script>
