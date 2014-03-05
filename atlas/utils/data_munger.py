@@ -1,5 +1,6 @@
 import netCDF4
 import os
+import math
 import json
 import numpy as np
 import pandas as pd
@@ -18,7 +19,7 @@ class DataMunger():
         self._dataset= DATASETS[dataset]
         self._scenario = SCENARIOS[scenario]
         self._irrigation = IRRIGATION[irr]
-        self._var = VARIABLES[self._model[1]][var]
+        self._var = VARIABLES[var]
 
     @property
     def gadm0_meta(self):
@@ -117,8 +118,8 @@ class DataMunger():
         d = netCDF4.Dataset(os.path.join(
             '..', 'data', 'netcdf', 'gadm01_aggr',
             '{}_{}_hist_{}_annual_{}_{}.nc4'.format(
-                self._model[1], self._dataset[1], self._crop, self._dataset[2],
-                self._dataset[3]
+                self._model[1], self._dataset[1], self._crop[1], self._dataset[3],
+                self._dataset[4]
             )
         ))
         _v = d.variables['{}_gadm{}'.format(var, self._adm)][:]
@@ -143,106 +144,52 @@ class DataMunger():
             )
         self.trim_aggr_data(var)
 
-    def grid_to_np(self, var, directory=None, prefix=''):
-        filepath = os.path.join(
-            '..', 'data', 'netcdf', directory,
-            '{}{}_{}_hist_{}_{}_{}_{}_annual_{}_{}.nc4'.format(
-                prefix,
+    def grid_to_np(self, lon, lat, var2=False, op=np.divide):
+
+        def lonlat_index(l, axis='lon'):
+            l = math.floor(float(l * 2)) / 2 + .25
+            larr = d.variables[axis][:]
+            lix = np.where(larr == l)[0][0]
+            lix = int(math.floor(lix - tile_size / 2))
+            return -lix
+
+        tile_size = 80
+        file_path = os.path.join(
+            # '..', 'data', 'netcdf', 'full_global',
+            'atlas', 'data', 'netcdf', 'full_global',
+            '{}_{}_hist_{}_{}_{}_{}_annual_{}_{}.nc4'.format(
                 self._model[1], self._dataset[1], self._scenario[1],
-                self._irrigation[1], var, self._crop[2],
-                self._dataset[2], self._dataset[3]))
-        d = netCDF4.Dataset(filepath)
-        lat = d.variables['lat'][:]
-        lon = d.variables['lon'][:]
-        _v = d.variables['{}_{}'.format(var, self._crop[2])][:]
+                self._irrigation[1], self._var[1], self._crop[1],
+                self._dataset[3], self._dataset[4]))
+        d = netCDF4.Dataset(file_path)
+        lonix = lonlat_index(lon)
+        latix = lonlat_index(lat, axis='lat')
+        _v = d.variables['{}_{}'.format(self._var[1], self._crop[1])][:]
         _v = _v.transpose(2, 1, 0)
-        return _v, lat, lon
-
-    def grid_to_tile_json(self, var, var2=None, directory='full_global',
-                          prefix='', op=np.divide):
-        _v, lat, lon = self.grid_to_np(var, directory=directory, prefix=prefix)
-        step = 40
-        la0 = 0
-        lo0 = 0
-        while la0 < 360 and lo0 < 720:
-            la1 = la0 + step
-            lo1 = lo0 + step
-            new_data = []
-            min_lat = lat[la1 - 1] - .25
-            min_lon = lon[lo0] - .25
-            max_lat = lat[la0] + .25
-            max_lon = lon[lo1 - 1] + .25
-            min_var = np.min(_v)
-            max_var = np.max(_v)
-            for lo_ in range(len(_v[lo0:lo1])):
-                for la_ in range(len(_v[lo_,la0:la1])):
-                    if _v[lo_+lo0, la_+la0].any():
-                        _lon = lon[lo_+lo0]
-                        _lat = lat[la_+la0]
-                        new_data.append({
-                            'type': 'Feature',
-                            'geometry': {
-                                'type': 'Polygon',
-                                'coordinates': [[
-                                    [_lon + .25, _lat - .25],
-                                    [_lon - .25, _lat - .25],
-                                    [_lon - .25, _lat],
-                                    [_lon - .25, _lat + .25],
-                                    [_lon + .25, _lat + .25],
-                                    [_lon + .25, _lat],
-                                    [_lon + .25, _lat - .25],
-                                ]],
-                            },
-                            'properties': {
-                                'lat': _lat,
-                                'lon': _lon,
-                                'crds': '{}-{}'.format(_lat, _lon).replace('.', '_'),
-                                'var': _v[lo_+lo0, la_+la0].tolist(),
-                            },
-                        })
-            var = '{}_{}'.format(var, var2) if var2 is not None else var
-            path = os.path.join(
-                '..', 'static', 'json', 'grid', directory, '{}.{}'.format(
-                    str(int(min_lon)).replace('-', 'w')
-                    if min_lon < 0 else 'e{}'.format(int(min_lon)),
-                    str(int(min_lat)).replace('-', 's')
-                    if min_lat < 0 else 'n{}'.format(int(min_lat)),
-                ))
-            if not os.path.exists(path):
-                os.makedirs(path)
-            with open(os.path.join(path, '{}{}_{}_{}_{}_{}_{}.json'.format(
-                    prefix, self._model[1], self._dataset[1],
-                    self._scenario[1], self._irrigation[1],
-                    var, self._crop[2])), 'w') as f:
-                f.write(
-                    json.dumps(
-                        {
-                            'data': new_data,
-                            'min': float(min_var),
-                            'max': float(max_var),
-                            'min_lat': min_lat,
-                            'min_lon': min_lon,
-                            'max_lat': max_lat,
-                            'max_lon': max_lon,
-                        }
-                    )
-                )
-            lo0 += step
-            if lo0 == 720:
-                lo0 = 0
-                la0 += step
-
-    def grid_to_json(self, var, var2=None, directory=None, prefix=None,
-                     op=np.divide):
-        _v, lat, lon = self.grid_to_np(var, directory=directory, prefix=prefix)
+        _v = np.roll(np.roll(_v, lonix, axis=0), latix, axis=1)
+        _v = _v[:tile_size,:tile_size,:]
         if var2:
-            _v2 = self.grid_to_np(var2, directory=directory, prefix=prefix)[0]
-            _v /= _v2
+            _v2 = self.grid_to_np(var2, lon=lon, lat=lat, var2=False, op=op)[0]
+            _v = op(_v, _v2)
+        return (
+            _v,
+            np.roll(d.variables['lon'][:], lonix)[:tile_size],
+            np.roll(d.variables['lat'][:], latix)[:tile_size],
+        )
+
+    def grid_to_json(self, lon, lat, var2=None, op=np.divide):
+        _v, lon, lat = self.grid_to_np(float(lon), float(lat), var2=var2, op=op)
         new_data = []
-        min_lat = np.min(lat)
-        min_lon = np.min(lon)
-        max_lat = np.max(lat)
-        max_lon = np.max(lon)
+        south = lat[-1]
+        west = lon[0]
+        north = lat[0]
+        east = lon[-1]
+        lon_offset = 360 if east < west else 180
+        lat_offset = 180 if south > north else 90
+        center = [
+            (east + west + 360) / 2 - lon_offset,
+            (north + south + 180) / 2 - lat_offset,
+        ]
         min_var = np.min(_v)
         max_var = np.max(_v)
         for lo_ in range(len(_v[:])):
@@ -271,28 +218,20 @@ class DataMunger():
                             'var': _v[:][lo_][la_].tolist(),
                         },
                     })
-        print(max_var, min_var)
-        var = '{}_{}'.format(var, var2) if var2 is not None else var
-        with open('../static/json/grid/{}{}_{}.json'.format(
-                prefix, var, self._crop[2]), 'w') as f:
-            f.write(
-                json.dumps(
-                    {
-                        'data': new_data,
-                        'min': float(min_var),
-                        'max': float(max_var),
-                        'min_lat': min_lat,
-                        'min_lon': min_lon,
-                        'max_lat': max_lat,
-                        'max_lon': max_lon,
-                    }
-                )
-            )
+        return json.dumps({
+            'data': new_data,
+            'min': float(min_var),
+            'max': float(max_var),
+            'min_lat': south,
+            'min_lon': west,
+            'max_lat': north,
+            'max_lon': east,
+            'center': center,
+        })
 
 
 if __name__ == '__main__':
         damn = DataMunger(model=0, dataset=0, scenario=0, irr=1, crop=5, var=11)
         damn._adm = 1
-        damn.grid_to_tile_json('yield', directory='full_global')
-        # print(damn.__class__.__name__)
-        # print(damn.add_gadm0_codes_to_ne0_json())
+        os.chdir('../..')
+        print damn.grid_to_json(80, 20)[100:300]
