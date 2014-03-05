@@ -53,6 +53,10 @@ def gadm1_south_asia(var):
     )
 
 
+@mod.route('/grid/<lon>/<lat>/',
+           defaults={'model': 'papsim', 'dataset': 'wfdei.cru',
+                     'scenario': 'fullharm', 'irrigation': 'firr',
+                     'crop': 'whe', 'var': 'yield', 'compare': None})
 @mod.route('/grid/<lon>/<lat>/<model>/<dataset>/<scenario>/<irrigation>' +
            '/<crop>/<var>/<compare>/')
 @mod.route('/grid/<lon>/<lat>/<model>/<dataset>/<scenario>/<irrigation>' +
@@ -76,10 +80,11 @@ def grid_view(lon, lat, model, dataset, scenario, irrigation, crop, var, compare
         irr=[a for a, b, c in IRRIGATION if b == irrigation][0],
         crop=[a for a, b, c in CROPS if b == crop][0],
         var=[a for a, b, c in VARIABLES if b == var][0],
-        adm=1
+        adm=1,
     )
     return render_template(
         'grid/grid.html',
+        map_type = 'grid',
         var=session['var'],
         lon=session['lon'],
         lat=session['lat'],
