@@ -164,7 +164,7 @@ class DataMunger():
         d = netCDF4.Dataset(file_path)
         lonix = lonlat_index(lon)
         latix = lonlat_index(lat, axis='lat')
-        _v = d.variables['{}_{}'.format(self._var[1], self._crop[1])][:]
+        _v = d.variables['{}_{}'.format(self._var[1], self._crop[1])][:].filled(np.nan)
         _v = _v.transpose(2, 1, 0)
         _v = np.roll(np.roll(_v, lonix, axis=0), latix, axis=1)
         _v = _v[:tile_size,:tile_size,:]
@@ -190,8 +190,8 @@ class DataMunger():
             (east + west + 360) / 2 - lon_offset,
             (north + south + 180) / 2 - lat_offset,
         ]
-        min_var = np.min(_v)
-        max_var = np.max(_v)
+        min_var = np.nanmin(_v)
+        max_var = np.nanmax(_v)
         for lo_ in range(len(_v[:])):
             for la_ in range(len(_v[:][lo_])):
                 if _v[:][lo_][la_].any():
@@ -231,7 +231,8 @@ class DataMunger():
 
 
 if __name__ == '__main__':
-        damn = DataMunger(model=0, dataset=0, scenario=0, irr=1, crop=5, var=11)
-        damn._adm = 1
-        os.chdir('../..')
-        print damn.grid_to_json(80, 20)[100:300]
+    import cProfile
+    damn = DataMunger(model=0, dataset=0, scenario=0, irr=1, crop=5, var=11)
+    damn._adm = 1
+    os.chdir('../..')
+    cProfile.run('damn.grid_to_json(80, 20)', 'profile_stats')
