@@ -12,33 +12,45 @@
       <ul id="top_nav" class="clearfix">
         <li><a href="/">ATLAS</a></li>
         <li id="menu_crop"><a href>Crop</a><ul>
-          <li><a href class="data-ajax" data-type="crop" data-value="0">Maize</a></li>
-          <li><a href class="data-ajax" data-type="crop" data-value="1">Millet</a></li>
-          <li><a href class="data-ajax" data-type="crop" data-value="2">Rice</a></li>
-          <li><a href class="data-ajax" data-type="crop" data-value="3">Sorghum</a></li>
-          <li><a href class="data-ajax" data-type="crop" data-value="4">Soybean</a></li>
-          <li class="active"><a href class="data-ajax" data-type="crop" data-value="5">Wheat</a></li>
+          {% for c in crops %}
+          <li{% if crop == c[1] %} class="active"{% endif %}>
+            <a href="/grid/{{ model }}/{{ dataset }}/{{ scenario }}/{{ irrigation }}/{{ c[1] }}/{{ var }}"
+               class="data-ajax" data-type="crop" data-value="{{ c[0] }}">{{ c[2] }}</a>
+          </li>
+          {% endfor %}
         </ul></li>
         <li id="menu_model"><a href>Model</a><ul>
-          <li class="active"><a href class="data-ajax" data-type="model" data-value="0">pAPSIM</a></li>
-          <li><a href class="data-ajax" data-type="model" data-value="1">pDSSAT</a></li>
-          <li><a href class="data-ajax" data-type="model" data-value="2">EPIC</a></li>
+          {% for m in models %}
+          <li{% if model == m[1] %} class="active"{% endif %}>
+            <a href="/grid/{{ m[1] }}/{{ dataset }}/{{ scenario }}/{{ irrigation }}/{{ crop }}/{{ var }}"
+               class="data-ajax" data-type="variable" data-value="{{ m[0] }}">{{ m[2] }}</a>
+          </li>
+          {% endfor %}
         </ul></li>
         <li id="menu_dataset"><a href>Dataset</a><ul>
-          <li class="active"><a href class="data-ajax" data-type="dataset" data-value="0">WFDEI</a></li>
-          <li><a href class="data-ajax" data-type="dataset" data-value="1">AgMERRA</a></li>
+          {% for d in datsets %}
+          <li{% if dataset == d[1] %} class="active"{% endif %}>
+            <a href="/grid/{{ model }}/{{ d[1] }}/{{ scenario }}/{{ irrigation }}/{{ crop }}/{{ var }}"
+               class="data-ajax" data-type="variable" data-value="{{ d[0] }}">{{ d[2] }}</a>
+          </li>
+          {% endfor %}
         </ul></li>
         <li id="menu_climate"><a href>Climate</a></li>
         <li id="menu_scenario"><a href>Scenarios</a><ul>
-          <li class="active"><a href class="data-ajax" data-type="scenario" data-value="0">Default</a></li>
-          <li><a href class="data-ajax" data-type="scenario" data-value="1">Fullharm</a></li>
-          <li><a href class="data-ajax" data-type="scenario" data-value="2">Fullharm_pm</a></li>
-          <li><a href class="data-ajax" data-type="scenario" data-value="3">Harmnon</a></li>
+          {% for s in scenarios %}
+          <li{% if scenario == s[1] %} class="active"{% endif %}>
+            <a href="/grid/{{ model }}/{{ dataset }}/{{ s[1] }}/{{ irrigation }}/{{ crop }}/{{ var }}"
+               class="data-ajax" data-type="variable" data-value="{{ s[0] }}">{{ s[2] }}</a>
+          </li>
+          {% endfor %}
         </ul></li>
         <li id="menu_irrigation"><a href>Irrigation</a><ul>
-          <li class="active"><a href class="data-ajax" data-type="irrigation" data-value="0">Irrigated</a></li>
-          <li><a href class="data-ajax" data-type="irrigation" data-value="1">Rainfed</a></li>
-          <li><a href class="data-ajax" data-type="irrigation" data-value="2">Sum</a></li>
+          {% for i in irrigations %}
+          <li{% if irrigation == i[1] %} class="active"{% endif %}>
+            <a href="/grid/{{ model }}/{{ dataset }}/{{ scenario }}/{{ i[1] }}/{{ crop }}/{{ var }}"
+               class="data-ajax" data-type="variable" data-value="{{ i[0] }}">{{ i[2] }}</a>
+          </li>
+          {% endfor %}
         </ul></li>
         <li id="menu_time"><a href>Year</a>
           <div>
@@ -47,49 +59,37 @@
           </div>
         </li>
         <li id="menu_variable"><a href>Variable</a><ul>
-          <li><a href class="data-ajax" data-type="variable" data-value="0">aet</a></li>
-          <li><a href class="data-ajax" data-type="variable" data-value="1">anthday</a></li>
-          <li><a href class="data-ajax" data-type="variable" data-value="2">gsprcp</a></li>
-          <li><a href class="data-ajax" data-type="variable" data-value="3">initr</a></li>
-          <li><a href class="data-ajax" data-type="variable" data-value="4">leach</a></li>
-          <li><a href class="data-ajax" data-type="variable" data-value="5">matyday</a></li>
-          <li><a href class="data-ajax" data-type="variable" data-value="6">pirrww</a></li>
-          <li><a href class="data-ajax" data-type="variable" data-value="7">plantday</a></li>
-          <li><a href class="data-ajax" data-type="variable" data-value="8">sco2</a></li>
-          <li><a href class="data-ajax" data-type="variable" data-value="9">sn2o</a></li>
-          <li><a href class="data-ajax" data-type="variable" data-value="10">sumt</a></li>
-          <li class="active"><a href class="data-ajax" data-type="variable" data-value="11">yield</a></li>
+          {% for v in vars %}
+          <li{% if var == v[1] %} class="active"{% endif %}>
+            <a href="/grid/{{ model }}/{{ dataset }}/{{ scenario }}/{{ irrigation }}/{{ crop }}/{{ v[1] }}"
+               class="data-ajax" data-type="variable" data-value="{{ v[0] }}">{{ v[2] }}</a>
+          </li>
+          {% endfor %}
         </ul></li>
         <li id="menu_comparison"><a href>+</a><ul>
           <li id="menu_model_compare"><a href>Model</a><ul>
-            <li><a class="data-ajax" href>pAPSIM</a></li>
-            <li><a class="data-ajax" href>pDSSAT</a></li>
-            <li><a class="data-ajax" href>EPIC</a></li>
+            {% for x in models %}
+            <li><a href="/grid/{{ model }}/{{ dataset }}/{{ scenario }}/{{ irrigation }}/{{ crop }}/{{ var }}/{{ x[1] }}"
+                   class="data-ajax" >{{ x[2] }}</a></li>
+            {% endfor %}
           </ul></li>
           <li id="menu_scenario_compare"><a href>Scenarios</a><ul>
-            <li><a href class="data-ajax" data-type="scenario" data-value="0">Default</a></li>
-            <li><a href class="data-ajax" data-type="scenario" data-value="1">Fullharm</a></li>
-            <li><a href class="data-ajax" data-type="scenario" data-value="2">Fullharm_pm</a></li>
-            <li><a href class="data-ajax" data-type="scenario" data-value="3">Harmnon</a></li>
+            {% for x in scenarios %}
+            <li><a href="/grid/{{ model }}/{{ dataset }}/{{ scenario }}/{{ irrigation }}/{{ crop }}/{{ var }}/{{ x[1] }}"
+                   class="data-ajax">{{ x[2] }}</a></li>
+            {% endfor %}
           </ul></li>
           <li id="menu_irrigation_compare"><a href>Irrigation</a><ul>
-            <li><a href class="data-ajax" data-type="irrigation" data-value="0">Irrigated</a></li>
-            <li><a href class="data-ajax" data-type="irrigation" data-value="1">Rainfed</a></li>
-            <li><a href class="data-ajax" data-type="irrigation" data-value="2">Sum</a></li>
+            {% for x in irrigations %}
+            <li><a href="/grid/{{ model }}/{{ dataset }}/{{ scenario }}/{{ irrigation }}/{{ crop }}/{{ var }}/{{ x[1] }}"
+                   class="data-ajax">{{ x[2] }}</a></li>
+            {% endfor %}
           </ul></li>
           <li id="menu_variable"><a href>Variable</a><ul>
-            <li><a class="data-ajax" href>aet</a></li>
-            <li><a class="data-ajax" href>anthday</a></li>
-            <li><a class="data-ajax" href>gsprcp</a></li>
-            <li><a class="data-ajax" href>initr</a></li>
-            <li><a class="data-ajax" href>leach</a></li>
-            <li><a class="data-ajax" href>matyday</a></li>
-            <li><a class="data-ajax" href>pirrww</a></li>
-            <li><a class="data-ajax" href>plantday</a></li>
-            <li><a class="data-ajax" href>sco2</a></li>
-            <li><a class="data-ajax" href>sn2o</a></li>
-            <li><a class="data-ajax" href>sumt</a></li>
-            <li><a class="data-ajax" href>yield</a></li>
+            {% for x in variables %}
+            <li><a href="/grid/{{ model }}/{{ dataset }}/{{ scenario }}/{{ irrigation }}/{{ crop }}/{{ var }}/{{ x[1] }}"
+                   class="data-ajax">{{ x[2] }}</a></li>
+            {% endfor %}
           </ul></li>
         </ul></li>
         <li id="menu_glossary"><a href>Glossary</a></li>

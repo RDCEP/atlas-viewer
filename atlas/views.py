@@ -4,6 +4,9 @@ import netCDF4
 import pandas as pd
 import numpy as np
 import json
+from atlas.utils.data_munger import DataMunger
+from atlas.constants import MODELS, DATASETS, SCENARIOS, IRRIGATION, \
+    CROPS, VARIABLES
 
 mod = Blueprint('atlas', __name__,)
 
@@ -29,12 +32,14 @@ def index(var):
         var=session['var'],
     )
 
+
 @mod.route('/gadm1/globe')
 def gadm1_globe():
     initial_session()
     return render_template(
         'gadm1_globe.html',
     )
+
 
 @mod.route('/south_asia/aggr/<var>')
 @mod.route('/south_asia/aggr/', defaults={'var': 'yield'})
@@ -47,44 +52,12 @@ def gadm1_south_asia(var):
         var=session['var'],
     )
 
-@mod.route('/south_asia/grid/<var>')
-@mod.route('/south_asia/grid/', defaults={'var': 'yield'})
-@mod.route('/south_asia/grid', defaults={'var': 'yield'})
-def south_asia_grid(var):
-    initial_session()
-    session['var'] = var
-    return render_template(
-        'grid/south_asia.html',
-        var=session['var'],
-    )
 
 @mod.route('/grid/<lon>/<lat>/<model>/<dataset>/<scenario>/<irrigation>' +
            '/<crop>/<var>/<compare>/')
 @mod.route('/grid/<lon>/<lat>/<model>/<dataset>/<scenario>/<irrigation>' +
            '/<crop>/<var>/',
            defaults={'compare': None, })
-@mod.route('/grid/<lon>/<lat>/<model>/<dataset>/<scenario>/<irrigation>' +
-            '/<crop>/',
-           defaults={'compare': None, 'var': 'yield', })
-@mod.route('/grid/<lon>/<lat>/<model>/<dataset>/<scenario>/',
-           defaults={'compare': None, 'var': 'yield', 'irrigation': 'noirr',
-                     'crop': 'whe', })
-@mod.route('/grid/<lon>/<lat>/<model>/<dataset>/',
-           defaults={'compare': None, 'var': 'yield', 'irrigation': 'noirr',
-                     'crop': 'whe', 'scenario': 'fullharm', })
-@mod.route('/grid/<lon>/<lat>/<model>/',
-           defaults={'compare': None, 'var': 'yield', 'irrigation': 'noirr',
-                     'crop': 'whe', 'scenario': 'fullharm',
-                     'dataset': 'wfdei.cru', })
-@mod.route('/grid/<lon>/<lat>/',
-           defaults={'compare': None, 'var': 'yield', 'irrigation': 'noirr',
-                     'crop': 'whe', 'scenario': 'fullharm',
-                     'dataset': 'wfdei.cru', 'model': 'papsim', })
-@mod.route('/grid/',
-           defaults={'compare': None, 'var': 'yield', 'irrigation': 'noirr',
-                     'crop': 'whe', 'scenario': 'fullharm',
-                     'dataset': 'wfdei.cru', 'model': 'papsim',
-                     'lon': 0, 'lat': 0})
 def grid_view(lon, lat, model, dataset, scenario, irrigation, crop, var, compare):
     initial_session()
     session['var'] = var
@@ -96,6 +69,15 @@ def grid_view(lon, lat, model, dataset, scenario, irrigation, crop, var, compare
     session['scenario'] = scenario
     session['crop'] = crop
     session['compare'] = compare
+    damn = DataMunger(
+        model=[a for a, b, c in MODELS if b == model][0],
+        dataset=[a for a, b, c, d, e in DATASETS if b == dataset][0],
+        scenario=[a for a, b, c in SCENARIOS if b == scenario][0],
+        irr=[a for a, b, c in IRRIGATION if b == irrigation][0],
+        crop=[a for a, b, c in CROPS if b == crop][0],
+        var=[a for a, b, c in VARIABLES if b == var][0],
+        adm=1
+    )
     return render_template(
         'grid/grid.html',
         var=session['var'],
@@ -107,7 +89,21 @@ def grid_view(lon, lat, model, dataset, scenario, irrigation, crop, var, compare
         scenario=session['scenario'],
         compare=session['compare'],
         crop=session['crop'],
+        json=damn.grid_to_json(lon, lat),
     )
+
+
+@mod.context_processor
+def menu_options():
+    return dict(
+        models=MODELS,
+        datasets=DATASETS,
+        scenarios=SCENARIOS,
+        irrigations=IRRIGATION,
+        crops=CROPS,
+        vars=VARIABLES,
+    )
+
 
 @mod.route('/update/<_data_type>/adm/<_adm>/var/<_var>/type/<_type>/value/<_value>', methods=['POST',])
 def update(_data_type, _adm, _var, _type, _value):

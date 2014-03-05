@@ -50,7 +50,7 @@
     };
 
   var update_projection = function(w, h, d) {
-    return (width / 6) * 360 / (d.max_lon - d.min_lon + 2);
+    return (width / 6) * 360 / (42);
   };
 
   var resize = function() {
@@ -59,7 +59,7 @@
     d3.select('svg').attr({height: height, width: width});
     projection.translate([width / 2, height / 2]);
     projection.scale(update_projection(width, height, data));
-    projection.center([(data.max_lon + data.min_lon) / 2, (data.max_lat + data.min_lat) / 2]);
+    projection.center(data.center);
     d3.selectAll('.boundary').attr('d', path);
   };
 
@@ -80,18 +80,10 @@
   var atlas = function(error, queued_data) {
 
     world = queued_data[0];
-    data = queued_data[1];
-    queued_data.slice(1).forEach(function(d) {
-      data.max_lat = (d.max_lat > data.max_lat) ? d.max_lat : data.max_lat;
-      data.min_lat = (d.min_lat < data.min_lat) ? d.min_lat : data.min_lat;
-      data.max_lon = (d.max_lon > data.max_lon) ? d.max_lon : data.max_lon;
-      data.min_lon = (d.min_lon < data.min_lon) ? d.min_lon : data.min_lon;
-      data.max = (d.max > data.max) ? d.max : data.max;
-      data.min = (d.min < data.min) ? d.min : data.min;
-      data.data = data.data.concat(d.data);
-    });
+    data = Options.data;
     projection.scale(update_projection(width, height, data));
-    projection.center([(data.max_lon + data.min_lon) / 2, (data.max_lat + data.min_lat) / 2]);
+//    projection.rotate([-data.center[0], 0]);
+    projection.center(data.center);
 
     color.domain([data.min, data.max]);
 
@@ -156,21 +148,8 @@
 
   };
 
-  var dir = '/static/json/grid/full_global/',
-    json_file = Options.model+'_'+Options.dataset+'_'+Options.scenario+'_';
-  json_file += Options.irrigation+'_'+Options.var+'_'+Options.crop+'.json';
-
   queue()
     .defer(d3.json, '/static/topojson/atlas_gadm1.json')
-    .defer(d3.json, dir+Options.lon0+'.'+Options.lat0+'/'+json_file)
-    .defer(d3.json, dir+Options.lon0+'.'+Options.lat1+'/'+json_file)
-    .defer(d3.json, dir+Options.lon0+'.'+Options.lat2+'/'+json_file)
-    .defer(d3.json, dir+Options.lon1+'.'+Options.lat0+'/'+json_file)
-    .defer(d3.json, dir+Options.lon1+'.'+Options.lat1+'/'+json_file)
-    .defer(d3.json, dir+Options.lon1+'.'+Options.lat2+'/'+json_file)
-    .defer(d3.json, dir+Options.lon2+'.'+Options.lat0+'/'+json_file)
-    .defer(d3.json, dir+Options.lon2+'.'+Options.lat1+'/'+json_file)
-    .defer(d3.json, dir+Options.lon2+'.'+Options.lat2+'/'+json_file)
     .awaitAll(atlas);
 
   var ajax_opts = d3.selectAll('.data-ajax');
