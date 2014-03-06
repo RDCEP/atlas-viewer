@@ -28,7 +28,7 @@
           {% endfor %}
         </ul></li>
         <li id="menu_dataset"><a href>Dataset</a><ul>
-          {% for d in datsets %}
+          {% for d in datasets %}
           <li{% if dataset == d[1] %} class="active"{% endif %}>
             <a href="/{{ map_type }}/{{ lon }}/{{ lat }}/{{ model }}/{{ d[1] }}/{{ scenario }}/{{ irrigation }}/{{ crop }}/{{ var }}"
                class="data-ajax" data-type="variable" data-value="{{ d[0] }}">{{ d[2]|nbsp }}</a>
@@ -86,7 +86,7 @@
             {% endfor %}
           </ul></li>
           <li id="menu_variable"><a href>Variable</a><ul>
-            {% for x in variables %}
+            {% for x in vars %}
             <li><a href="/{{ map_type }}/{{ lon }}/{{ lat }}/{{ model }}/{{ dataset }}/{{ scenario }}/{{ irrigation }}/{{ crop }}/{{ var }}/{{ x[1] }}"
                    class="data-ajax">{{ x[2]|nowrap }}</a></li>
             {% endfor %}
