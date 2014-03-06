@@ -1,6 +1,6 @@
 (function() {
 
-  var world, data, globe_regions,
+  var world, data, globe_regions, ptop, pbot,
     height = window.innerHeight,
     width = window.innerWidth,
     start_year = 1979,
@@ -9,7 +9,6 @@
     globe_scale = (height - 100) / 2,
     plate_scale = (width - 100) / 6,
     sens = .2,
-
     _scen = 0,
     _irr = 0,
     _time = 0,
@@ -19,10 +18,8 @@
     defs = svg.append('defs'),
     color = d3.scale.quantile()
       .range(['#ffffcc', '#ffeda0', '#fed976', '#feb24c', '#fd8d3c', '#fc4e2a', '#e31a1c', '#bd0026', '#800026']),
-    projection = d3.geo.albers()
-      .rotate([-Options.lon, Options.lat])
-      .center([-.6, 38.7])
-      .parallels([29.5, 45.5])
+    projection = d3.geo.mercator()
+      .rotate([-Options.lon, -Options.lat])
       .scale(1070)
       .translate([width / 2, height / 2])
       .precision(.1),
@@ -93,13 +90,11 @@
     height = window.innerHeight;
     d3.select('svg').attr({height: height, width: width});
     projection.translate([width / 2, height / 2]);
-    graph_wrap.attr({transform: 'translate(0,'+(height- 100)+')'});
+    graph_wrap.attr({transform: 'translate(0,'+(height - 100)+')'});
     _x.range([0, width]);
     y_axis.tickSize(width);
     graph_axes_x.call(x_axis);
-//    d3.selectAll('.boundary').attr('d', path);
     graph_line.attr('d', _line);
-
   };
 
   var update_data_fills = function(_data) {
@@ -168,7 +163,6 @@
     world = queued_data[0];
     data = queued_data[1];
 
-    console.log(data.max);
     color.domain([data.min, data.max]);
     _y.domain([data.min, data.max]);
 
@@ -199,9 +193,9 @@
       .attr('d', path)
       .on('click', focus_region)
       .on('dblclick', function(d) {
-        if (10500 < +d.properties.adm < 10600) {
-          window.location = '/south_asia/grid/'+Options.var;
-        }
+        var c = d3.geo.centroid(d);
+        //TODO: add Options to URL
+        window.location = '/grid/'+Math.round(c[0])+'/'+Math.round(c[1])+'/';
       })
       .on('mouseover', function(d) {
         d3.select('#hover_legend')
@@ -230,28 +224,6 @@
     .defer(d3.json, '/static/json/aggr/gadm1/'+Options.var+'_gadm1_home.json')
     .awaitAll(atlas);
 
-  var ajax_opts = d3.selectAll('.data-ajax');
-  ajax_opts.on('click', function() {
-    d3.event.preventDefault();
-    var opt = d3.select(this),
-      opt_type = opt.attr('data-type'),
-      opt_value = opt.attr('data-value');
-    if (opt_type == 'scenario') {
-      _scen = opt_value;
-    }
-    if (opt_type == 'irrigation') {
-      _irr = opt_value;
-    }
-    d3.xhr('/update/aggr/adm/1/var/'+Options.var+'/type/'+opt_type+'/value/'+opt_value)
-      .responseType('json')
-      .post()
-      .on('load', function(_data) {
-        data = _data.response;
-        d3.select('#corner_legend [data-type="'+opt_type+'"]').text(opt.text());
-        update_data_fills(data);
-      });
-  });
-
   var time_opt = d3.select('#time_select');
   var time_label = d3.select('#menu_time label');
   time_opt.on('change', function() {
@@ -268,5 +240,7 @@
   });
 
   d3.select(window).on('resize', resize);
+
+  resize();
 
 })();
