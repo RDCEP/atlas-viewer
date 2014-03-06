@@ -62,7 +62,7 @@
           {% for v in vars %}
           <li{% if var == v[1] %} class="active"{% endif %}>
             <a href="/{{ map_type }}/{{ lon }}/{{ lat }}/{{ model }}/{{ dataset }}/{{ scenario }}/{{ irrigation }}/{{ crop }}/{{ v[1] }}"
-               class="data-ajax" data-type="variable" data-value="{{ v[0] }}">{{ v[2]|nbsp }}</a>
+               class="data-ajax" data-type="variable" data-value="{{ v[0] }}">{{ v[2]|nowrap }}</a>
           </li>
           {% endfor %}
         </ul></li>
@@ -88,7 +88,7 @@
           <li id="menu_variable"><a href>Variable</a><ul>
             {% for x in variables %}
             <li><a href="/{{ map_type }}/{{ lon }}/{{ lat }}/{{ model }}/{{ dataset }}/{{ scenario }}/{{ irrigation }}/{{ crop }}/{{ var }}/{{ x[1] }}"
-                   class="data-ajax">{{ x[2]|nbsp }}</a></li>
+                   class="data-ajax">{{ x[2]|nowrap }}</a></li>
             {% endfor %}
           </ul></li>
         </ul></li>

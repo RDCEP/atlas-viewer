@@ -39,6 +39,10 @@ def nbsp(text):
     text = re.sub(r' ', '&nbsp;', text)
     return jinja2.Markup(text)
 
+def nowrap(text):
+    text = re.sub(r' ', '&nbsp;', text)
+    text = re.sub(r'([^ -]+-[^ -]+)', r'<span class="nowrap">\1</span>', text)
+    return jinja2.Markup(text)
 
 def format_currency(value):
     return "${:,.2f}".format(value)
