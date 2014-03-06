@@ -1,7 +1,7 @@
 import netCDF4
 import os
 import math
-import json
+import yajl as json
 import numpy as np
 import pandas as pd
 import pycountry
@@ -151,7 +151,11 @@ class DataMunger():
             larr = d.variables[axis][:]
             lix = np.where(larr == l)[0][0]
             lix = int(math.floor(lix - tile_size / 2))
-            return -lix
+            # if tile_size / 2 < lix < len(larr)- tile_size / 2:
+            #     return lix
+            # else:
+            #     return -lix
+            return lix
 
         tile_size = 80
         file_path = os.path.join(
@@ -164,17 +168,20 @@ class DataMunger():
         d = netCDF4.Dataset(file_path)
         lonix = lonlat_index(lon)
         latix = lonlat_index(lat, axis='lat')
+        print(lonix, latix)
         _v = d.variables['{}_{}'.format(self._var[1], self._crop[1])][:].filled(np.nan)
         _v = _v.transpose(2, 1, 0)
-        _v = np.roll(np.roll(_v, lonix, axis=0), latix, axis=1)
-        _v = _v[:tile_size,:tile_size,:]
+        # _v = _v.take(xrange(lonix, lonix+tile_size), axis=0, mode='wrap').take(xrange(latix, latix+tile_size), axis=1, mode='wrap')
+        _v = np.roll(np.roll(_v, -lonix, axis=0), -latix, axis=1)[:tile_size, :tile_size, :]
         if var2:
-            _v2 = self.grid_to_np(var2, lon=lon, lat=lat, var2=False, op=op)[0]
+            _v2 = self.grid_to_np(lon, lat, var2=False, op=op)[0]
             _v = op(_v, _v2)
         return (
             _v,
-            np.roll(d.variables['lon'][:], lonix)[:tile_size],
-            np.roll(d.variables['lat'][:], latix)[:tile_size],
+            # np.roll(d.variables['lon'][:], -lonix)[:tile_size],
+            # np.roll(d.variables['lat'][:], -latix)[:tile_size],
+            d.variables['lon'][:].take(range(lonix, lonix+tile_size), axis=0, mode='wrap'),
+            d.variables['lat'][:].take(range(latix, latix+tile_size), axis=0, mode='wrap'),
         )
 
     def grid_to_json(self, lon, lat, var2=None, op=np.divide):
