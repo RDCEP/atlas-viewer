@@ -53,6 +53,41 @@ def gadm1_south_asia(var):
     )
 
 
+@mod.route('/aggr/<lon>/<lat>/',
+           defaults={'model': 'papsim', 'dataset': 'wfdei.cru',
+                     'scenario': 'fullharm', 'irrigation': 'firr',
+                     'crop': 'whe', 'var': 'yield', 'compare': None})
+@mod.route('/aggr/<lon>/<lat>/<model>/<dataset>/<scenario>/<irrigation>' +
+           '/<crop>/<var>/<compare>/')
+@mod.route('/aggr/<lon>/<lat>/<model>/<dataset>/<scenario>/<irrigation>' +
+           '/<crop>/<var>/',
+           defaults={'compare': None, })
+def aggr_view(lon, lat, model, dataset, scenario, irrigation, crop, var, compare):
+    initial_session()
+    session['var'] = var
+    session['lon'] = lon
+    session['lat'] = lat
+    session['model'] = model
+    session['dataset'] = dataset
+    session['irrigation'] = irrigation
+    session['scenario'] = scenario
+    session['crop'] = crop
+    session['compare'] = compare
+    return render_template(
+        'aggr/aggr.html',
+        map_type = 'grid',
+        var=session['var'],
+        lon=session['lon'],
+        lat=session['lat'],
+        model=session['model'],
+        dataset=session['dataset'],
+        irrigation=session['irrigation'],
+        scenario=session['scenario'],
+        compare=session['compare'],
+        crop=session['crop'],
+    )
+
+
 @mod.route('/grid/<lon>/<lat>/',
            defaults={'model': 'papsim', 'dataset': 'wfdei.cru',
                      'scenario': 'fullharm', 'irrigation': 'firr',
