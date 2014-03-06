@@ -75,10 +75,12 @@ path
   line-height: 1em
   position: relative
   z-index: 999
+  ul
+    list-style-type: none
   & > li
     border: none
     display: inline-block
-    padding: 0 0 0 15px
+    padding: 0 0 0 1em
     margin: 0
     & + li
       position: relative
@@ -86,7 +88,7 @@ path
         //@include columns(2, 2em)
         border: none
         position: absolute
-        top: 100%
+        top: 99%
         left: 0
         background-color: black
         z-index: 999
@@ -133,13 +135,14 @@ path
   margin-left: 2em!important
 #menu_time
   position: relative
+  z-index: 990
   div
     height: 0
     position: absolute
     top: 100%
     left: 0
     background-color: black
-    z-index: 1000
+    z-index: -1
     padding: 0 1em
   input
     height: 0
@@ -154,6 +157,7 @@ path
   &:hover div
     height: auto
     padding: .75em 1em .5em
+    z-index: 999
     input
       height: auto
     .active
