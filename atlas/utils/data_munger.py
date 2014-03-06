@@ -1,7 +1,10 @@
 import netCDF4
 import os
 import math
-import yajl as json
+try:
+    import yajl as json
+except ImportError:
+    import json
 import numpy as np
 import pandas as pd
 import pycountry
