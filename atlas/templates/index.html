@@ -1,1 +1,11 @@
 {% extends 'base.html' %}
+<script>
+  {% block jsoptions %}
+  {{ super() }}
+  Options.model = '{{ model }}';
+  Options.dataset = '{{ dataset }}';
+  Options.scenario = '{{ scenario }}';
+  Options.irrigation = '{{ irrigation }}';
+  Options.crop = '{{ crop }}';
+  {% endblock %}
+</script>

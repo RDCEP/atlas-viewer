@@ -8,10 +8,11 @@ IRRIGATION = [
 ]
 MODELS = [
   (0, 'papsim', 'pAPSIM', ),
+  (1, 'pdssat', 'pDSSAT', ),
 ]
 DATASETS = [
   (0, 'wfdei.cru', 'WFDEI.CRU', 1979, 2012),
-  (1, 'agmerra', 'AGMERRA', 1980, 2010),
+  (1, 'agmerra', 'AgMERRA', 1980, 2010),
 ]
 CROPS = [
   (0, 'mai', 'Maize', ),

@@ -148,33 +148,38 @@
       .attr('class', 'world-boundary boundary')
       .attr('d', path)
       .on('dblclick', function(d) {
-        if (+d.properties.adm == 105) {
-          window.location = '/south_asia/aggr/'+Options.var;
-        } else if (ortho && d3.select(this).classed('active')) {
-          ortho = false;
-          svg.selectAll('.boundary').transition()
-            .duration(300)
-            .attr('d', path)
-            .attrTween('d', projection_tween(projection, projection = projection_map, true, d3.geo.centroid(d)));
-        } else {
-          ortho = true;
-          svg.selectAll('.boundary').transition()
-            .duration(300)
-            .attr('d', path)
-            .attrTween('d', projection_tween(projection, projection = projection_globe, false, d3.geo.centroid(d)));
-          sphere.remove();
-          sphere = [
-            defs.append('path')
-              .datum({type: 'Sphere'})
-              .attr('id', 'sphere')
-              .attr('d', path)
-              .attr('class', 'boundary'),
-            svg.append('use')
-              .attr('class', 'stroke')
-              .attr('xlink:href', '#sphere')
-            ];
-
-        }
+        var c = d3.geo.centroid(d),
+          url= '/aggr/'+Math.round(c[0])+'/'+Math.round(c[1])+'/';
+        url += Options.model+'/'+Options.dataset+'/'+Options.scenario+'/';
+        url += Options.irrigation+'/'+Options.crop+'/'+Options.var;
+        window.location = url;
+//        if (+d.properties.adm == 105) {
+//          window.location = '/south_asia/aggr/'+Options.var;
+//        } else if (ortho && d3.select(this).classed('active')) {
+//          ortho = false;
+//          svg.selectAll('.boundary').transition()
+//            .duration(300)
+//            .attr('d', path)
+//            .attrTween('d', projection_tween(projection, projection = projection_map, true, d3.geo.centroid(d)));
+//        } else {
+//          ortho = true;
+//          svg.selectAll('.boundary').transition()
+//            .duration(300)
+//            .attr('d', path)
+//            .attrTween('d', projection_tween(projection, projection = projection_globe, false, d3.geo.centroid(d)));
+//          sphere.remove();
+//          sphere = [
+//            defs.append('path')
+//              .datum({type: 'Sphere'})
+//              .attr('id', 'sphere')
+//              .attr('d', path)
+//              .attr('class', 'boundary'),
+//            svg.append('use')
+//              .attr('class', 'stroke')
+//              .attr('xlink:href', '#sphere')
+//            ];
+//
+//        }
       });
 
     update_data_fills(data);

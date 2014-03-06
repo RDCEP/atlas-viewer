@@ -128,6 +128,14 @@
           .style({
             'display': 'none'
           });
+      })
+      .on('dblclick', function(d) {
+        console.log(1);
+        var c = d3.geo.centroid(d),
+          url= '/aggr/'+Math.round(c[0])+'/'+Math.round(c[1])+'/';
+        url += Options.model+'/'+Options.dataset+'/'+Options.scenario+'/';
+        url += Options.irrigation+'/'+Options.crop+'/'+Options.var;
+        window.location = url;
       });
     globe_fills = world_fill.selectAll('.world-fill')
       .data(topojson.feature(world, world.objects.regions).features)
@@ -143,6 +151,7 @@
       .append('path')
       .attr('class', 'grid-boundary boundary')
       .attr('d', path);
+
     update_data_fills(data);
 //    svg.call(drag_rotate);
 
