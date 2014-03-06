@@ -222,3 +222,6 @@ path {
 .domain {
   stroke: transparent;
   fill: transparent; }
+
+.nowrap {
+  white-space: nowrap; }
