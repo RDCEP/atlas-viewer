@@ -73,17 +73,19 @@ path {
   line-height: 1em;
   position: relative;
   z-index: 999; }
+  #top_nav ul {
+    list-style-type: none; }
   #top_nav > li {
     border: none;
     display: inline-block;
-    padding: 0 0 0 15px;
+    padding: 0 0 0 1em;
     margin: 0; }
     #top_nav > li + li {
       position: relative; }
       #top_nav > li + li ul {
         border: none;
         position: absolute;
-        top: 100%;
+        top: 99%;
         left: 0;
         background-color: black;
         z-index: 999;
@@ -131,14 +133,15 @@ path {
   margin-left: 2em !important; }
 
 #menu_time {
-  position: relative; }
+  position: relative;
+  z-index: 990; }
   #menu_time div {
     height: 0;
     position: absolute;
     top: 100%;
     left: 0;
     background-color: black;
-    z-index: 1000;
+    z-index: -1;
     padding: 0 1em; }
   #menu_time input {
     height: 0;
@@ -152,7 +155,8 @@ path {
     color: black; }
   #menu_time:hover div {
     height: auto;
-    padding: 0.75em 1em 0.5em; }
+    padding: 0.75em 1em 0.5em;
+    z-index: 999; }
     #menu_time:hover div input {
       height: auto; }
     #menu_time:hover div .active {
