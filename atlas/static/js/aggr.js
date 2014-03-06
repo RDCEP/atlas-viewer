@@ -32,10 +32,6 @@
         var λ = d3.event.x * sens,
         φ = -d3.event.y * sens,
         rotate = projection.rotate();
-        //Restriction for rotating upside-down
-        φ = φ > 30 ? 30 :
-        φ < -30 ? -30 :
-        φ;
         projection.rotate([λ, φ]);
         path = d3.geo.path().projection(projection);
         svg.selectAll('.boundary').attr('d', path);
