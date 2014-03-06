@@ -189,9 +189,11 @@
       .attr('d', path)
       .on('click', focus_region)
       .on('dblclick', function(d) {
-        var c = d3.geo.centroid(d);
-        //TODO: add Options to URL
-        window.location = '/grid/'+Math.round(c[0])+'/'+Math.round(c[1])+'/';
+        var c = d3.geo.centroid(d),
+          url= '/grid/'+Math.round(c[0])+'/'+Math.round(c[1])+'/';
+        url += Options.model+'/'+Options.dataset+'/'+Options.scenario+'/';
+        url += Options.irrigation+'/'+Options.crop+'/'+Options.var;
+        window.location = url;
       })
       .on('mouseover', function(d) {
         d3.select('#hover_legend')
