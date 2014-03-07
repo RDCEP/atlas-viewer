@@ -38,6 +38,8 @@
         φ = φ > 30 ? 30 :
         φ < -30 ? -30 :
         φ;
+        Options.lon = λ;
+        Options.lat = φ;
         projection.rotate([λ, φ]);
         path = d3.geo.path().projection(projection);
         svg.selectAll('.boundary').attr('d', path);

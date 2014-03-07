@@ -2,6 +2,8 @@
 <script>
   {% block jsoptions %}
   {{ super() }}
+  Options.lon = {{ lon }};
+  Options.lat = {{ lat }};
   Options.model = '{{ model }}';
   Options.dataset = '{{ dataset }}';
   Options.scenario = '{{ scenario }}';
