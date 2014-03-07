@@ -22,13 +22,22 @@ def initial_session(var=None):
         session['time'] = 0
 
 
-@mod.route('/',
+@mod.route('/globe/<lon>/<lat>/<model>/<dataset>/<scenario>/<irrigation>' +
+           '/<crop>/<var>/<compare>')
+@mod.route('/globe/<lon>/<lat>/<model>/<dataset>/<scenario>/<irrigation>' +
+           '/<crop>/<var>', defaults={'compare': None, })
+@mod.route('/globe/<lon>/<lat>',
            defaults={'model': 'papsim', 'dataset': 'wfdei.cru',
+                     'scenario': 'fullharm', 'irrigation': 'firr',})
+@mod.route('/',
+           defaults={'lon': 0, 'lat': 0, 'model': 'papsim', 'dataset': 'wfdei.cru',
                      'scenario': 'fullharm', 'irrigation': 'firr',
                      'crop': 'whe', 'var': 'yield', 'compare': None})
-def index(model, dataset, scenario, irrigation, crop, var, compare):
+def index(lon, lat, model, dataset, scenario, irrigation, crop, var, compare):
     initial_session()
     session['var'] = var
+    session['lon'] = lon
+    session['lat'] = lat
     session['model'] = model
     session['dataset'] = dataset
     session['irrigation'] = irrigation
@@ -37,7 +46,7 @@ def index(model, dataset, scenario, irrigation, crop, var, compare):
     session['compare'] = compare
     return render_template(
         'index.html',
-        map_type = 'grid',
+        map_type='globe',
         var=session['var'],
         model=session['model'],
         dataset=session['dataset'],
@@ -45,6 +54,8 @@ def index(model, dataset, scenario, irrigation, crop, var, compare):
         scenario=session['scenario'],
         compare=session['compare'],
         crop=session['crop'],
+        lon=session['lon'],
+        lat=session['lat'],
     )
 
 
