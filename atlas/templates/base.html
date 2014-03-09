@@ -27,7 +27,7 @@
           </li>
           {% endfor %}
         </ul></li>
-        <li id="menu_dataset"><a href>Dataset</a><ul>
+        <li id="menu_dataset"><a href>Climate</a><ul>
           {% for d in datasets %}
           <li{% if dataset == d[1] %} class="active"{% endif %}>
             <a href="/{{ map_type }}/{{ lon }}/{{ lat }}/{{ model }}/{{ d[1] }}/{{ scenario }}/{{ irrigation }}/{{ crop }}/{{ var }}"
@@ -35,7 +35,6 @@
           </li>
           {% endfor %}
         </ul></li>
-        <li id="menu_climate"><a href>Climate</a></li>
         <li id="menu_scenario"><a href>Scenarios</a><ul>
           {% for s in scenarios %}
           <li{% if scenario == s[1] %} class="active"{% endif %}>
