@@ -22,6 +22,12 @@ def initial_session(var=None):
         session['time'] = 0
 
 
+@mod.route('/test')
+def map_test():
+    return render_template(
+        'map_test.html',
+    )
+
 @mod.route('/globe/<lon>/<lat>/<model>/<dataset>/<scenario>/<irrigation>' +
            '/<crop>/<var>/<compare>')
 @mod.route('/globe/<lon>/<lat>/<model>/<dataset>/<scenario>/<irrigation>' +
@@ -86,6 +92,40 @@ def aggr_view(lon, lat, model, dataset, scenario, irrigation, crop, var, compare
         lat=session['lat'],
         model=session['model'],
         dataset=session['dataset'],
+        irrigation=session['irrigation'],
+        scenario=session['scenario'],
+        compare=session['compare'],
+        crop=session['crop'],
+    )
+
+
+@mod.route('/magpie/<lon>/<lat>/<model>/<dataset>/<scenario>/<irrigation>' +
+           '/<crop>/<var>/<compare>')
+@mod.route('/magpie/<lon>/<lat>/<model>/<dataset>/<scenario>/<irrigation>' +
+           '/<crop>/<var>', defaults={'compare': None, })
+@mod.route('/magpie/<lon>/<lat>',
+           defaults={'model': 'papsim', 'dataset': 'wfdei.cru',
+                     'scenario': 'fullharm', 'irrigation': 'firr',
+                     'crop': 'whe', 'var': 'yield', 'compare': None})
+def magpie_view(lon, lat, model, dataset, scenario, irrigation, crop, var, compare):
+    initial_session()
+    session['var'] = var
+    session['lon'] = lon
+    session['lat'] = lat
+    session['model'] = model
+    session['dataset'] = dataset
+    session['irrigation'] = irrigation
+    session['scenario'] = scenario
+    session['crop'] = crop
+    session['compare'] = compare
+    return render_template(
+        'magpie.html',
+        map_type = 'grid',
+        var=session['var'],
+        lon=session['lon'],
+        lat=session['lat'],
+        model=session['model'],
+        dataset='MAgPIE',
         irrigation=session['irrigation'],
         scenario=session['scenario'],
         compare=session['compare'],
