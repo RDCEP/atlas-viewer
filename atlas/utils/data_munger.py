@@ -1,10 +1,10 @@
-import netCDF4
-import os
-import math
 try:
     import yajl as json
 except ImportError:
     import json
+import netCDF4
+import os
+import math
 import numpy as np
 import pandas as pd
 import pycountry
@@ -84,6 +84,36 @@ class DataMunger():
             f.write(json.dumps(ne))
         return ne
 
+    def add_gadm1_codes_to_gadm1_json(self):
+        """
+        Add GADM level 1 information to level 1 map outlines from GADM.
+        """
+        with open('../static/topojson/gadm1_map.json') as f:
+            ga = json.loads(f.read())
+        ga['objects']['regions'] = ga['objects']['_bejeezus']
+        ga['objects'].pop('_bejeezus', None)
+        for region in ga['objects']['regions']['geometries']:
+            props = region['properties']
+            try:
+                region['properties']['iso'] = region['properties']['ISO']
+                region['properties']['adm1'] = '{0:02d}'.format(region['properties']['ID_1'])
+                region['properties']['adm0'] = '{0}'.format(region['properties']['ID_0'])
+                region['properties']['adm'] = '{0}{1:02d}'.format(region['properties']['ID_0'], region['properties']['ID_1'])
+                region['properties']['name'] = region['properties']['NAME_1']
+                region['properties']['country'] = region['properties']['NAME']
+                region['properties'].pop('ISO', None)
+                region['properties'].pop('ID_1', None)
+                region['properties'].pop('ID_0', None)
+                region['properties'].pop('ENGTYPE_1', None)
+                region['properties'].pop('TYPE_1', None)
+                region['properties'].pop('NL_NAME_1', None)
+                region['properties'].pop('VARNAME_1', None)
+            except:
+                pass
+        with open('../static/topojson/atlas_gadm1.json', 'w') as f:
+            f.write(json.dumps(ga))
+        return ga
+
     def add_gadm0_codes_to_ne0_json(self):
         """
         Add GADM level 0 information to level 0 map outlines from Natural Earth.
@@ -116,6 +146,42 @@ class DataMunger():
         data['data'] = {k: np.array(v)[:, 0, 0].tolist() for k, v in data['data'].iteritems()}
         with open('../static/json/aggr/{}_gadm{}_home.json'.format(var, self._adm), 'w') as f:
             f.write(json.dumps(data))
+
+    def magpie_to_json(self, var):
+        """
+        One-time use. For converting MAgPIE nc4 to json.
+        """
+        # for crop in ['bmg', 'bmt', 'cas', 'mai', 'mgr', 'mil', 'nut', 'oth', 'pea', 'rap', 'ric', 'sgb', 'soy', 'sug', 'sun', 'whe']:
+        for crop in ['whe',]:
+            d = netCDF4.Dataset(os.path.join(
+                '..', 'data', 'netcdf', 'magpie',
+                'MAgPIE_LUC_for_ATLAS_illustration_{}_agg.nc4'.format(crop)
+            ))
+            # for irr in ['firr', 'rainf']:
+            #     d = netCDF4.Dataset(os.path.join('..', 'data', 'netcdf', 'magpie', 'MAgPIE_LUC_for_ATLAS_illustration_{}_{}.nc4'.format(crop, irr)))
+            _v = d.variables['{}_gadm{}'.format(crop, self._adm)][:]
+            _gi = d.variables['gadm{}_index'.format(self._adm)][:]
+            new_data = {}
+            for i in range(len(_gi)):
+                new_data[str(_gi[i])] = [v - np.mean(_v[:20]) for v in _v[i].tolist()[20:]]
+            with open('../static/json/aggr/gadm{}/magpie/{}_gadm{}.json'.format(
+                    self._adm, crop, self._adm), 'w') as f:
+                f.write(
+                    json.dumps(
+                        {
+                            'data': new_data,
+                            'min': round(np.min(_v[:]), 1),
+                            'max': round(np.max(_v[:]), 1),
+                        }
+                    )
+                )
+            trimmed = {
+                'data': {k: np.array(v)[:, 0].tolist() for k, v in new_data.iteritems()},
+                'min': round(np.min([np.array(v)[:, 0].tolist() for k, v in new_data.iteritems()]), 1),
+                'max': round(np.max([np.array(v)[:, 0].tolist() for k, v in new_data.iteritems()]), 1),
+            }
+            with open('../static/json/aggr/gadm{}/magpie/{}_gadm{}_home.json'.format(self._adm, crop, self._adm), 'w') as f:
+                f.write(json.dumps(trimmed))
 
     def aggr_to_np(self, var):
         d = netCDF4.Dataset(os.path.join(
@@ -244,5 +310,6 @@ if __name__ == '__main__':
     import cProfile
     damn = DataMunger(model=0, dataset=0, scenario=0, irr=1, crop=5, var=11)
     damn._adm = 1
-    os.chdir('../..')
-    cProfile.run('damn.grid_to_json(80, 20)', 'profile_stats')
+    damn.magpie_to_json(None)
+    # os.chdir('../..')
+    # cProfile.run('damn.grid_to_json(80, 20)', 'profile_stats')
