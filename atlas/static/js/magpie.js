@@ -3,9 +3,9 @@
   var world, data, globe_regions, ptop, pbot,
     height = window.innerHeight,
     width = window.innerWidth,
-    start_year = 1979,
-    end_year = 2012,
-    current_year = 1979,
+    start_year = 2015,
+    end_year = 2095,
+    current_year = 2095,
     globe_scale = (height - 100) / 2,
     plate_scale = (width - 100) / 6,
     sens = .2,
@@ -21,7 +21,8 @@
     color_plus = d3.scale.quantile()
       .range(['#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026']),
     color_minus = d3.scale.quantile()
-      .range(['#e0f3f8', '#abd9e9', '#74add1', '#4575b4', '#313695']),
+      .range(['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8']),
+//      .range(['#e0f3f8', '#abd9e9', '#74add1', '#4575b4', '#313695']),
     projection = d3.geo.mercator()
       .rotate([-Options.lon, -Options.lat])
       .scale(1070)
@@ -55,7 +56,7 @@
       .attr('class', 'y axis')
       .attr('transform', 'translate(0,0)'),
     graph_data,
-    _x = d3.time.scale().domain([new Date(1979,0,1), new Date(2012,0,1)]).range([0, width]),
+    _x = d3.time.scale().domain([new Date(start_year,0,1), new Date(end_year,0,1)]).range([0, width]),
     _y = d3.scale.linear().domain([0, 1]).range([100, 0]),
     graph_cursor = graph_wrap.append('line')
       .attr({
@@ -118,9 +119,10 @@
       if (d3.select(this).classed('active')) {
         graph_data = data.data[d.properties.adm].slice();
         graph_data.forEach(function(d, i) {
-          graph_data[i] = {x: new Date(i+1979,0,1), y: (d > 1000) ? null : d, y0: 0};
+          graph_data[i] = {x: new Date(i+start_year,0,1), y: d, y0: 0};
         });
-        _y.domain([0, d3.max(graph_data, function(d) { return d.y })]);
+        _y.domain([d3.min(graph_data, function(d) { return d.y }),
+          d3.max(graph_data, function(d) { return d.y })]);
         graph_line.datum(graph_data)
           .attr('d', _line);
       }
@@ -130,9 +132,10 @@
   var focus_region = function(d) {
     graph_data = data.data[d.properties.adm].slice();
     graph_data.forEach(function(d, i) {
-      graph_data[i] = {x: new Date(i+1979,0,1), y: (d > 1000) ? null : d, y0: 0};
+      graph_data[i] = {x: new Date(i+2014,0,1), y: d, y0: 0};
     });
-    _y.domain([0, d3.max(graph_data, function(d) { return d.y })]);
+    _y.domain([d3.min(graph_data, function(d) { return d.y }),
+      d3.max(graph_data, function(d) { return d.y })]);
     var _this = this;
     var region = d3.select(this);
     d3.selectAll('.world-boundary')
@@ -164,10 +167,9 @@
     world = queued_data[0];
     data = queued_data[1];
 
-    console.log(data);
-
     if (data.min < 0) {
-      color_minus.domain([data.min, 0]);
+//      color_minus.domain([data.min, 0]);
+      color_minus.domain([0, data.min]);
       color_plus.domain([0, data.max]);
     } else {
       color_plus.domain([data.min, data.max]);
@@ -210,7 +212,7 @@
       })
       .on('mouseover', function(d) {
         d3.select('#hover_legend')
-          .text(d.properties.name)
+          .text(d.properties.name+', '+ d.properties.NAME_0+'\n')
           .style({
             'display': 'block',
             'left': path.centroid(d)[0]+'px',
