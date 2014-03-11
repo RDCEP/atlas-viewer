@@ -4,7 +4,8 @@ SCENARIOS = [
 ]
 IRRIGATION = [
   (0, 'firr', 'Full', ),
-  (1, 'noirr', 'None', ),
+  (1, 'noirr', 'Rainfed', ),
+  (1, 'sum', 'Sum', ),
 ]
 MODELS = [
   (0, 'papsim', 'pAPSIM', ),
