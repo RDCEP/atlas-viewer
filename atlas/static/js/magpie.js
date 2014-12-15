@@ -21,7 +21,8 @@
     color_plus = d3.scale.quantile()
       .range(['#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026']),
     color_minus = d3.scale.quantile()
-      .range(['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8']),
+      .range(['#313695', '#4575b4', '#74add1', '#abd9e9']),
+//      .range(['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8']),
 //      .range(['#e0f3f8', '#abd9e9', '#74add1', '#4575b4', '#313695']),
     projection = d3.geo.mercator()
       .rotate([-Options.lon, -Options.lat])
@@ -167,13 +168,23 @@
     world = queued_data[0];
     data = queued_data[1];
 
-    if (data.min < 0) {
-//      color_minus.domain([data.min, 0]);
-      color_minus.domain([0, data.min]);
-      color_plus.domain([0, data.max]);
-    } else {
-      color_plus.domain([data.min, data.max]);
-    }
+    var merged_values = [];
+    merged_values = merged_values.concat.apply(merged_values, d3.values(data.data));
+
+    color_minus.domain(merged_values.filter(function(d) {
+	    return !(d >= 0 || d === '' || typeof d == 'undefined' || d === null);
+    }));
+    color_plus.domain(merged_values.filter(function(d) {
+	    return !(d < 0 || d === '' || typeof d == 'undefined' || d === null);
+    }));
+
+//    if (data.min < 0) {
+////      color_minus.domain([data.min, 0]);
+//      color_minus.domain([0, data.min]);
+//      color_plus.domain([0, data.max]);
+//    } else {
+//      color_plus.domain([data.min, data.max]);
+//    }
 
     _y.domain([data.min, data.max]);
 

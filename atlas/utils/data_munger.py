@@ -305,11 +305,34 @@ class DataMunger():
             'center': center,
         })
 
+    def hadgem(self, var):
+        d = netCDF4.Dataset(os.path.join(
+            '..', 'data', 'netcdf', 'aggr',
+            'pdssat_hadgem2-es_rcp8p5_whe_annual_1950_2099.nc4'
+        ))
+        _v = d.variables['{}_gadm1'.format(var)][:].filled(np.nan)
+        _gi = d.variables['gadm1_index'][:]
+        new_data = {}
+
+        for i in range(len(_gi)):
+            new_data[str(_gi[i])] = [np.divide(v,  np.nanmean(_v[i, :30, 0, 0])) for v in _v[i, :, 0, 0].tolist()]
+        with open('../static/json/hadgem/{}_gadm1.json'.format(var), 'w') as f:
+            f.write(
+                json.dumps(
+                    {
+                        'data': new_data,
+                        'min': round(np.nanmin(_v[:]), 1),
+                        'max': round(np.nanmax(_v[:]), 1),
+                    }
+                )
+            )
+        self.trim_aggr_data(var)
 
 if __name__ == '__main__':
     import cProfile
     damn = DataMunger(model=0, dataset=0, scenario=0, irr=1, crop=5, var=11)
     damn._adm = 1
-    damn.magpie_to_json(None)
+    # damn.magpie_to_json(None)
+    damn.hadgem('yield')
     # os.chdir('../..')
     # cProfile.run('damn.grid_to_json(80, 20)', 'profile_stats')

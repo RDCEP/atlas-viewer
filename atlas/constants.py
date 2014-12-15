@@ -12,8 +12,9 @@ MODELS = [
   (1, 'pdssat', 'pDSSAT', ),
 ]
 DATASETS = [
-  (0, 'wfdei.cru', 'WFDEI.CRU', 1979, 2012),
+  (0, 'wfdei', 'WFDEI', 1979, 2012),
   (1, 'agmerra', 'AgMERRA', 1980, 2010),
+  (2, 'hadgem', 'HADGEM', 1950, 2099),
 ]
 CROPS = [
   (0, 'mai', 'Maize', ),

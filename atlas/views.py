@@ -65,6 +65,36 @@ def index(lon, lat, model, dataset, scenario, irrigation, crop, var, compare):
     )
 
 
+@mod.route('/aggr/<lon>/<lat>/pdssat/hadgem/<scenario>/<irrigation>' +
+           '/<crop>/<var>/<compare>', defaults={'model': 'pdssat', 'dataset': 'hadgem'})
+@mod.route('/aggr/<lon>/<lat>/pdssat/hadgem/<scenario>/<irrigation>' +
+           '/<crop>/<var>', defaults={'compare': None, 'model': 'pdssat', 'dataset': 'hadgem'})
+def hadgem_view(lon, lat, model, dataset, scenario, irrigation, crop, var, compare):
+    initial_session()
+    session['var'] = var
+    session['lon'] = lon
+    session['lat'] = lat
+    session['model'] = model
+    session['dataset'] = dataset
+    session['irrigation'] = irrigation
+    session['scenario'] = scenario
+    session['crop'] = crop
+    session['compare'] = compare
+    return render_template(
+        'hadgem.html',
+        map_type = 'grid',
+        var=session['var'],
+        lon=session['lon'],
+        lat=session['lat'],
+        model='pdssat',
+        dataset='HADGEM',
+        irrigation=session['irrigation'],
+        scenario=session['scenario'],
+        compare=session['compare'],
+        crop=session['crop'],
+    )
+
+
 @mod.route('/aggr/<lon>/<lat>/<model>/<dataset>/<scenario>/<irrigation>' +
            '/<crop>/<var>/<compare>')
 @mod.route('/aggr/<lon>/<lat>/<model>/<dataset>/<scenario>/<irrigation>' +
@@ -92,40 +122,6 @@ def aggr_view(lon, lat, model, dataset, scenario, irrigation, crop, var, compare
         lat=session['lat'],
         model=session['model'],
         dataset=session['dataset'],
-        irrigation=session['irrigation'],
-        scenario=session['scenario'],
-        compare=session['compare'],
-        crop=session['crop'],
-    )
-
-
-@mod.route('/magpie/<lon>/<lat>/<model>/<dataset>/<scenario>/<irrigation>' +
-           '/<crop>/<var>/<compare>')
-@mod.route('/magpie/<lon>/<lat>/<model>/<dataset>/<scenario>/<irrigation>' +
-           '/<crop>/<var>', defaults={'compare': None, })
-@mod.route('/magpie/<lon>/<lat>',
-           defaults={'model': 'papsim', 'dataset': 'wfdei.cru',
-                     'scenario': 'fullharm', 'irrigation': 'firr',
-                     'crop': 'whe', 'var': 'yield', 'compare': None})
-def magpie_view(lon, lat, model, dataset, scenario, irrigation, crop, var, compare):
-    initial_session()
-    session['var'] = var
-    session['lon'] = lon
-    session['lat'] = lat
-    session['model'] = model
-    session['dataset'] = dataset
-    session['irrigation'] = irrigation
-    session['scenario'] = scenario
-    session['crop'] = crop
-    session['compare'] = compare
-    return render_template(
-        'magpie.html',
-        map_type = 'grid',
-        var=session['var'],
-        lon=session['lon'],
-        lat=session['lat'],
-        model=session['model'],
-        dataset='MAgPIE',
         irrigation=session['irrigation'],
         scenario=session['scenario'],
         compare=session['compare'],
@@ -175,6 +171,40 @@ def grid_view(lon, lat, model, dataset, scenario, irrigation, crop, var, compare
         compare=session['compare'],
         crop=session['crop'],
         json=damn.grid_to_json(lon, lat),
+    )
+
+
+@mod.route('/magpie/<lon>/<lat>/<model>/<dataset>/<scenario>/<irrigation>' +
+           '/<crop>/<var>/<compare>')
+@mod.route('/magpie/<lon>/<lat>/<model>/<dataset>/<scenario>/<irrigation>' +
+           '/<crop>/<var>', defaults={'compare': None, })
+@mod.route('/magpie/<lon>/<lat>',
+           defaults={'model': 'papsim', 'dataset': 'wfdei.cru',
+                     'scenario': 'fullharm', 'irrigation': 'firr',
+                     'crop': 'whe', 'var': 'yield', 'compare': None})
+def magpie_view(lon, lat, model, dataset, scenario, irrigation, crop, var, compare):
+    initial_session()
+    session['var'] = var
+    session['lon'] = lon
+    session['lat'] = lat
+    session['model'] = model
+    session['dataset'] = dataset
+    session['irrigation'] = irrigation
+    session['scenario'] = scenario
+    session['crop'] = crop
+    session['compare'] = compare
+    return render_template(
+        'magpie.html',
+        map_type = 'grid',
+        var=session['var'],
+        lon=session['lon'],
+        lat=session['lat'],
+        model=session['model'],
+        dataset='MAgPIE',
+        irrigation=session['irrigation'],
+        scenario=session['scenario'],
+        compare=session['compare'],
+        crop=session['crop'],
     )
 
 
