@@ -22,11 +22,14 @@
         <li id="menu_model"><a href>Model</a><ul>
           <li class="active">
             <a href
-               class="data-ajax" data-type="model" data-value="magpie">MAgPIE</a>
+               class="data-ajax" data-type="model" data-value="pdssat">pDSSAT</a>
           </li>
         </ul></li>
         <li id="menu_dataset"><a href>Climate</a><ul>
-
+          <li class="active">
+            <a href
+               class="data-ajax" data-type="model" data-value="hadgem">HADGEM</a>
+          </li>
         </ul></li>
         <li id="menu_scenario"><a href>Scenarios</a><ul>
           {% for s in scenarios %}
@@ -46,42 +49,17 @@
         </ul></li>
         <li id="menu_time"><a href>Year</a>
           <div>
-            <input id="time_select" type="range" min="0" max="80" step="1" value="0">
-            <label class="active">2015</label>
+            <input id="time_select" type="range" min="0" max="150" step="1" value="0">
+            <label class="active">1950</label>
           </div>
         </li>
         <li id="menu_variable"><a href>Variable</a><ul>
           <li class="active">
             <a href
-               class="data-ajax" data-type="model" data-value="magpie">&Delta;&nbsp;Area</a>
+               class="data-ajax" data-type="variable" data-value="yield">Yield</a>
           </li>
         </ul></li>
-        <li id="menu_comparison"><a href>+</a><ul>
-          <li id="menu_model_compare"><a href>Model</a><ul>
-            {% for x in models %}
-            <li><a href="/{{ map_type }}/{{ lon }}/{{ lat }}/{{ model }}/{{ dataset }}/{{ scenario }}/{{ irrigation }}/{{ crop }}/{{ var }}/{{ x[1] }}"
-                   class="data-ajax" >{{ x[2]|nbsp }}</a></li>
-            {% endfor %}
-          </ul></li>
-          <li id="menu_scenario_compare"><a href>Scenarios</a><ul>
-            {% for x in scenarios %}
-            <li><a href="/{{ map_type }}/{{ lon }}/{{ lat }}/{{ model }}/{{ dataset }}/{{ scenario }}/{{ irrigation }}/{{ crop }}/{{ var }}/{{ x[1] }}"
-                   class="data-ajax">{{ x[2]|nbsp }}</a></li>
-            {% endfor %}
-          </ul></li>
-          <li id="menu_irrigation_compare"><a href>Irrigation</a><ul>
-            {% for x in irrigations %}
-            <li><a href="/{{ map_type }}/{{ lon }}/{{ lat }}/{{ model }}/{{ dataset }}/{{ scenario }}/{{ irrigation }}/{{ crop }}/{{ var }}/{{ x[1] }}"
-                   class="data-ajax">{{ x[2]|nbsp }}</a></li>
-            {% endfor %}
-          </ul></li>
-          <li id="menu_variable"><a href>Variable</a><ul>
-            {% for x in vars %}
-            <li><a href="/{{ map_type }}/{{ lon }}/{{ lat }}/{{ model }}/{{ dataset }}/{{ scenario }}/{{ irrigation }}/{{ crop }}/{{ var }}/{{ x[1] }}"
-                   class="data-ajax">{{ x[2]|nowrap }}</a></li>
-            {% endfor %}
-          </ul></li>
-        </ul></li>
+
         <li id="menu_glossary"><a href>Glossary</a></li>
         <li id="menu_documentation"><a href>Documentation</a></li>
       </ul>
@@ -110,7 +88,7 @@
 <script src="{{ url_for('static', filename='js/vendor/topojson.v1.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/vendor/queue.v1.min.js') }}"></script>
 {% block bodyjs %}
-<script src="{{ url_for('static', filename='js/magpie.js') }}?3" charset="utf-8" ></script>
+<script src="{{ url_for('static', filename='js/hadgem2.js') }}?3" charset="utf-8" ></script>
 {% endblock %}
 </body>
 </html>

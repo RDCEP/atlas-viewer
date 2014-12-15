@@ -1,11 +1,11 @@
 (function() {
 
-  var world, data, globe_regions,
+  var world, data, globe_regions, ptop, pbot,
     height = window.innerHeight,
     width = window.innerWidth,
-    start_year = 1979,
-    end_year = 2012,
-    current_year = 1979,
+    start_year = 1950,
+    end_year = 2099,
+    current_year = 1950,
     globe_scale = (height - 100) / 2,
     plate_scale = (width - 100) / 6,
     sens = .2,
@@ -18,9 +18,13 @@
     defs = svg.append('defs'),
     color = d3.scale.quantile()
       .range(['#ffffcc', '#ffeda0', '#fed976', '#feb24c', '#fd8d3c', '#fc4e2a', '#e31a1c', '#bd0026', '#800026']),
-    projection = d3.geo.albers()
-      .rotate([-80, 20])
-      .parallels([4, 34])
+    color_plus = d3.scale.quantile()
+      .range(['#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026']),
+    color_minus = d3.scale.quantile()
+      .range(['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8']),
+//      .range(['#e0f3f8', '#abd9e9', '#74add1', '#4575b4', '#313695']),
+    projection = d3.geo.mercator()
+      .rotate([-Options.lon, -Options.lat])
       .scale(1070)
       .translate([width / 2, height / 2])
       .precision(.1),
@@ -33,10 +37,6 @@
         var λ = d3.event.x * sens,
         φ = -d3.event.y * sens,
         rotate = projection.rotate();
-        //Restriction for rotating upside-down
-        φ = φ > 30 ? 30 :
-        φ < -30 ? -30 :
-        φ;
         projection.rotate([λ, φ]);
         path = d3.geo.path().projection(projection);
         svg.selectAll('.boundary').attr('d', path);
@@ -56,7 +56,7 @@
       .attr('class', 'y axis')
       .attr('transform', 'translate(0,0)'),
     graph_data,
-    _x = d3.time.scale().domain([new Date(1979,0,1), new Date(2012,0,1)]).range([0, width]),
+    _x = d3.time.scale().domain([new Date(start_year,0,1), new Date(end_year,0,1)]).range([0, width]),
     _y = d3.scale.linear().domain([0, 1]).range([100, 0]),
     graph_cursor = graph_wrap.append('line')
       .attr({
@@ -91,18 +91,11 @@
     height = window.innerHeight;
     d3.select('svg').attr({height: height, width: width});
     projection.translate([width / 2, height / 2]);
-    var ptop = projection.invert([0,0])[1],
-      pbot = projection.invert([0,height])[1];
-    projection.parallels([
-      ptop - (ptop - pbot) / 6, pbot + (ptop - pbot) / 6
-    ]);
     graph_wrap.attr({transform: 'translate(0,'+(height - 100)+')'});
     _x.range([0, width]);
     y_axis.tickSize(width);
     graph_axes_x.call(x_axis);
-//    d3.selectAll('.boundary').attr('d', path);
     graph_line.attr('d', _line);
-
   };
 
   var update_data_fills = function(_data) {
@@ -114,10 +107,11 @@
         fill: function() {
           j = d.properties.adm;
           if (_data.data.hasOwnProperty(j)) {
-            if (_data.data[j][_time] < 1000000) {
-              return color(_data.data[j][_time]);
+            if (_data.data[j][_time] < 0) {
+              return color_minus(_data.data[j][_time]);
+            } else {
+              return color_plus(_data.data[j][_time]);
             }
-            return '#cccccc';
           }
           return '#cccccc';
         }
@@ -125,9 +119,10 @@
       if (d3.select(this).classed('active')) {
         graph_data = data.data[d.properties.adm].slice();
         graph_data.forEach(function(d, i) {
-          graph_data[i] = {x: new Date(i+1979,0,1), y: (d > 1000) ? null : d, y0: 0};
+          graph_data[i] = {x: new Date(i+start_year,0,1), y: d, y0: 0};
         });
-        _y.domain([0, d3.max(graph_data, function(d) { return d.y })]);
+        _y.domain([d3.min(graph_data, function(d) { return d.y }),
+          d3.max(graph_data, function(d) { return d.y })]);
         graph_line.datum(graph_data)
           .attr('d', _line);
       }
@@ -137,9 +132,10 @@
   var focus_region = function(d) {
     graph_data = data.data[d.properties.adm].slice();
     graph_data.forEach(function(d, i) {
-      graph_data[i] = {x: new Date(i+1979,0,1), y: (d > 1000) ? null : d, y0: 0};
+      graph_data[i] = {x: new Date(i+2014,0,1), y: d, y0: 0};
     });
-    _y.domain([0, d3.max(graph_data, function(d) { return d.y })]);
+    _y.domain([d3.min(graph_data, function(d) { return d.y }),
+      d3.max(graph_data, function(d) { return d.y })]);
     var _this = this;
     var region = d3.select(this);
     d3.selectAll('.world-boundary')
@@ -171,7 +167,14 @@
     world = queued_data[0];
     data = queued_data[1];
 
-    color.domain([data.min, data.max]);
+    if (data.min < 0) {
+//      color_minus.domain([data.min, 0]);
+      color_minus.domain([0, data.min]);
+      color_plus.domain([0, data.max]);
+    } else {
+      color_plus.domain([data.min, data.max]);
+    }
+
     _y.domain([data.min, data.max]);
 
     var sphere = [
@@ -202,13 +205,14 @@
       .on('click', focus_region)
       .on('dblclick', function(d) {
         var c = d3.geo.centroid(d),
-          url = '/grid/'+Math.round(c[0])+'/'+Math.round(c[1])+'/';
-        //TODO: add Options to URL
+          url= '/grid/'+Math.round(c[0])+'/'+Math.round(c[1])+'/';
+        url += Options.model+'/'+Options.dataset+'/'+Options.scenario+'/';
+        url += Options.irrigation+'/'+Options.crop+'/'+Options.var;
         window.location = url;
       })
       .on('mouseover', function(d) {
         d3.select('#hover_legend')
-          .text(d.properties.name)
+          .text(d.properties.name+', '+ d.properties.NAME_0+'\n')
           .style({
             'display': 'block',
             'left': path.centroid(d)[0]+'px',
@@ -228,9 +232,13 @@
 
   };
 
+  d3.json('/static/json/hadgem/yield_new.json', function(error, data) {
+    console.log(error, data);
+  })
+
   queue()
     .defer(d3.json, '/static/topojson/atlas_gadm1.json')
-    .defer(d3.json, '/static/json/aggr/gadm1/'+Options.var+'_gadm1_home.json')
+    .defer(d3.json, '/static/json/hadgem/yield_new.json')
     .awaitAll(atlas);
 
   var time_opt = d3.select('#time_select');
@@ -238,7 +246,7 @@
   time_opt.on('change', function() {
     _time = +d3.select(this).property('value');
     var _ctime = time_label.text();
-    current_year = 1979 + _time;
+    current_year = 2015 + _time;
     time_label.text(current_year);
     graph_cursor.attr({
       'x1': _x(new Date(current_year,0,1)),
