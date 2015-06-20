@@ -1,13 +1,11 @@
 {% extends 'base.html' %}
-<script>
-  {% block jsoptions %}
-  {{ super() }}
-  Options.lon = {{ lon }};
-  Options.lat = {{ lat }};
-  Options.model = '{{ model }}';
-  Options.dataset = '{{ dataset }}';
-  Options.scenario = '{{ scenario }}';
-  Options.irrigation = '{{ irrigation }}';
-  Options.crop = '{{ crop }}';
-  {% endblock %}
-</script>
+{% block jsoptions %}
+{{ super() }}
+Options.lon = {{ lon }};
+Options.lat = {{ lat }};
+Options.model = '{{ model }}';
+Options.dataset = '{{ dataset }}';
+Options.scenario = '{{ scenario }}';
+Options.irrigation = '{{ irrigation }}';
+Options.crop = '{{ crop }}';
+{% endblock %}
