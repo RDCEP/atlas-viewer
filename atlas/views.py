@@ -22,12 +22,6 @@ def initial_session(var=None):
         session['time'] = 0
 
 
-@mod.route('/test')
-def map_test():
-    return render_template(
-        'map_test.html',
-    )
-
 @mod.route('/globe/<lon>/<lat>/<model>/<dataset>/<scenario>/<irrigation>' +
            '/<crop>/<var>/<compare>')
 @mod.route('/globe/<lon>/<lat>/<model>/<dataset>/<scenario>/<irrigation>' +
