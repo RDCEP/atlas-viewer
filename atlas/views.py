@@ -1,12 +1,11 @@
-from flask import request, redirect, url_for, Blueprint, render_template, \
+from flask import Blueprint, render_template, \
     session, jsonify
-import netCDF4
-import pandas as pd
 import numpy as np
 import json
 from atlas.utils.data_munger import DataMunger
 from atlas.constants import MODELS, DATASETS, SCENARIOS, IRRIGATION, \
     CROPS, VARIABLES
+
 
 mod = Blueprint('atlas', __name__,)
 
@@ -22,13 +21,6 @@ def initial_session(var=None):
         session['time'] = 0
 
 
-@mod.route('/globe/<lon>/<lat>/<model>/<dataset>/<scenario>/<irrigation>' +
-           '/<crop>/<var>/<compare>')
-@mod.route('/globe/<lon>/<lat>/<model>/<dataset>/<scenario>/<irrigation>' +
-           '/<crop>/<var>', defaults={'compare': None, })
-@mod.route('/globe/<lon>/<lat>',
-           defaults={'model': 'papsim', 'dataset': 'wfdei.cru',
-                     'scenario': 'fullharm', 'irrigation': 'firr',})
 @mod.route('/',
            defaults={'lon': 0, 'lat': 0, 'model': 'papsim', 'dataset': 'wfdei.cru',
                      'scenario': 'fullharm', 'irrigation': 'firr',
@@ -56,36 +48,6 @@ def index(lon, lat, model, dataset, scenario, irrigation, crop, var, compare):
         crop=session['crop'],
         lon=session['lon'],
         lat=session['lat'],
-    )
-
-
-@mod.route('/aggr/<lon>/<lat>/pdssat/hadgem/<scenario>/<irrigation>' +
-           '/<crop>/<var>/<compare>', defaults={'model': 'pdssat', 'dataset': 'hadgem'})
-@mod.route('/aggr/<lon>/<lat>/pdssat/hadgem/<scenario>/<irrigation>' +
-           '/<crop>/<var>', defaults={'compare': None, 'model': 'pdssat', 'dataset': 'hadgem'})
-def hadgem_view(lon, lat, model, dataset, scenario, irrigation, crop, var, compare):
-    initial_session()
-    session['var'] = var
-    session['lon'] = lon
-    session['lat'] = lat
-    session['model'] = model
-    session['dataset'] = dataset
-    session['irrigation'] = irrigation
-    session['scenario'] = scenario
-    session['crop'] = crop
-    session['compare'] = compare
-    return render_template(
-        'hadgem.html',
-        map_type = 'grid',
-        var=session['var'],
-        lon=session['lon'],
-        lat=session['lat'],
-        model='pdssat',
-        dataset='HADGEM',
-        irrigation=session['irrigation'],
-        scenario=session['scenario'],
-        compare=session['compare'],
-        crop=session['crop'],
     )
 
 
@@ -168,40 +130,6 @@ def grid_view(lon, lat, model, dataset, scenario, irrigation, crop, var, compare
     )
 
 
-@mod.route('/magpie/<lon>/<lat>/<model>/<dataset>/<scenario>/<irrigation>' +
-           '/<crop>/<var>/<compare>')
-@mod.route('/magpie/<lon>/<lat>/<model>/<dataset>/<scenario>/<irrigation>' +
-           '/<crop>/<var>', defaults={'compare': None, })
-@mod.route('/magpie/<lon>/<lat>',
-           defaults={'model': 'papsim', 'dataset': 'wfdei.cru',
-                     'scenario': 'fullharm', 'irrigation': 'firr',
-                     'crop': 'whe', 'var': 'yield', 'compare': None})
-def magpie_view(lon, lat, model, dataset, scenario, irrigation, crop, var, compare):
-    initial_session()
-    session['var'] = var
-    session['lon'] = lon
-    session['lat'] = lat
-    session['model'] = model
-    session['dataset'] = dataset
-    session['irrigation'] = irrigation
-    session['scenario'] = scenario
-    session['crop'] = crop
-    session['compare'] = compare
-    return render_template(
-        'magpie.html',
-        map_type = 'grid',
-        var=session['var'],
-        lon=session['lon'],
-        lat=session['lat'],
-        model=session['model'],
-        dataset='MAgPIE',
-        irrigation=session['irrigation'],
-        scenario=session['scenario'],
-        compare=session['compare'],
-        crop=session['crop'],
-    )
-
-
 @mod.context_processor
 def menu_options():
     return dict(
@@ -224,5 +152,3 @@ def update(_data_type, _adm, _var, _type, _value):
         for k, v in data['data'].iteritems()
     }
     return jsonify(data)
-
-
