@@ -147,42 +147,6 @@ class DataMunger():
         with open('../static/json/aggr/{}_gadm{}_home.json'.format(var, self._adm), 'w') as f:
             f.write(json.dumps(data))
 
-    def magpie_to_json(self, var):
-        """
-        One-time use. For converting MAgPIE nc4 to json.
-        """
-        # for crop in ['bmg', 'bmt', 'cas', 'mai', 'mgr', 'mil', 'nut', 'oth', 'pea', 'rap', 'ric', 'sgb', 'soy', 'sug', 'sun', 'whe']:
-        for crop in ['whe',]:
-            d = netCDF4.Dataset(os.path.join(
-                '..', 'data', 'netcdf', 'magpie',
-                'MAgPIE_LUC_for_ATLAS_illustration_{}_agg.nc4'.format(crop)
-            ))
-            # for irr in ['firr', 'rainf']:
-            #     d = netCDF4.Dataset(os.path.join('..', 'data', 'netcdf', 'magpie', 'MAgPIE_LUC_for_ATLAS_illustration_{}_{}.nc4'.format(crop, irr)))
-            _v = d.variables['{}_gadm{}'.format(crop, self._adm)][:]
-            _gi = d.variables['gadm{}_index'.format(self._adm)][:]
-            new_data = {}
-            for i in range(len(_gi)):
-                new_data[str(_gi[i])] = [v - np.mean(_v[:20]) for v in _v[i].tolist()[20:]]
-            with open('../static/json/aggr/gadm{}/magpie/{}_gadm{}.json'.format(
-                    self._adm, crop, self._adm), 'w') as f:
-                f.write(
-                    json.dumps(
-                        {
-                            'data': new_data,
-                            'min': round(np.min(_v[:]), 1),
-                            'max': round(np.max(_v[:]), 1),
-                        }
-                    )
-                )
-            trimmed = {
-                'data': {k: np.array(v)[:, 0].tolist() for k, v in new_data.iteritems()},
-                'min': round(np.min([np.array(v)[:, 0].tolist() for k, v in new_data.iteritems()]), 1),
-                'max': round(np.max([np.array(v)[:, 0].tolist() for k, v in new_data.iteritems()]), 1),
-            }
-            with open('../static/json/aggr/gadm{}/magpie/{}_gadm{}_home.json'.format(self._adm, crop, self._adm), 'w') as f:
-                f.write(json.dumps(trimmed))
-
     def aggr_to_np(self, var):
         d = netCDF4.Dataset(os.path.join(
             '..', 'data', 'netcdf', 'gadm01_aggr',
@@ -305,34 +269,10 @@ class DataMunger():
             'center': center,
         })
 
-    def hadgem(self, var):
-        d = netCDF4.Dataset(os.path.join(
-            '..', 'data', 'netcdf', 'aggr',
-            'pdssat_hadgem2-es_rcp8p5_whe_annual_1950_2099.nc4'
-        ))
-        _v = d.variables['{}_gadm1'.format(var)][:].filled(np.nan)
-        _gi = d.variables['gadm1_index'][:]
-        new_data = {}
-
-        for i in range(len(_gi)):
-            new_data[str(_gi[i])] = [np.divide(v,  np.nanmean(_v[i, :30, 0, 0])) for v in _v[i, :, 0, 0].tolist()]
-        with open('../static/json/hadgem/{}_gadm1.json'.format(var), 'w') as f:
-            f.write(
-                json.dumps(
-                    {
-                        'data': new_data,
-                        'min': round(np.nanmin(_v[:]), 1),
-                        'max': round(np.nanmax(_v[:]), 1),
-                    }
-                )
-            )
-        self.trim_aggr_data(var)
 
 if __name__ == '__main__':
     import cProfile
     damn = DataMunger(model=0, dataset=0, scenario=0, irr=1, crop=5, var=11)
     damn._adm = 1
-    # damn.magpie_to_json(None)
-    damn.hadgem('yield')
     # os.chdir('../..')
     # cProfile.run('damn.grid_to_json(80, 20)', 'profile_stats')
