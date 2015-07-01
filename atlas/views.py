@@ -11,14 +11,11 @@ mod = Blueprint('atlas', __name__,)
 
 
 def initial_session(var=None):
-    try:
-        session['scenario'] = 0 if not session['scenario'] else session['scenario']
-        session['irrigation'] = 0 if not session['irrigation'] else session['irrigation']
-        session['time'] = 0 if not session['time'] else session['time']
-    except KeyError:
-        session['scenario'] = 0
-        session['irrigation'] = 0
-        session['time'] = 0
+    for k in ['scenario', 'irrigation', 'time']:
+        try:
+            session[k] = 0 if not session[k] else session[k]
+        except KeyError:
+            session[k] = 0
 
 
 @mod.route('/',
@@ -143,6 +140,7 @@ def menu_options():
 
 
 @mod.route('/update/<_data_type>/adm/<_adm>/var/<_var>/type/<_type>/value/<_value>', methods=['POST',])
+# This is used in atlas_001.js
 def update(_data_type, _adm, _var, _type, _value):
     with open('./atlas/static/json/{}/gadm{}/{}_gadm{}.json'.format(_data_type, _adm, _var, _adm), 'r') as f:
         data = json.loads(f.read())
