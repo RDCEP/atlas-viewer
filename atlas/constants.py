@@ -1,3 +1,7 @@
+import os
+
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+
 SCENARIOS = [
   (0, 'default', 'Default', ),
   (1, 'fullharm', 'Full harm', ),
