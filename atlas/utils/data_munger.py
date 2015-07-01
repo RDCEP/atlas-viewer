@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 import pycountry
 from atlas.constants import MODELS, DATASETS, SCENARIOS, IRRIGATION, \
-        CROPS, VARIABLES
+        CROPS, VARIABLES, BASE_DIR
 
 
 class DataMunger():
@@ -29,7 +29,8 @@ class DataMunger():
         """
         Return gadm0 codes as DataFrame
         """
-        d = pd.DataFrame.from_csv(os.path.join('gadm0.meta.csv'), index_col=3)
+        d = pd.DataFrame.from_csv(os.path.join(
+            BASE_DIR, 'utils', 'gadm0.meta.csv'), index_col=3)
         d.index = np.arange(len(d))
         return d
 
@@ -38,7 +39,8 @@ class DataMunger():
         """
         Return gadm1 codes as DataFrame
         """
-        d = pd.DataFrame.from_csv(os.path.join('gadm1.meta.csv'), index_col=4)
+        d = pd.DataFrame.from_csv(os.path.join(
+            BASE_DIR, 'utils', 'gadm1.meta.csv'), index_col=4)
         return d
 
     @property
@@ -62,9 +64,11 @@ class DataMunger():
         """
         Add GADM level 1 information to level 1 map outlines from Natural Earth.
         """
-        gadm = pd.DataFrame.from_csv('./gadm1.meta.csv', index_col=4)
+        gadm = pd.DataFrame.from_csv(os.path.join(
+            BASE_DIR, 'utils', 'gadm1.meta.csv'), index_col=4)
         gadm.index = np.arange(len(gadm))
-        with open('../static/topojson/ne1_s0001.json') as f:
+        with open(os.path.join(
+                BASE_DIR, 'static', 'topojson', 'ne1_s0001.json')) as f:
             ne = json.loads(f.read())
         for region in ne['objects']['regions']['geometries']:
             props = region['properties']
@@ -80,7 +84,8 @@ class DataMunger():
                 region['properties']['adm'] = '{0}{1:02d}'.format(id0, id1)
             except:
                 pass
-        with open('../static/topojson/atlas_gadm1.json', 'w') as f:
+        with open(os.path.join(
+                BASE_DIR, 'static', 'topojson', 'atlas_gadm1.json'), 'w') as f:
             f.write(json.dumps(ne))
         return ne
 
@@ -88,7 +93,8 @@ class DataMunger():
         """
         Add GADM level 1 information to level 1 map outlines from GADM.
         """
-        with open('../static/topojson/gadm1_map.json') as f:
+        with open(os.path.join(
+                BASE_DIR, 'static', 'topojson', 'gadm1_map.json')) as f:
             ga = json.loads(f.read())
         ga['objects']['regions'] = ga['objects']['_bejeezus']
         ga['objects'].pop('_bejeezus', None)
@@ -110,7 +116,8 @@ class DataMunger():
                 region['properties'].pop('VARNAME_1', None)
             except:
                 pass
-        with open('../static/topojson/atlas_gadm1.json', 'w') as f:
+        with open(os.path.join(
+                BASE_DIR, 'static', 'topojson', 'atlas_gadm1.json'), 'w') as f:
             f.write(json.dumps(ga))
         return ga
 
@@ -119,7 +126,8 @@ class DataMunger():
         Add GADM level 0 information to level 0 map outlines from Natural Earth.
         """
         gadm = self.gadm0_meta
-        with open('../static/topojson/ne0_s0001.json', 'r') as f:
+        with open(os.path.join(
+                BASE_DIR, 'static', 'topojson', 'ne0_s0001.json'), 'r') as f:
             ne = json.loads(f.read())
         for region in ne['objects']['regions']['geometries']:
             props = region['properties']
@@ -132,7 +140,8 @@ class DataMunger():
             except:
                 pass
                 # print(props)
-        with open('../static/topojson/atlas_gadm0.json', 'w') as f:
+        with open(os.path.join(
+                BASE_DIR, 'static', 'topojson', 'atlas_gadm0.json'), 'w') as f:
             f.write(json.dumps(ne))
         return ne
 
@@ -141,15 +150,19 @@ class DataMunger():
         Trim extra scenarios and irrigations from json file (for initial
         loading of page).
         """
-        with open('../static/json/aggr/{}_gadm{}.json'.format(var, self._adm), 'r') as f:
+        with open(os.path.join(
+                BASE_DIR, 'static', 'json', 'aggr',
+                '{}_gadm{}.json'.format(var, self._adm)), 'r') as f:
             data = json.loads(f.read())
         data['data'] = {k: np.array(v)[:, 0, 0].tolist() for k, v in data['data'].iteritems()}
-        with open('../static/json/aggr/{}_gadm{}_home.json'.format(var, self._adm), 'w') as f:
+        with open(os.path.join(
+                BASE_DIR, 'static', 'json', 'aggr',
+                '{}_gadm{}_home.json'.format(var, self._adm)), 'w') as f:
             f.write(json.dumps(data))
 
     def aggr_to_np(self, var):
         d = netCDF4.Dataset(os.path.join(
-            '..', 'data', 'netcdf', 'gadm01_aggr',
+            BASE_DIR, 'data', 'netcdf', 'gadm01_aggr',
             '{}_{}_hist_{}_annual_{}_{}.nc4'.format(
                 self._model[1], self._dataset[1], self._crop[1], self._dataset[3],
                 self._dataset[4]
@@ -164,8 +177,9 @@ class DataMunger():
         new_data = {}
         for i in range(len(_gi)):
             new_data[str(_gi[i])] = _v[i].data.tolist()
-        with open('../static/json/aggr/{}_gadm{}.json'.format(
-                var, self._adm), 'w') as f:
+        with open(os.path.join(
+                BASE_DIR, 'static', 'json', 'aggr',
+                '{}_gadm{}.json'.format(var, self._adm)), 'w') as f:
             f.write(
                 json.dumps(
                     {
@@ -179,42 +193,33 @@ class DataMunger():
 
     def grid_to_np(self, lon, lat, var2=False, op=np.divide):
 
-        def lonlat_index(l, axis='lon'):
+        def lonlat_index(d, l, axis='lon', t=80):
             l = math.floor(float(l * 2)) / 2 + .25
             larr = d.variables[axis][:]
             lix = np.where(larr == l)[0][0]
-            lix = int(math.floor(lix - tile_size / 2))
-            # if tile_size / 2 < lix < len(larr)- tile_size / 2:
-            #     return lix
-            # else:
-            #     return -lix
+            lix = int(math.floor(lix - t / 2))
             return lix
 
         tile_size = 80
         file_path = os.path.join(
-            # '..', 'data', 'netcdf', 'full_global',
-            'atlas', 'data', 'netcdf', 'full_global',
+            BASE_DIR, 'data', 'netcdf', 'full_global',
             '{}_{}_hist_{}_{}_{}_{}_annual_{}_{}.nc4'.format(
                 self._model[1], self._dataset[1], self._scenario[1],
                 self._irrigation[1], self._var[1], self._crop[1],
                 self._dataset[3], self._dataset[4]))
-        d = netCDF4.Dataset(file_path)
-        lonix = lonlat_index(lon)
-        latix = lonlat_index(lat, axis='lat')
-        print(lonix, latix)
-        _v = d.variables['{}_{}'.format(self._var[1], self._crop[1])][:].filled(np.nan)
+        _data = netCDF4.Dataset(file_path)
+        lonix = lonlat_index(_data, lon, axis='lon', t=tile_size)
+        latix = lonlat_index(_data, lon, axis='lat', t=tile_size)
+        _v = _data.variables['{}_{}'.format(self._var[1], self._crop[1])][:].filled(np.nan)
         _v = _v.transpose(2, 1, 0)
-        # _v = _v.take(xrange(lonix, lonix+tile_size), axis=0, mode='wrap').take(xrange(latix, latix+tile_size), axis=1, mode='wrap')
         _v = np.roll(np.roll(_v, -lonix, axis=0), -latix, axis=1)[:tile_size, :tile_size, :]
         if var2:
             _v2 = self.grid_to_np(lon, lat, var2=False, op=op)[0]
             _v = op(_v, _v2)
         return (
             _v,
-            # np.roll(d.variables['lon'][:], -lonix)[:tile_size],
-            # np.roll(d.variables['lat'][:], -latix)[:tile_size],
-            d.variables['lon'][:].take(range(lonix, lonix+tile_size), axis=0, mode='wrap'),
-            d.variables['lat'][:].take(range(latix, latix+tile_size), axis=0, mode='wrap'),
+            _data.variables['lon'][:].take(range(lonix, lonix+tile_size), axis=0, mode='wrap'),
+            _data.variables['lat'][:].take(range(latix, latix+tile_size), axis=0, mode='wrap'),
         )
 
     def grid_to_json(self, lon, lat, var2=None, op=np.divide):
