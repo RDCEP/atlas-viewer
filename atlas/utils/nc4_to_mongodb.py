@@ -11,6 +11,7 @@ from pymongo import MongoClient
 
 client = MongoClient('localhost', 27017)
 import geojson
+import json
 
 # input location of the netCDF file
 nc_file = "/home/ricardo/estagio/papsim_wfdei.cru_hist_default_firr_aet_whe_annual_1979_2012.nc4"
@@ -83,6 +84,7 @@ try:
                     raise
                 print '*** Start ***'
                 print new_points
+                new_points = [json.loads(coords) for coords in new_points]
                 result = points.insert_many(new_points)
                 print '*** Inserted Points ***'
                 print result.inserted_ids  # Give output of inserted values for a point on all times
