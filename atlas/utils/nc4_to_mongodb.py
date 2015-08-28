@@ -4,12 +4,12 @@ __author__ = "rblourenco@uchicago.edu"
 # Timestamp for testing
 # import datetime
 
+from pymongo.errors import PyMongoError
+import sys
 from netCDF4 import Dataset
-
 from pymongo import MongoClient
 
 client = MongoClient('localhost', 27017)
-
 import geojson
 
 # input location of the netCDF file
@@ -27,6 +27,7 @@ value = 'aet_whe'
 # Defining MongoDB instance
 db = client['atlas']
 points = db.simulation
+
 
 # Define GeoJSON standard for ATLAS
 class GenerateDocument:
@@ -77,9 +78,9 @@ try:
                         new_points.append(tile)
                         tile = {}  # Clear buffer
                         # print '*** End ***'
-                except Exception:
-                    print 'Error while reading time'
-                    print Exception
+                except:
+                    print "Unexpected error:", sys.exc_info()[0]
+                    raise
                 print '*** Start ***'
                 print new_points
                 result = points.insert_many(new_points)
@@ -87,9 +88,11 @@ try:
                 print result.inserted_ids  # Give output of inserted values for a point on all times
                 print '*** End ***'
                 new_points = []  # Clear Buffer
-        except exception pymongo.errors.PyMongoError:
-            print 'Error while reading longitudes'
-            print exceptions.Exception
-except Exception:
-    print 'Error while reading latitudes'
-    print Exception
+        except PyMongoError:
+            print 'Error while commiting on MongoDB'
+        except:
+            print "Unexpected error:", sys.exc_info()[0]
+            raise
+except:
+    print "Unexpected error:", sys.exc_info()[0]
+    raise
