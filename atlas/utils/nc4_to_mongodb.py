@@ -1,9 +1,7 @@
 __author__ = "rblourenco@uchicago.edu"
 # 2015-08-19 - Initial commit
 
-# Timestamp for testing
-# import datetime
-
+import datetime
 from pymongo.errors import PyMongoError
 import sys
 from netCDF4 import Dataset
@@ -23,7 +21,7 @@ nc_dataset = Dataset(nc_file, 'r')
 longitude = 'lon'
 latitude = 'lat'
 time = 'time'
-value = 'aet_whe'
+sim_context = 'aet_whe'
 
 # Defining MongoDB instance
 db = client['atlas']
@@ -32,20 +30,38 @@ points = db.simulation
 
 # Define GeoJSON standard for ATLAS
 class GenerateDocument:
-    def __init__(self, x, y, simulation_variable):
+    def __init__(self, x, y, simulation_variable, valor):
         self.x = x
         self.y = y
         self.sim = simulation_variable
+        self.valor = valor
 
     @property
     def __geo_interface__(self):
-        return {'type': 'Point', 'coordinates': (self.x, self.y), 'simulation': self.sim}
+        varOutput = {
+            'type': "Feature",
+            'shard_key_x': self.x,
+            'shard_key_y': self.y,
+            'geometry': {
+                'type': 'Point',
+                'coordinates': [
+                    self.x,
+                    self.y
+                ]
+            },
+            'properties': {
+                'simulation': self.sim,
+                'timestamp': datetime.datetime.now().isoformat(),
+                '1984': self.valor
+            }
+        }
+        return varOutput
 
 
 # get netCDF variable objects
 latitudes = nc_dataset.variables[latitude]
 longitudes = nc_dataset.variables[longitude]
-values = nc_dataset.variables[value]
+values = nc_dataset.variables[sim_context]
 times = nc_dataset.variables[time]
 
 # get netCDF variable values
@@ -65,30 +81,22 @@ try:
     for lat in range(len(count_lat)):
         try:
             for lon in range(len(count_long)):
-                # TODO: Needs to write commit on mongodb collection (still to define database model)
-                # Loop in time: Fills time values on the GeoJSON
                 new_points = []
                 try:
-                    for tyme in range(len(count_time)):
-                        # TODO: Write loop that constantly fills values of a JSON year - look into geojson notation
-                        # print '*** Beginning ***'
-                        # print datetime.datetime.now().isoformat()
-                        # print 'Lat: ', lats[lat], ', Long: ', lons[lon], ', Time: ', tims[tyme]
-                        # print str(vals[tyme, lats[lat], lons[lon]])
-                        tile = geojson.dumps((GenerateDocument(lons[lon], lats[lat], value)), sort_keys=True)
+                    for tyme in range(len(count_time)):  # Loop in time: Fills time values on the GeoJSON                        
+                        xx = str(vals[tyme, lats[lat], lons[lon]])
+                        tile = geojson.dumps((GenerateDocument(lons[lon], lats[lat], sim_context, xx)), sort_keys=True)
                         new_points.append(tile)
-                        tile = {}  # Clear buffer
-                        # print '*** End ***'
+                        tile = {}  # Clear buffer                        
                 except:
                     print "Unexpected error:", sys.exc_info()[0]
                     raise
-                print '*** Start ***'
-                print new_points
+                # commit new_points
                 new_points = [json.loads(coords) for coords in new_points]
                 result = points.insert_many(new_points)
-                print '*** Inserted Points ***'
+                # print '*** Inserted Points ***'
                 print result.inserted_ids  # Give output of inserted values for a point on all times
-                print '*** End ***'
+                # print '*** End ***'
                 new_points = []  # Clear Buffer
         except PyMongoError:
             print 'Error while commiting on MongoDB'
@@ -98,3 +106,4 @@ try:
 except:
     print "Unexpected error:", sys.exc_info()[0]
     raise
+print '**** End Run ********'
