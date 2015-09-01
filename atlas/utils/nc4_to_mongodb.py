@@ -29,32 +29,27 @@ points = db.simulation
 
 
 # Define GeoJSON standard for ATLAS
-class GenerateDocument:
-    def __init__(self, x, y, simulation_variable, valor):
+class GenerateDocument(object):
+    def __init__(self, x, y, simulation_variable, time_calc, valor):
         self.x = x
         self.y = y
         self.sim = simulation_variable
+        self.time = time_calc
         self.valor = valor
 
     @property
     def __geo_interface__(self):
-        varOutput = {
-            'type': "Feature",
-            'shard_key_x': self.x,
-            'shard_key_y': self.y,
-            'geometry': {
-                'type': 'Point',
-                'coordinates': [
-                    self.x,
-                    self.y
-                ]
-            },
-            'properties': {
-                'simulation': self.sim,
-                'timestamp': datetime.datetime.now().isoformat(),
-                '1984': self.valor
-            }
-        }
+        varOutput = dict(type="Feature", shard_key_x=self.x, shard_key_y=self.y, geometry={
+            'type': 'Point',
+            'coordinates': [
+                self.x,
+                self.y
+            ]
+        }, properties={
+            'simulation': self.sim,
+            'timestamp': datetime.datetime.now().isoformat(),
+            self.time: self.valor
+        })
         return varOutput
 
 
@@ -78,14 +73,14 @@ count_time = [int(i) for i in tims]
 
 # populating the database
 try:
-    for lat in range(len(count_lat)):
+    for lat in xrange(len(count_lat)):
         try:
-            for lon in range(len(count_long)):
+            for lon in xrange(len(count_long)):
                 new_points = []
                 try:
-                    for tyme in range(len(count_time)):  # Loop in time: Fills time values on the GeoJSON                        
+                    for tyme in xrange(len(count_time)):  # Loop in time: Fills time values on the GeoJSON
                         xx = str(vals[tyme, lats[lat], lons[lon]])
-                        tile = geojson.dumps((GenerateDocument(lons[lon], lats[lat], sim_context, xx)), sort_keys=True)
+                        tile = geojson.dumps((GenerateDocument(lons[lon], lats[lat], sim_context, tyme, xx)), sort_keys=True)
                         new_points.append(tile)
                         tile = {}  # Clear buffer                        
                 except:
