@@ -1,5 +1,7 @@
 {
   "type": "Feature",
+  "shard_key_x": -47.881115935742855,
+  "shard_key_y": -15.754330434934857,
   "geometry": {
     "type": "Point",
     "coordinates": [
@@ -8,22 +10,8 @@
     ]
   },
   "properties": {
-    "aet": {
-      "timestamp": "2013-10-02T01:11:18.965Z",
-      "years": {
-        "1981": {
-          "value": 0.00
-        },
-        "1982": {
-          "value": 0.00
-        },
-        "1983": {
-          "value": 0.00
-        },
-        "1984": {
-          "value": 0.00
-        }
-      }
-    }
+    "simulation": "aet",
+    "timestamp": "2013-10-02T01:11:18.965Z",
+    "1984": 0.0
   }
 }
