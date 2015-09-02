@@ -37,19 +37,21 @@ class GenerateDocument(object):
         self.time = time_calc
         self.valor = valor
 
-    @property
+    @property  # Attention: When referring to MongoDB User Reference, GeoJSON Standard 'geometry' should be used instead
+    # of 'loc', for geoindexing
     def __geo_interface__(self):
-        varOutput = dict(type="Feature", shard_key_x=self.x, shard_key_y=self.y, geometry={
+        varOutput = {'type': 'Feature', 'shard_key_x': self.x, 'shard_key_y': self.y, 'geometry': {
             'type': 'Point',
             'coordinates': [
                 self.x,
                 self.y
             ]
-        }, properties={
+        }, 'properties': {
             'simulation': self.sim,
             'timestamp': datetime.datetime.now().isoformat(),
-            self.time: self.valor
-        })
+            'time': self.time,
+            'value': self.valor
+        }}
         return varOutput
 
 
@@ -80,7 +82,8 @@ try:
                 try:
                     for tyme in xrange(len(count_time)):  # Loop in time: Fills time values on the GeoJSON
                         xx = str(vals[tyme, lats[lat], lons[lon]])
-                        tile = geojson.dumps((GenerateDocument(lons[lon], lats[lat], sim_context, tyme, xx)), sort_keys=True)
+                        tile = geojson.dumps((GenerateDocument(lons[lon], lats[lat], sim_context, tyme, xx)),
+                                             sort_keys=True)
                         new_points.append(tile)
                         tile = {}  # Clear buffer                        
                 except:
