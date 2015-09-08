@@ -19,10 +19,10 @@ class MongoRead:
         self.a_y = a_y  # Coordinate point A, y axis
         self.b_x = b_x  # Coordinate point B, x axis
         self.b_y = b_y  # Coordinate point B, y axis
-        self.c_x = c_x  # Coordinate point A, x axis
-        self.c_y = c_y  # Coordinate point A, y axis
-        self.d_x = d_x  # Coordinate point A, x axis
-        self.d_y = d_y  # Coordinate point A, y axis
+        self.c_x = c_x  # Coordinate point C, x axis
+        self.c_y = c_y  # Coordinate point C, y axis
+        self.d_x = d_x  # Coordinate point D, x axis
+        self.d_y = d_y  # Coordinate point D, y axis
 
         self.dpmm = dpmm  # Dot per milimeter rate extracted from browser
 
