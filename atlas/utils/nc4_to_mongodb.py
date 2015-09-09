@@ -2,6 +2,7 @@ __author__ = "rblourenco@uchicago.edu"
 # 2015-08-19 - Initial commit
 
 import datetime
+from datetime import timedelta
 from pymongo.errors import PyMongoError
 import sys
 from netCDF4 import Dataset
@@ -10,6 +11,10 @@ from pymongo import MongoClient
 client = MongoClient('localhost', 27017)
 import geojson
 import json
+
+start_time = datetime.datetime.now()
+print ' *** Start ***'
+print str(start_time)
 
 # input location of the netCDF file
 nc_file = "/home/ricardo/estagio/papsim_wfdei.cru_hist_default_firr_aet_whe_annual_1979_2012.nc4"
@@ -22,6 +27,7 @@ longitude = 'lon'
 latitude = 'lat'
 time = 'time'
 sim_context = 'aet_whe'
+pixel_side_length = 0.001  # Using degree decimals - if zero, states a point
 
 # Defining MongoDB instance
 db = client['atlas']
@@ -30,21 +36,32 @@ points = db.simulation
 
 # Define GeoJSON standard for ATLAS
 class GenerateDocument(object):
-    def __init__(self, x, y, simulation_variable, time_calc, valor):
+    def __init__(self, x, y, simulation_variable, time_calc, valor, side):
         self.x = x
         self.y = y
         self.sim = simulation_variable
         self.time = time_calc
         self.valor = valor
+        self.side = side
 
     @property  # Attention: When referring to MongoDB User Reference, GeoJSON Standard 'geometry' should be used instead
     # of 'loc', for geoindexing
     def __geo_interface__(self):
-        varOutput = {'type': 'Feature', 'shard_key_x': self.x, 'shard_key_y': self.y, 'geometry': {
-            'type': 'Point',
+        # Define polygon based on centroid x,y and side
+        point_ax = self.x - (self.side / 2)
+        point_ay = self.y + (self.side / 2)
+        point_bx = self.x + (self.side / 2)
+        point_by = self.y + (self.side / 2)
+        point_cx = self.x + (self.side / 2)
+        point_cy = self.y - (self.side / 2)
+        point_dx = self.x - (self.side / 2)
+        point_dy = self.y - (self.side / 2)
+
+        varOutput = {'type': 'Feature', 'centroid_x': self.x, 'centroid_y': self.y, 'geometry': {
+            'type': 'Polygon',
             'coordinates': [
-                self.x,
-                self.y
+                [[point_ax, point_ay], [point_bx, point_by], [point_cx, point_cy], [point_dx, point_dy],
+                 [point_ax, point_ay]]
             ]
         }, 'properties': {
             'simulation': self.sim,
@@ -82,8 +99,9 @@ try:
                 try:
                     for tyme in xrange(len(count_time)):  # Loop in time: Fills time values on the GeoJSON
                         xx = str(vals[tyme, lats[lat], lons[lon]])
-                        tile = geojson.dumps((GenerateDocument(lons[lon], lats[lat], sim_context, tyme, xx)),
-                                             sort_keys=True)
+                        tile = geojson.dumps(
+                            (GenerateDocument(lons[lon], lats[lat], sim_context, tyme, xx, pixel_side_length)),
+                            sort_keys=True)
                         new_points.append(tile)
                         tile = {}  # Clear buffer                        
                 except:
@@ -93,7 +111,7 @@ try:
                 new_points = [json.loads(coords) for coords in new_points]
                 result = points.insert_many(new_points)
                 # print '*** Inserted Points ***'
-                print result.inserted_ids  # Give output of inserted values for a point on all times
+                #print result.inserted_ids  # Give output of inserted values for a point on all times
                 # print '*** End ***'
                 new_points = []  # Clear Buffer
         except PyMongoError:
@@ -104,4 +122,8 @@ try:
 except:
     print "Unexpected error:", sys.exc_info()[0]
     raise
+end_time = datetime.datetime.now()
+elapsed_time = end_time - start_time
 print '**** End Run ********'
+print 'Elapsed time'
+print str(elapsed_time)

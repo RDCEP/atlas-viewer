@@ -29,7 +29,7 @@ class MongoRead:
     @property
     def quadrilateral(self): # Returns the GeoJSON documents within it
         geojsonfiles = []
-        cursor = collection.find({"geometry": {"$geoWithin": {"$geometry": {"type": "Polygon", "coordinates": [
+        cursor = collection.find({"geometry": {"$geoIntersects": {"$geometry": {"type": "Polygon", "coordinates": [
             [[self.a_x, self.a_y], [self.b_x, self.b_y], [self.c_x, self.c_y],
              [self.d_x, self.d_y], [self.a_x, self.a_y]]]}}}})
         for document in cursor:
