@@ -1,23 +1,26 @@
 __author__ = "rblourenco@uchicago.edu"
 # 2015-08-19 - Initial commit
-
+import os
+import sys
 import datetime
 from datetime import timedelta
+import json
 from pymongo.errors import PyMongoError
-import sys
-from netCDF4 import Dataset
 from pymongo import MongoClient
+from netCDF4 import Dataset
+import geojson
+from atlas.constants import BASE_DIR
 
 client = MongoClient('localhost', 27017)
-import geojson
-import json
 
 start_time = datetime.datetime.now()
-print ' *** Start ***'
-print str(start_time)
+print(' *** Start ***')
+print(str(start_time))
 
 # input location of the netCDF file
-nc_file = "/home/ricardo/estagio/papsim_wfdei.cru_hist_default_firr_aet_whe_annual_1979_2012.nc4"
+nc_file = os.path.join(
+    BASE_DIR, 'data', 'netcdf', 'full_global',
+    'papsim_wfdei.cru_hist_default_firr_aet_whe_annual_1979_2012.nc4')
 
 # open the netCDF file
 nc_dataset = Dataset(nc_file, 'r')
@@ -105,7 +108,7 @@ try:
                         new_points.append(tile)
                         tile = {}  # Clear buffer                        
                 except:
-                    print "Unexpected error:", sys.exc_info()[0]
+                    print('Unexpected error:', sys.exc_info()[0])
                     raise
                 # commit new_points
                 new_points = [json.loads(coords) for coords in new_points]
@@ -115,15 +118,15 @@ try:
                 # print '*** End ***'
                 new_points = []  # Clear Buffer
         except PyMongoError:
-            print 'Error while commiting on MongoDB'
+            print('Error while commiting on MongoDB')
         except:
-            print "Unexpected error:", sys.exc_info()[0]
+            print('Unexpected error:', sys.exc_info()[0])
             raise
 except:
-    print "Unexpected error:", sys.exc_info()[0]
+    print('Unexpected error:', sys.exc_info()[0])
     raise
 end_time = datetime.datetime.now()
 elapsed_time = end_time - start_time
-print '**** End Run ********'
-print 'Elapsed time'
-print str(elapsed_time)
+print('**** End Run ********')
+print('Elapsed time')
+print(str(elapsed_time))
