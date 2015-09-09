@@ -3,7 +3,6 @@ __author__ = 'rblourenco@uchicago.edu'
 
 # Class for geospatial information retrieval on MongoDB
 # 2015-09-04 - Initial commit
-
 # Importing MongoDB Client Library
 from pymongo import MongoClient
 
@@ -33,6 +32,8 @@ class MongoRead:
             [[self.a_x, self.a_y], [self.b_x, self.b_y], [self.c_x, self.c_y],
              [self.d_x, self.d_y], [self.a_x, self.a_y]]]}}}})
         for document in cursor:
+            document['properties']['_id'] = document['_id']
+            del(document['_id'])
             geojsonfiles.append(document)
 
         return geojsonfiles
@@ -41,3 +42,10 @@ class MongoRead:
     def multiscale(self):
         geojsonfiles = []
         return geojsonfiles
+
+if __name__ == '__main__':
+    import pprint
+    pp = pprint.PrettyPrinter(indent=2)
+    mr = MongoRead(46., 10, 48, 10, 48, 8, 46, 8, 1)
+    # print json.dumps(mr.quadrilateral)
+    pp.pprint(mr.quadrilateral)
