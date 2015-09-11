@@ -3,7 +3,6 @@ __author__ = "rblourenco@uchicago.edu"
 import os
 import sys
 import datetime
-from datetime import timedelta
 import json
 from pymongo.errors import PyMongoError
 from pymongo import MongoClient
@@ -11,7 +10,11 @@ from netCDF4 import Dataset
 import geojson
 from atlas.constants import BASE_DIR
 
-client = MongoClient('localhost', 27017)
+# In case of being a local client
+# client = MongoClient('localhost', 27017)
+
+uri = "mongodb://user:password@example.com/the_database?authMechanism=SCRAM-SHA-1"
+client = MongoClient(uri)
 
 start_time = datetime.datetime.now()
 print(' *** Start ***')
