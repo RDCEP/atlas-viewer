@@ -1,12 +1,30 @@
 {
   "type": "Feature",
-  "shard_key_x": -47.881115935742855,
-  "shard_key_y": -15.754330434934857,
+  "centroid_x": "longitude_center",
+  "centroid_y": "latitude_center",
   "geometry": {
-    "type": "Point",
+    "type": "Polygon",
     "coordinates": [
-      -47.881115935742855,
-      -15.754330434934857
+      [
+        "lon_point_a",
+        "lat_point_a"
+      ],
+      [
+        "lon_point_b",
+        "lat_point_b"
+      ],
+      [
+        "lon_point_c",
+        "lat_point_c"
+      ],
+      [
+        "lon_point_d",
+        "lat_point_d"
+      ],
+      [
+        "lon_point_a",
+        "lat_point_a"
+      ]
     ]
   },
   "properties": {
