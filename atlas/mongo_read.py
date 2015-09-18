@@ -5,12 +5,18 @@ __author__ = 'rblourenco@uchicago.edu'
 # 2015-09-04 - Initial commit
 # Importing MongoDB Client Library
 from pymongo import MongoClient
+from pymongo.errors import PyMongoError
 
 # MongoDB Setup
-client = MongoClient('localhost', 27017)
+# Local run
+# client = MongoClient('localhost', 27017)
+
+# Remote run
+uri = "mongodb://user:password@example.com/the_database?authMechanism=SCRAM-SHA-1"
+client = MongoClient(uri)
+
 db = client['atlas']
 collection = db['simulation']
-
 
 class MongoRead:
     def __init__(self, a_x, a_y, b_x, b_y, c_x, c_y, d_x, d_y, dpmm):
@@ -46,6 +52,9 @@ class MongoRead:
 if __name__ == '__main__':
     import pprint
     pp = pprint.PrettyPrinter(indent=2)
-    mr = MongoRead(46., 10, 48, 10, 48, 8, 46, 8, 1)
-    # print json.dumps(mr.quadrilateral)
-    pp.pprint(mr.quadrilateral)
+    try:                                                      # When reading always include exception for MongoDB
+        mr = MongoRead(46., 10, 48, 10, 48, 8, 46, 8, 1)
+        # print json.dumps(mr.quadrilateral)
+        pp.pprint(mr.quadrilateral)
+    except PyMongoError:
+        print 'Error while reading on MongoDB.'
