@@ -2,6 +2,13 @@ import os
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
+MONGO = dict(user='username',
+             password='password',
+             domain='domain.tld',
+             database='database',
+             local=False,
+             port=27017,)
+
 SCENARIOS = [
   (0, 'default', 'Default', ),
   (1, 'fullharm', 'Full harm', ),

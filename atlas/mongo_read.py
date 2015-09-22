@@ -1,22 +1,22 @@
-__author__ = 'rblourenco@uchicago.edu'
-
-
-# Class for geospatial information retrieval on MongoDB
-# 2015-09-04 - Initial commit
-# Importing MongoDB Client Library
 from pymongo import MongoClient
 from pymongo.errors import PyMongoError
+from atlas.constants import MONGO
 
-# MongoDB Setup
-# Local run
-# client = MongoClient('localhost', 27017)
 
-# Remote run
-uri = "mongodb://user:password@example.com/the_database?authMechanism=SCRAM-SHA-1"
-client = MongoClient(uri)
+__author__ = 'rblourenco@uchicago.edu'
+# Class for geospatial information retrieval on MongoDB
+# 2015-09-04 - Initial commit
+
+
+uri = "mongodb://{}:{}@{}/{}?authMechanism=SCRAM-SHA-1".format(
+    MONGO['user'], MONGO['password'], MONGO['domain'], MONGO['database']
+)
+client = MongoClient(uri) if not MONGO['local'] \
+    else MongoClient('localhost', 27017)
 
 db = client['atlas']
 collection = db['simulation']
+
 
 class MongoRead:
     def __init__(self, a_x, a_y, b_x, b_y, c_x, c_y, d_x, d_y, dpmm):
