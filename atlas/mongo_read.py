@@ -4,7 +4,6 @@ from atlas.constants import MONGO
 
 
 __author__ = 'rblourenco@uchicago.edu'
-# Class for geospatial information retrieval on MongoDB
 # 2015-09-04 - Initial commit
 
 
@@ -18,25 +17,53 @@ db = client['atlas']
 collection = db['simulation']
 
 
-class MongoRead:
+class MongoRead(object):
     def __init__(self, a_x, a_y, b_x, b_y, c_x, c_y, d_x, d_y, dpmm):
-        self.a_x = a_x  # Coordinate point A, x axis
-        self.a_y = a_y  # Coordinate point A, y axis
-        self.b_x = b_x  # Coordinate point B, x axis
-        self.b_y = b_y  # Coordinate point B, y axis
-        self.c_x = c_x  # Coordinate point C, x axis
-        self.c_y = c_y  # Coordinate point C, y axis
-        self.d_x = d_x  # Coordinate point D, x axis
-        self.d_y = d_y  # Coordinate point D, y axis
+        """Class for geospatial information retrieval on MongoDB
 
-        self.dpmm = dpmm  # Dot per milimeter rate extracted from browser
+        :param a_x: Top left decimal longitude
+        :type a_x: float
+        :param a_y: Top left decimal latitude
+        :type a_y: float
+        :param b_x: Top right decimal longitude
+        :type b_x: float
+        :param b_y: Top right decimal latitude
+        :type b_y: float
+        :param c_x: Bottom right decimal longitude
+        :type c_x: float
+        :param c_y: Bottom right decimal latitude
+        :type c_y: float
+        :param d_x: Bottom left decimal longitude
+        :type d_x: float
+        :param d_y: Bottom left decimal latitude
+        :type d_y: float
+        :param dpmm: Dots per millimeter
+        :type dpmm: float
+        """
+        self.a_x = a_x
+        self.a_y = a_y
+        self.b_x = b_x
+        self.b_y = b_y
+        self.c_x = c_x
+        self.c_y = c_y
+        self.d_x = d_x
+        self.d_y = d_y
+        self.dpmm = dpmm
 
     @property
-    def quadrilateral(self): # Returns the GeoJSON documents within it
+    def quadrilateral(self):
+        """Returns the GeoJSON documents within a quadrilateral
+
+        :return: List of GeoJSON files
+        :rtype: list
+        """
         geojsonfiles = []
-        cursor = collection.find({"geometry": {"$geoIntersects": {"$geometry": {"type": "Polygon", "coordinates": [
-            [[self.a_x, self.a_y], [self.b_x, self.b_y], [self.c_x, self.c_y],
-             [self.d_x, self.d_y], [self.a_x, self.a_y]]]}}}})
+        cursor = collection.find(
+            {"geometry": {"$geoIntersects": {
+                "$geometry": {"type": "Polygon", "coordinates": [
+                    [[self.a_x, self.a_y], [self.b_x, self.b_y],
+                     [self.c_x, self.c_y], [self.d_x, self.d_y],
+                     [self.a_x, self.a_y]]]}}}})
         for document in cursor:
             document['properties']['_id'] = document['_id']
             del(document['_id'])
@@ -48,6 +75,7 @@ class MongoRead:
     def multiscale(self):
         geojsonfiles = []
         return geojsonfiles
+
 
 if __name__ == '__main__':
     import pprint
