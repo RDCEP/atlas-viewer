@@ -11,7 +11,7 @@ uri = "mongodb://{}:{}@{}/{}?authMechanism=SCRAM-SHA-1".format(
     MONGO['user'], MONGO['password'], MONGO['domain'], MONGO['database']
 )
 client = MongoClient(uri) if not MONGO['local'] \
-    else MongoClient('localhost', 27017)
+    else MongoClient('localhost', MONGO['port'])
 
 db = client['atlas']
 collection = db['simulation']
