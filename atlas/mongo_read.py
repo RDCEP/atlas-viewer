@@ -52,9 +52,9 @@ class MongoRead:
 if __name__ == '__main__':
     import pprint
     pp = pprint.PrettyPrinter(indent=2)
-    try:                                                      # When reading always include exception for MongoDB
-        mr = MongoRead(46., 10, 48, 10, 48, 8, 46, 8, 1)
-        # print json.dumps(mr.quadrilateral)
+    try:
+        mr = MongoRead(46., 10., 48., 10., 48., 8., 46., 8., 1)
         pp.pprint(mr.quadrilateral)
-    except PyMongoError:
+    except PyMongoError, error:
         print 'Error while reading on MongoDB.'
+        raise error
