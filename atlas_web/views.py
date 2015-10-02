@@ -19,80 +19,20 @@ def initial_session(var=None):
             session[k] = 0
 
 
+@mod.route('/api/<tlx>/<tly>/<brx>/<bry>')
+def mongo_test(tlx, tly, brx, bry):
+    from atlas.mongo_read import MongoRead
+    initial_session()
+    mr = MongoRead(tlx, tly, brx, tly, brx, bry, tlx, bry, 4)
+    return mr.quadrilateral
+
+
+
 @mod.route('/',
            defaults={'lon': 0, 'lat': 0, 'model': 'papsim', 'dataset': 'wfdei.cru',
                      'scenario': 'fullharm', 'irrigation': 'firr',
                      'crop': 'whe', 'var': 'yield', 'compare': None})
 def index(lon, lat, model, dataset, scenario, irrigation, crop, var, compare):
-    initial_session()
-    session['var'] = var
-    session['lon'] = lon
-    session['lat'] = lat
-    session['model'] = model
-    session['dataset'] = dataset
-    session['irrigation'] = irrigation
-    session['scenario'] = scenario
-    session['crop'] = crop
-    session['compare'] = compare
-    return render_template(
-        'index.html',
-        map_type='globe',
-        var=session['var'],
-        model=session['model'],
-        dataset=session['dataset'],
-        irrigation=session['irrigation'],
-        scenario=session['scenario'],
-        compare=session['compare'],
-        crop=session['crop'],
-        lon=session['lon'],
-        lat=session['lat'],
-    )
-
-
-@mod.route('/aggr/<lon>/<lat>/<model>/<dataset>/<scenario>/<irrigation>' +
-           '/<crop>/<var>/<compare>')
-@mod.route('/aggr/<lon>/<lat>/<model>/<dataset>/<scenario>/<irrigation>' +
-           '/<crop>/<var>', defaults={'compare': None, })
-@mod.route('/aggr/<lon>/<lat>',
-           defaults={'model': 'papsim', 'dataset': 'wfdei.cru',
-                     'scenario': 'fullharm', 'irrigation': 'firr',
-                     'crop': 'whe', 'var': 'yield', 'compare': None})
-def aggr_view(lon, lat, model, dataset, scenario, irrigation, crop, var, compare):
-    initial_session()
-    session['var'] = var
-    session['lon'] = lon
-    session['lat'] = lat
-    session['model'] = model
-    session['dataset'] = dataset
-    session['irrigation'] = irrigation
-    session['scenario'] = scenario
-    session['crop'] = crop
-    session['compare'] = compare
-    return render_template(
-        'aggr/aggr.html',
-        map_type = 'grid',
-        var=session['var'],
-        lon=session['lon'],
-        lat=session['lat'],
-        model=session['model'],
-        dataset=session['dataset'],
-        irrigation=session['irrigation'],
-        scenario=session['scenario'],
-        compare=session['compare'],
-        crop=session['crop'],
-    )
-
-
-@mod.route('/grid/<lon>/<lat>/<model>/<dataset>/<scenario>/<irrigation>' +
-           '/<crop>/<var>/<compare>')
-@mod.route('/grid/<lon>/<lat>/<model>/<dataset>/<scenario>/<irrigation>' +
-           '/<crop>/<var>',
-           defaults={'compare': None, })
-@mod.route('/grid/<lon>/<lat>',
-           defaults={'model': 'papsim', 'dataset': 'wfdei.cru',
-                     'scenario': 'fullharm', 'irrigation': 'firr',
-                     'crop': 'whe', 'var': 'yield', 'compare': None})
-def grid_view(lon, lat, model, dataset, scenario, irrigation, crop, var, compare):
     initial_session()
     session['var'] = var
     session['lon'] = lon
@@ -114,17 +54,17 @@ def grid_view(lon, lat, model, dataset, scenario, irrigation, crop, var, compare
     )
     return render_template(
         'grid/grid.html',
-        map_type = 'grid',
+        map_type='grid',
         var=session['var'],
-        lon=session['lon'],
-        lat=session['lat'],
         model=session['model'],
         dataset=session['dataset'],
         irrigation=session['irrigation'],
         scenario=session['scenario'],
         compare=session['compare'],
         crop=session['crop'],
-        json=damn.grid_to_json(lon, lat),
+        lon=session['lon'],
+        lat=session['lat'],
+        json=damn.grid_to_json(0., 0.),
     )
 
 
