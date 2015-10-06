@@ -1,5 +1,10 @@
+try:
+    import simplejson as json
+except ImportError:
+    import json
 from pymongo import MongoClient
 from pymongo.errors import PyMongoError
+from bson import json_util
 from atlas.constants import MONGO
 
 
@@ -67,7 +72,7 @@ class MongoRead(object):
         for document in cursor:
             document['properties']['_id'] = document['_id']
             del(document['_id'])
-            geojsonfiles.append(document)
+            geojsonfiles.append(json.dumps(document, default=json_util.default))
 
         return geojsonfiles
 
