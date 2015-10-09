@@ -11,10 +11,10 @@ import geojson
 from atlas.constants import BASE_DIR
 
 # In case of being a local client
-# client = MongoClient('localhost', 27017)
+client = MongoClient('localhost', 27017)
 
 uri = "mongodb://user:password@example.com/the_database?authMechanism=SCRAM-SHA-1"
-client = MongoClient(uri)
+#client = MongoClient(uri)
 
 start_time = datetime.datetime.now()
 print(' *** Start ***')
@@ -34,6 +34,7 @@ latitude = 'lat'
 time = 'time'
 sim_context = 'aet_whe'
 pixel_side_length = 0.001  # Using degree decimals - if zero, states a point
+nc4file = 'papsim_wfdei.cru_hist_default_firr_aet_whe_annual_1979_2012'
 
 # Defining MongoDB instance
 db = client['atlas']
@@ -42,13 +43,14 @@ points = db.simulation
 
 # Define GeoJSON standard for ATLAS
 class GenerateDocument(object):
-    def __init__(self, x, y, simulation_variable, time_calc, valor, side):
+    def __init__(self, x, y, simulation_variable, time_calc, valor, side, nc4filename):
         self.x = x
         self.y = y
         self.sim = simulation_variable
         self.time = time_calc
         self.valor = valor
         self.side = side
+        self.nc4filename = nc4filename
 
     @property  # Attention: When referring to MongoDB User Reference, GeoJSON Standard 'geometry' should be used instead
     # of 'loc', for geoindexing
@@ -70,6 +72,7 @@ class GenerateDocument(object):
                  [point_ax, point_ay]]
             ]
         }, 'properties': {
+            'nc4filename': self.nc4filename,
             'simulation': self.sim,
             'timestamp': datetime.datetime.now().isoformat(),
             'time': self.time,
@@ -106,7 +109,7 @@ try:
                     for tyme in xrange(len(count_time)):  # Loop in time: Fills time values on the GeoJSON
                         xx = str(vals[tyme, lats[lat], lons[lon]])
                         tile = geojson.dumps(
-                            (GenerateDocument(lons[lon], lats[lat], sim_context, tyme, xx, pixel_side_length)),
+                            (GenerateDocument(lons[lon], lats[lat], sim_context, tyme, xx, pixel_side_length, nc4file)),
                             sort_keys=True)
                         new_points.append(tile)
                         tile = {}  # Clear buffer                        
@@ -117,7 +120,7 @@ try:
                 new_points = [json.loads(coords) for coords in new_points]
                 result = points.insert_many(new_points)
                 # print '*** Inserted Points ***'
-                #print result.inserted_ids  # Give output of inserted values for a point on all times
+                print result.inserted_ids  # Give output of inserted values for a point on all times
                 # print '*** End ***'
                 new_points = []  # Clear Buffer
         except PyMongoError:
@@ -131,5 +134,9 @@ except:
 end_time = datetime.datetime.now()
 elapsed_time = end_time - start_time
 print('**** End Run ********')
+print('Start time')
+print (str(start_time))
+print ('End time')
+print (str(end_time))
 print('Elapsed time')
 print(str(elapsed_time))
