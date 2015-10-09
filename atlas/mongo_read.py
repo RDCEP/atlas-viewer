@@ -21,6 +21,9 @@ client = MongoClient(uri) if not MONGO['local'] \
 db = client['atlas']
 collection = db['simulation']
 
+def toJson(data):
+    """Convert Mongo object(s) to JSON"""
+    return json.dumps(data, default=json_util.default)
 
 class MongoRead(object):
     def __init__(self, a_x, a_y, b_x, b_y, c_x, c_y, d_x, d_y, dpmm):
@@ -74,7 +77,7 @@ class MongoRead(object):
             del(document['_id'])
             geojsonfiles.append(json.dumps(document, default=json_util.default))
 
-        return geojsonfiles
+        return toJson(geojsonfiles)
 
     @property
     def multiscale(self):
