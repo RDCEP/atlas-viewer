@@ -3,10 +3,12 @@ import os
 import sys
 import datetime
 import itertools
+import ntpath
 try:
     import simplejson as json
 except ImportError:
     import json
+from numpy import ma
 from pymongo.errors import PyMongoError
 from pymongo import MongoClient
 from netCDF4 import Dataset
@@ -98,11 +100,11 @@ class NetCDFToMongo(object):
         """Represent null values from netCDF as '--' and numeric values
         as floats.
         """
+        if value is ma.masked:
+            return None
         try:
             return float(value)
         except ValueError:
-            return str(value)
-        except:
             print('*** Encountered uncoercible non-numeric ***\n{}'.format(
                 value
             ))
@@ -120,7 +122,7 @@ class NetCDFToMongo(object):
                         xx = self.num_or_null(self.vals[i, lat, lon])
                         tile = geojson.dumps((
                             GenerateDocument(lon, lat, self.sim_context, i, xx,
-                                             self.pixel_side_length)
+                                             self.pixel_side_length, self.file)
                         ), sort_keys=True)
                         new_points.append(tile)
                         tile = {}
@@ -148,13 +150,15 @@ class NetCDFToMongo(object):
 
 # Define GeoJSON standard for ATLAS
 class GenerateDocument(object):
-    def __init__(self, x, y, simulation_variable, time_calc, valor, side):
+    def __init__(self, x, y, simulation_variable, time_calc, valor,
+                 side, filename):
         self.x = x
         self.y = y
         self.sim = simulation_variable
         self.time = time_calc
         self.valor = valor
         self.side = side
+        self.filename = filename
 
     @property
     def __geo_interface__(self):
@@ -183,6 +187,7 @@ class GenerateDocument(object):
                  [point_cx, point_cy], [point_dx, point_dy],
                  [point_ax, point_ay]]]},
             'properties': {
+                'nc4filename': ntpath.basename(self.filename),
                 'simulation': self.sim,
                 'timestamp': datetime.datetime.now().isoformat(),
                 'time': self.time,
