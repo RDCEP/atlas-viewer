@@ -4,11 +4,13 @@ import sys
 import datetime
 import itertools
 import ntpath
+import multiprocessing as mp
 try:
     import simplejson as json
 except ImportError:
     import json
 from numpy import ma
+import numpy as np
 from pymongo.errors import PyMongoError
 from pymongo import MongoClient
 from netCDF4 import Dataset
@@ -27,10 +29,12 @@ client = MongoClient(uri) if not MONGO['local'] \
     else MongoClient('localhost', MONGO['port'])
 db = client['atlas']
 points = db.simulation
+file = os.path.join(
+            BASE_DIR, 'data', 'netcdf', 'full_global',
+            'papsim_wfdei.cru_hist_default_firr_aet_whe_annual_1979_2012.nc4')
 
-
-class NetCDFToMongo(object):
-    def __init__(self, file):
+class NetCDFToMongo(mp.Process):
+    def __init__(self):
         """Class for writing geospatial information to Mongo from netCDF files
 
         :param file: Path to netCDF input file
@@ -38,6 +42,7 @@ class NetCDFToMongo(object):
         :return: None
         :rtype: None
         """
+        super(NetCDFToMongo, self).__init__()
         self.file = file
         self.nc_dataset = Dataset(self.file, 'r')
         self._lon_var = None
@@ -122,12 +127,15 @@ class NetCDFToMongo(object):
             ))
             pass
 
-    def ingest(self):
+    def ingest(self, quads_x=1, quads_y=1, qx=0, qy=0):
         start_time = datetime.datetime.now()
         print('*** Start Run ***\n{}'.format(start_time))
 
+        _lats = np.array_split(self.lats, quads_y)
+        _lons = np.array_split(self.lons, quads_x)
+
         try:
-            for lat, lon in itertools.product(self.lats, self.lons):
+            for lat, lon in itertools.product(_lats[qy], _lons[qx]):
                 new_points = list()
                 try:
                     for i, _ in enumerate(self.tims):
@@ -158,6 +166,9 @@ class NetCDFToMongo(object):
         print('*** End Run ***\n{}'.format(end_time))
         elapsed_time = end_time - start_time
         print('*** Elapsed ***\n{}'.format(elapsed_time))
+
+    def run(self, quads_x=1, quads_y=1, qx=0, qy=0):
+        self.ingest(quads_x, quads_y, qx, qy)
 
 
 # Define GeoJSON standard for ATLAS
@@ -211,10 +222,15 @@ class GenerateDocument(object):
 
 if __name__ == '__main__':
     try:
-        nc_file = os.path.join(
-            BASE_DIR, 'data', 'netcdf', 'full_global',
-            'papsim_wfdei.cru_hist_default_firr_aet_whe_annual_1979_2012.nc4')
-        mi = NetCDFToMongo(nc_file)
-        mi.ingest()
+        # nc_file = os.path.join(
+        #     BASE_DIR, 'data', 'netcdf', 'full_global',
+        #     'papsim_wfdei.cru_hist_default_firr_aet_whe_annual_1979_2012.nc4')
+        jobs = []
+        for i in range(4):
+            mi = NetCDFToMongo()
+            jobs.append(mi)
+            mi.start()
+        for j in jobs:
+            j.join()
     except:
         raise
