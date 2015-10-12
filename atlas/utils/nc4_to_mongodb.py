@@ -12,7 +12,7 @@ except ImportError:
 from numpy import ma
 import numpy as np
 from pymongo.errors import PyMongoError
-from pymongo import MongoClient
+from pymongo import MongoClient, GEOSPHERE
 from netCDF4 import Dataset
 import geojson
 from atlas.constants import BASE_DIR, MONGO
@@ -106,14 +106,13 @@ class NetCDFToMongo(object):
         """Represent null values from netCDF as '--' and numeric values
         as floats.
         """
-        if value is ma.masked:
-            return None
         try:
+            if str(value) == '--':
+                return None
             return float(value)
         except ValueError:
             print('*** Encountered uncoercible non-numeric ***\n{}'.format(
-                value
-            ))
+                value))
             pass
 
     def parallel_ingest(self):
@@ -136,6 +135,7 @@ class NetCDFToMongo(object):
                 try:
                     for i, _ in enumerate(_tims[sector]):
                         xx = self.num_or_null(self.vals[i, lat, lon])
+                        # xx = self.vals[i, lat, lon]
                         tile = geojson.dumps((
                             GenerateDocument(lon, lat, self.sim_context, i, xx,
                                              self.pixel_side_length,
@@ -152,6 +152,7 @@ class NetCDFToMongo(object):
                 # print result.inserted_ids
                 # print '*** End Points ***'
                 new_points = []
+            points.create_index(GEOSPHERE)
         except PyMongoError:
             print('Error while committing on MongoDB')
             raise
@@ -163,9 +164,6 @@ class NetCDFToMongo(object):
         print('*** End Run ***\n{}'.format(end_time))
         elapsed_time = end_time - start_time
         print('*** Elapsed ***\n{}'.format(elapsed_time))
-
-    def run(self, quads_x=1, quads_y=1, qx=0, qy=0):
-        self.ingest(quads_x, quads_y, qx, qy)
 
 
 # Define GeoJSON standard for ATLAS
@@ -223,6 +221,6 @@ if __name__ == '__main__':
             BASE_DIR, 'data', 'netcdf', 'full_global',
             'papsim_wfdei.cru_hist_default_firr_aet_whe_annual_1979_2012.nc4')
         ingestor = NetCDFToMongo(nc_file)
-        ingestor.ingest()
+        ingestor.parallel_ingest()
     except:
         raise
