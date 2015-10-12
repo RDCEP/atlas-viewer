@@ -44,6 +44,10 @@ class NetCDFToMongo(object):
         self._lat_var = None
         self._time_var = None
         self._sim_context = None
+        self._vals = None
+        self._lats = None
+        self._lons = None
+        self._tims = None
 
     @property
     def lat_var(self):
@@ -71,19 +75,27 @@ class NetCDFToMongo(object):
 
     @property
     def lats(self):
-        return self.nc_dataset.variables[self.lat_var][:]
+        if self._lats is None:
+            self._lats = self.nc_dataset.variables[self.lat_var][:]
+        return self._lats
 
     @property
     def lons(self):
-        return self.nc_dataset.variables[self.lon_var][:]
+        if self._lons is None:
+            self._lons = self.nc_dataset.variables[self.lon_var][:]
+        return self._lons
 
     @property
     def vals(self):
-        return self.nc_dataset.variables[self.sim_context][:, :, :]
+        if self._vals is None:
+            self._vals = self.nc_dataset.variables[self.sim_context][:, :, :]
+        return self._vals
 
     @property
     def tims(self):
-        return self.nc_dataset.variables[self.time_var][:]
+        if self._tims is None:
+            self._tims = self.nc_dataset.variables[self.time_var][:]
+        return self._tims
 
     @property
     def pixel_side_length(self):
@@ -118,7 +130,7 @@ class NetCDFToMongo(object):
             for lat, lon in itertools.product(self.lats, self.lons):
                 new_points = list()
                 try:
-                    for i, t in enumerate(self.tims):
+                    for i, _ in enumerate(self.tims):
                         xx = self.num_or_null(self.vals[i, lat, lon])
                         tile = geojson.dumps((
                             GenerateDocument(lon, lat, self.sim_context, i, xx,
@@ -131,7 +143,7 @@ class NetCDFToMongo(object):
                     raise
                 new_points = [json.loads(coords) for coords in new_points]
                 result = points.insert_many(new_points)
-                # print '*** Inserted Points ***'
+                # print '*** Inserted {} Points ***'.format(len(new_points))
                 # print result.inserted_ids
                 # print '*** End Points ***'
                 new_points = []
