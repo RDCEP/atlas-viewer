@@ -29,12 +29,10 @@ client = MongoClient(uri) if not MONGO['local'] \
     else MongoClient('localhost', MONGO['port'])
 db = client['atlas']
 points = db.simulation
-file = os.path.join(
-            BASE_DIR, 'data', 'netcdf', 'full_global',
-            'papsim_wfdei.cru_hist_default_firr_aet_whe_annual_1979_2012.nc4')
 
-class NetCDFToMongo(mp.Process):
-    def __init__(self):
+
+class NetCDFToMongo(object):
+    def __init__(self, nc_file):
         """Class for writing geospatial information to Mongo from netCDF files
 
         :param file: Path to netCDF input file
@@ -42,17 +40,16 @@ class NetCDFToMongo(mp.Process):
         :return: None
         :rtype: None
         """
-        super(NetCDFToMongo, self).__init__()
-        self.file = file
-        self.nc_dataset = Dataset(self.file, 'r')
+        self.nc_file = nc_file
+        self.nc_dataset = Dataset(self.nc_file, 'r')
         self._lon_var = None
         self._lat_var = None
         self._time_var = None
         self._sim_context = None
-        self._vals = None
-        self._lats = None
-        self._lons = None
-        self._tims = None
+        self._vals = self.nc_dataset.variables[self.sim_context][:, :, :]
+        self._lats = self.nc_dataset.variables[self.lat_var][:]
+        self._lons = self.nc_dataset.variables[self.lon_var][:]
+        self._tims = self.nc_dataset.variables[self.time_var][:]
 
     @property
     def lat_var(self):
@@ -80,26 +77,18 @@ class NetCDFToMongo(mp.Process):
 
     @property
     def lats(self):
-        if self._lats is None:
-            self._lats = self.nc_dataset.variables[self.lat_var][:]
         return self._lats
 
     @property
     def lons(self):
-        if self._lons is None:
-            self._lons = self.nc_dataset.variables[self.lon_var][:]
         return self._lons
 
     @property
     def vals(self):
-        if self._vals is None:
-            self._vals = self.nc_dataset.variables[self.sim_context][:, :, :]
         return self._vals
 
     @property
     def tims(self):
-        if self._tims is None:
-            self._tims = self.nc_dataset.variables[self.time_var][:]
         return self._tims
 
     @property
@@ -127,22 +116,30 @@ class NetCDFToMongo(mp.Process):
             ))
             pass
 
-    def ingest(self, quads_x=1, quads_y=1, qx=0, qy=0):
+    def parallel_ingest(self):
+        jobs = []
+        n = mp.cpu_count()
+        for i in range(n):
+            p = mp.Process(target=self.ingest, args=(n, i))
+            jobs.append(p)
+            p.start()
+
+    def ingest(self, sectors=1, sector=0):
         start_time = datetime.datetime.now()
         print('*** Start Run ***\n{}'.format(start_time))
 
-        _lats = np.array_split(self.lats, quads_y)
-        _lons = np.array_split(self.lons, quads_x)
+        _tims = np.array_split(self.tims, sectors)
 
         try:
-            for lat, lon in itertools.product(_lats[qy], _lons[qx]):
+            for lat, lon in itertools.product(self.lats, self.lons):
                 new_points = list()
                 try:
-                    for i, _ in enumerate(self.tims):
+                    for i, _ in enumerate(_tims[sector]):
                         xx = self.num_or_null(self.vals[i, lat, lon])
                         tile = geojson.dumps((
                             GenerateDocument(lon, lat, self.sim_context, i, xx,
-                                             self.pixel_side_length, self.file)
+                                             self.pixel_side_length,
+                                             self.nc_file)
                         ), sort_keys=True)
                         new_points.append(tile)
                         tile = {}
@@ -222,15 +219,10 @@ class GenerateDocument(object):
 
 if __name__ == '__main__':
     try:
-        # nc_file = os.path.join(
-        #     BASE_DIR, 'data', 'netcdf', 'full_global',
-        #     'papsim_wfdei.cru_hist_default_firr_aet_whe_annual_1979_2012.nc4')
-        jobs = []
-        for i in range(4):
-            mi = NetCDFToMongo()
-            jobs.append(mi)
-            mi.start()
-        for j in jobs:
-            j.join()
+        nc_file = os.path.join(
+            BASE_DIR, 'data', 'netcdf', 'full_global',
+            'papsim_wfdei.cru_hist_default_firr_aet_whe_annual_1979_2012.nc4')
+        ingestor = NetCDFToMongo(nc_file)
+        ingestor.ingest()
     except:
         raise
