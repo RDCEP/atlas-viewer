@@ -23,8 +23,12 @@ def initial_session(var=None):
 def mongo_test(tlx, tly, brx, bry):
     from atlas.mongo_read import MongoRead
     initial_session()
-    mr = MongoRead(tlx, tly, brx, tly, brx, bry, tlx, bry, 4)
-    return mr.quadrilateral
+    mr = MongoRead(float(tlx), float(tly),
+                   float(brx), float(tly),
+                   float(brx), float(bry),
+                   float(tlx), float(bry), 4)
+    print(mr.quadrilateral)
+    return jsonify(mr.quadrilateral)
 
 
 
