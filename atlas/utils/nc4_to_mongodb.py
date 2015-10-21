@@ -126,16 +126,16 @@ class NetCDFToMongo(object):
         points = db.simulation
 
         start_time = datetime.datetime.now()
-        print('\n*** Start Run ***\n{}\n\n'.format(start_time))
+        print('*** Start Run ***\n{}\n\n'.format(start_time))
 
-        _tims = np.array_split(self.tims, sectors)
+        _tims = np.array_split(np.arange(len(self.tims)), sectors)[sector]
 
         try:
             for (lat_idx, lat), (lon_idx, lon) in itertools.product(
                     enumerate(self.lats), enumerate(self.lons)):
                 new_points = list()
                 try:
-                    for i, _ in enumerate(_tims):
+                    for i in _tims:
                         xx = self.num_or_null(self.vals[i, lat_idx, lon_idx])
                         tile = geojson.dumps((
                             GenerateDocument(lon, lat, self.sim_context, i, xx,
@@ -151,8 +151,15 @@ class NetCDFToMongo(object):
                 # print '*** Inserted {} Points ***'.format(len(new_points))
                 # print result.inserted_ids
                 # print '*** End Points ***'
-                new_points = []
+                new_points[:] = []
+
+            print('\n*** Start Indexing ***\n{}')
+            index_start = datetime.datetime.now()
             points.create_index(GEOSPHERE)
+            index_end = datetime.datetime.now()
+            print('\n*** Finished indexing in {} ***\n\n'.format(
+                index_end - index_start))
+
         except PyMongoError:
             print('Error while committing on MongoDB')
             raise
