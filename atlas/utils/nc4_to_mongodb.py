@@ -147,7 +147,8 @@ class NetCDFToMongo(object):
                         xx = self.num_or_null(self.vals[i, lat_idx, lon_idx])
                         tile = geojson.dumps((
                             GenerateDocument(lon, lat, self.sim_context, i, xx,
-                                             self.pixel_side_length, self.file)))
+                                             self.pixel_side_length,
+                                             self.nc_filefile)))
                         new_points.append(tile)
                         tile = {}
                 except:
@@ -227,6 +228,6 @@ if __name__ == '__main__':
     from atlas.constants import NC_FILE
     try:
         mi = NetCDFToMongo(NC_FILE)
-        mi.ingest()
+        mi.parallel_ingest()
     except:
         raise
