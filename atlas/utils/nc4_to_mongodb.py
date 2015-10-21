@@ -117,7 +117,7 @@ class NetCDFToMongo(object):
         try:
             return float(value)
         except ValueError:
-            print('*** Encountered uncoercible non-numeric ***\n{}'.format(
+            print('\n*** Encountered uncoercible non-numeric ***\n{}\n\n'.format(
                 value
             ))
             pass
@@ -132,17 +132,11 @@ class NetCDFToMongo(object):
                 new_points = list()
                 try:
                     for i, _ in enumerate(self.tims):
-                        print('Time: {} Lat: {} Lon: {}').format(i, lat, lon)
                         xx = self.num_or_null(self.vals[i, lat_idx, lon_idx])
-                        print('NetCDF value at [{}, {}, {}]: {}, {}'.format(
-                            i, lat_idx, lon_idx,
-                            self.vals[i, lat_idx, lon_idx],
-                            xx))
                         tile = geojson.dumps((
                             GenerateDocument(lon, lat, self.sim_context, i, xx,
                                              self.pixel_side_length, self.file)))
                         new_points.append(tile)
-                        print('Tile: {}'.format(tile))
                         tile = {}
                 except:
                     print('Unexpected error:', sys.exc_info()[0])
@@ -220,16 +214,6 @@ if __name__ == '__main__':
     from atlas.constants import NC_FILE
     try:
         mi = NetCDFToMongo(NC_FILE)
-        mi._tims = [0]
-        print('Latitudes: {}'.format(mi.lats))
-        print('Longitudes: {}'.format(mi.lons))
-        print('NetCDF latitude index: {}'.format(np.where(mi._lats==mi.lats[0])[0]))
-        print('NetCDF longitude index: {}'.format(np.where(mi._lons==mi.lons[0])[0]))
-        print('NetCDF value at [0, {}, {}]: {}'.format(
-            np.where(mi._lats==mi.lats[0])[0][0],
-            np.where(mi._lons==mi.lons[0])[0][0], mi.vals[0, 139, 521]))
-        # print(mi.lons[520:522:1])
-        # print(mi.lats[139])
         mi.ingest()
     except:
         raise
