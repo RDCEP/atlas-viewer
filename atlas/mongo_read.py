@@ -76,6 +76,16 @@ class MongoRead(object):
         geojsonfiles = []
         return geojsonfiles
 
+    def get_point(self, lon, lat):
+        cursor = collection.find(
+            {"centroid_x": lon, "centroid_y": lat})
+        return [d for d in cursor]
+
+    def get_any_values(self):
+        cursor = collection.find(
+            {"value": "251.503"})
+        return [d for d in cursor]
+
 
 if __name__ == '__main__':
     import pprint
