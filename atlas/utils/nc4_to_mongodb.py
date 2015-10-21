@@ -77,13 +77,13 @@ class NetCDFToMongo(object):
     def lats(self):
         if self._lats is None:
             self._lats = self.nc_dataset.variables[self.lat_var][:]
-        return self._lats
+        return self._lats[:5]
 
     @property
     def lons(self):
         if self._lons is None:
             self._lons = self.nc_dataset.variables[self.lon_var][:]
-        return self._lons
+        return self._lons[:5]
 
     @property
     def vals(self):
@@ -106,7 +106,7 @@ class NetCDFToMongo(object):
         :return:
         :rtype: float
         """
-        return 0.001
+        return 0.
 
     def num_or_null(self, value):
         """Represent null values from netCDF as '--' and numeric values
@@ -131,12 +131,14 @@ class NetCDFToMongo(object):
                 new_points = list()
                 try:
                     for i, _ in enumerate(self.tims):
+                        print('Time: {} Lon: {} Lat: {}').format(i, lon, lat)
                         xx = self.num_or_null(self.vals[i, lat, lon])
+                        print('NetCDF: {}'.format(xx))
                         tile = geojson.dumps((
                             GenerateDocument(lon, lat, self.sim_context, i, xx,
-                                             self.pixel_side_length, self.file)
-                        ), sort_keys=True)
+                                             self.pixel_side_length, self.file)))
                         new_points.append(tile)
+                        print('Tile: {}'.format(tile))
                         tile = {}
                 except:
                     print('Unexpected error:', sys.exc_info()[0])

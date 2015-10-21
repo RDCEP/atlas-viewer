@@ -2,11 +2,11 @@ import os
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
-MONGO = dict(user='username',
-             password='password',
-             domain='domain.tld',
-             database='database',
-             local=False,
+MONGO = dict(user='atlasAdmin',
+             password='jamelaomangueira',
+             domain='52.0.201.108',
+             database='',
+             local=True,
              port=27017,)
 
 SCENARIOS = [
