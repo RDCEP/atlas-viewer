@@ -6,13 +6,12 @@ NC_FILE = os.path.join(
     BASE_DIR, 'data', 'netcdf', 'full_global',
     'papsim_wfdei.cru_hist_default_firr_aet_whe_annual_1979_2012.nc4')
 
-MONGO = dict(user='atlasAdmin',
-             password='jamelaomangueira',
-             domain='52.0.201.108',
-             database='',
-             local=True,
-             port=27017,)
-
+MONGO = dict(user='username',
+             password='password',
+             domain='domain.tld',
+             database='database',
+             local=False,
+             
 SCENARIOS = [
   (0, 'default', 'Default', ),
   (1, 'fullharm', 'Full harm', ),
