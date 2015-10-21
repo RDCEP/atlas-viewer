@@ -13,7 +13,7 @@ from pymongo.errors import PyMongoError
 from pymongo import MongoClient
 from netCDF4 import Dataset
 import geojson
-from atlas.constants import BASE_DIR, MONGO, NC_FILE
+from atlas.constants import MONGO
 
 
 __author__ = "rblourenco@uchicago.edu"
@@ -30,16 +30,16 @@ points = db.simulation
 
 
 class NetCDFToMongo(object):
-    def __init__(self, file):
+    def __init__(self, nc_file):
         """Class for writing geospatial information to Mongo from netCDF files
 
-        :param file: Path to netCDF input file
-        :type file: str
+        :param nc_file: Path to netCDF input file
+        :type nc_file: str
         :return: None
         :rtype: None
         """
-        self.file = file
-        self.nc_dataset = Dataset(self.file, 'r')
+        self.nc_file = nc_file
+        self.nc_dataset = Dataset(self.nc_file, 'r')
         self._lon_var = None
         self._lat_var = None
         self._time_var = None
@@ -77,13 +77,13 @@ class NetCDFToMongo(object):
     def lats(self):
         if self._lats is None:
             self._lats = self.nc_dataset.variables[self.lat_var][:]
-        return self._lats[0:3:1]
+        return self._lats
 
     @property
     def lons(self):
         if self._lons is None:
             self._lons = self.nc_dataset.variables[self.lon_var][:]
-        return self._lons[0:3]
+        return self._lons
 
     @property
     def vals(self):
@@ -135,7 +135,7 @@ class NetCDFToMongo(object):
                         xx = self.num_or_null(self.vals[i, lat_idx, lon_idx])
                         tile = geojson.dumps((
                             GenerateDocument(lon, lat, self.sim_context, i, xx,
-                                             self.pixel_side_length, self.file)))
+                                             self.pixel_side_length, self.nc_file)))
                         new_points.append(tile)
                         tile = {}
                 except:
@@ -210,7 +210,6 @@ class GenerateDocument(object):
 
 
 if __name__ == '__main__':
-    import numpy as np
     from atlas.constants import NC_FILE
     try:
         mi = NetCDFToMongo(NC_FILE)
