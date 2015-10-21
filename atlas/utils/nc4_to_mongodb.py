@@ -1,5 +1,4 @@
 from __future__ import division
-import os
 import sys
 import datetime
 import itertools
@@ -10,12 +9,11 @@ try:
 except ImportError:
     import json
 from numpy import ma
-import numpy as np
 from pymongo.errors import PyMongoError
 from pymongo import MongoClient, GEOSPHERE
 from netCDF4 import Dataset
 import geojson
-from atlas.constants import BASE_DIR, MONGO, NC_FILE
+from atlas.constants import MONGO
 
 
 __author__ = "rblourenco@uchicago.edu"
@@ -35,8 +33,8 @@ class NetCDFToMongo(object):
     def __init__(self, nc_file):
         """Class for writing geospatial information to Mongo from netCDF files
 
-        :param file: Path to netCDF input file
-        :type file: str
+        :param nc_file: Path to netCDF input file
+        :type nc_file: str
         :return: None
         :rtype: None
         """
@@ -148,7 +146,7 @@ class NetCDFToMongo(object):
                         tile = geojson.dumps((
                             GenerateDocument(lon, lat, self.sim_context, i, xx,
                                              self.pixel_side_length,
-                                             self.nc_filefile)))
+                                             self.nc_file)))
                         new_points.append(tile)
                         tile = {}
                 except:
