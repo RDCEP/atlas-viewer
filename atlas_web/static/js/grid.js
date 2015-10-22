@@ -1,6 +1,6 @@
 (function() {
 
-  var world, data, grid_regions
+  var world, data, grid_regions, tl, br
     , height = window.innerHeight
     , width = window.innerWidth
     , current_year = 1979
@@ -45,11 +45,11 @@
     var λ = d3.event.x * sens
       , φ = d3.event.y * sens
       , c = projection.center()
-      , tl = projection.invert([0,0])
-      , br = projection.invert([width, height])
       , upper_drag_limit = projection([0, 90])[1]
       , lower_drag_limit = projection([0, -90])[1] - height
     ;
+    tl = projection.invert([0,0]);
+    br = projection.invert([width, height]);
     φ = φ > lower_drag_limit ? lower_drag_limit :
     φ < upper_drag_limit ? upper_drag_limit :
     φ;
@@ -58,7 +58,7 @@
     svg.selectAll('.boundary').attr('d', path);
   }
 
-  var update_projection = function(w, h, d) {
+  var update_projection = function(w, h) {
     return (width / 6) * 360 / (42);
   };
 
@@ -68,7 +68,7 @@
     d3.select('svg').attr({height: height, width: width});
     projection.translate([width / 2, height / 2]);
     projection.scale(update_projection(width, height, data));
-    projection.center(data.center);
+    //projection.center(data.center);
     d3.selectAll('.boundary').attr('d', path);
   };
 
@@ -87,12 +87,14 @@
 
   var atlas = function(error, queued_data) {
 
-    world = queued_data[0];
-    data = Options.data;
-    projection.scale(update_projection(width, height, data));
-    projection.center(data.center);
+    data = queued_data[0];
+    console.log(data);
+    //data = Options.data;
+    projection.scale(update_projection(width, height));
+    //projection.center(data.center);
 
-    color.domain([data.min, data.max]);
+    color.domain([d3.min(data, function(d) { return d.properties.value; }),
+                  d3.max(data, function(d) { return d.properties.value; })]);
 
     var sphere = [
       ocean_layer.append('path')
@@ -116,7 +118,7 @@
       });
 
     grid_regions = grid_layer.selectAll('.grid-boundary')
-      .data(data.data)
+      .data(data)
       .enter()
       .append('path')
       .filter(function(d) {
@@ -131,8 +133,11 @@
 
   };
 
+  tl = projection.invert([0, 0]);
+  br = projection.invert([width, height]);
+
   queue()
-    .defer(d3.json, '/static/topojson/atlas_gadm1.json')
+    //.defer(d3.json, '/static/topojson/atlas_gadm1.json')
     .defer(d3.json, '/api/'+tl[0]+'/'+tl[1]+'/'+br[0]+'/'+br[1])
     .awaitAll(atlas);
 
