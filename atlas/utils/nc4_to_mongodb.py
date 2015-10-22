@@ -26,6 +26,7 @@ client = MongoClient(uri) if not MONGO['local'] \
     else MongoClient('localhost', MONGO['port'])
 db = client['atlas']
 points = db.simulation
+points.create_index([('geometry', GEOSPHERE)])
 
 
 class NetCDFToMongo(object):
@@ -148,13 +149,6 @@ class NetCDFToMongo(object):
                 # print result.inserted_ids
                 # print '*** End Points ***'
                 new_points = []
-
-            print('\n*** Start Indexing ***\n{}')
-            index_start = datetime.datetime.now()
-            points.create_index(GEOSPHERE)
-            index_end = datetime.datetime.now()
-            print('\n*** Finished indexing in {} ***\n\n'.format(
-                index_end - index_start))
 
         except PyMongoError:
             print('Error while committing on MongoDB')
