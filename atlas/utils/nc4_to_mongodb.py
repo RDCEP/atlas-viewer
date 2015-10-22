@@ -8,7 +8,7 @@ try:
     import simplejson as json
 except ImportError:
     import json
-from numpy import ma
+import numpy as np
 from pymongo.errors import PyMongoError
 from pymongo import MongoClient, GEOSPHERE
 from netCDF4 import Dataset
@@ -92,15 +92,15 @@ class NetCDFToMongo(object):
         Using degree decimals - if zero, states a point
 
         :return:
-        :rtype: float
+        :rtype: tuple
         """
-        return 0.
+        return abs(np.diff(self.lons[:2])[0]), abs(np.diff(self.lats[:2])[0])
 
     def num_or_null(self, value):
         """Represent null values from netCDF as '--' and numeric values
         as floats.
         """
-        if value is ma.masked:
+        if value is np.ma.masked:
             return None
         try:
             return float(value)
@@ -138,8 +138,9 @@ class NetCDFToMongo(object):
                     for i in _tims:
                         xx = self.num_or_null(self.vals[i, lat_idx, lon_idx])
                         tile = geojson.dumps((
-                            GenerateDocument(lon, lat, self.sim_context, i, xx,
-                                             self.pixel_side_length,
+                            GenerateDocument(lon, lat, self.sim_context, i,
+                                             xx, self.pixel_side_length[0],
+                                             self.pixel_side_length[1],
                                              self.nc_file)))
                         new_points.append(tile)
                         tile = {}
@@ -176,13 +177,14 @@ class NetCDFToMongo(object):
 # Define GeoJSON standard for ATLAS
 class GenerateDocument(object):
     def __init__(self, x, y, simulation_variable, time_calc, valor,
-                 side, filename):
+                 side_x, side_y, filename):
         self.x = x
         self.y = y
         self.sim = simulation_variable
         self.time = time_calc
         self.valor = valor
-        self.side = side
+        self.side_x = side_x
+        self.side_y = side_y
         self.filename = filename
 
     @property
@@ -196,14 +198,14 @@ class GenerateDocument(object):
         :return: GeoJSON object representing data point
         :rtype: dict
         """
-        point_ax = self.x - (self.side / 2)
-        point_ay = self.y + (self.side / 2)
-        point_bx = self.x + (self.side / 2)
-        point_by = self.y + (self.side / 2)
-        point_cx = self.x + (self.side / 2)
-        point_cy = self.y - (self.side / 2)
-        point_dx = self.x - (self.side / 2)
-        point_dy = self.y - (self.side / 2)
+        point_ax = self.x - (self.side_x / 2)
+        point_ay = self.y + (self.side_y / 2)
+        point_bx = self.x + (self.side_x / 2)
+        point_by = self.y + (self.side_y / 2)
+        point_cx = self.x + (self.side_x / 2)
+        point_cy = self.y - (self.side_y / 2)
+        point_dx = self.x - (self.side_x / 2)
+        point_dy = self.y - (self.side_y / 2)
 
         varOutput = {
             'type': 'Feature', 'centroid_x': self.x, 'centroid_y': self.y,
@@ -223,7 +225,6 @@ class GenerateDocument(object):
 
 
 if __name__ == '__main__':
-    import numpy as np
     from atlas.constants import NC_FILE
     try:
         mi = NetCDFToMongo(NC_FILE)

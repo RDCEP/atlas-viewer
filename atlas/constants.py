@@ -10,7 +10,7 @@ MONGO = dict(user='username',
              password='password',
              domain='domain.tld',
              database='database',
-             local=False,
+             local=True,
              port=27017,)
              
 SCENARIOS = [
