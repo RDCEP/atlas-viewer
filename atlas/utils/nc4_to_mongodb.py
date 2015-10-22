@@ -13,7 +13,7 @@ from pymongo.errors import PyMongoError
 from pymongo import MongoClient
 from netCDF4 import Dataset
 import geojson
-from atlas.constants import BASE_DIR, MONGO
+from atlas.constants import MONGO
 
 
 __author__ = "rblourenco@uchicago.edu"
@@ -30,20 +30,24 @@ points = db.simulation
 
 
 class NetCDFToMongo(object):
-    def __init__(self, file):
+    def __init__(self, nc_file):
         """Class for writing geospatial information to Mongo from netCDF files
 
-        :param file: Path to netCDF input file
-        :type file: str
+        :param nc_file: Path to netCDF input file
+        :type nc_file: str
         :return: None
         :rtype: None
         """
-        self.file = file
-        self.nc_dataset = Dataset(self.file, 'r')
+        self.nc_file = nc_file
+        self.nc_dataset = Dataset(self.nc_file, 'r')
         self._lon_var = None
         self._lat_var = None
         self._time_var = None
         self._sim_context = None
+        self._vals = None
+        self._lats = None
+        self._lons = None
+        self._tims = None
 
     @property
     def lat_var(self):
@@ -71,19 +75,27 @@ class NetCDFToMongo(object):
 
     @property
     def lats(self):
-        return self.nc_dataset.variables[self.lat_var][:]
+        if self._lats is None:
+            self._lats = self.nc_dataset.variables[self.lat_var][:]
+        return self._lats
 
     @property
     def lons(self):
-        return self.nc_dataset.variables[self.lon_var][:]
+        if self._lons is None:
+            self._lons = self.nc_dataset.variables[self.lon_var][:]
+        return self._lons
 
     @property
     def vals(self):
-        return self.nc_dataset.variables[self.sim_context][:, :, :]
+        if self._vals is None:
+            self._vals = self.nc_dataset.variables[self.sim_context][:, :, :]
+        return self._vals
 
     @property
     def tims(self):
-        return self.nc_dataset.variables[self.time_var][:]
+        if self._tims is None:
+            self._tims = self.nc_dataset.variables[self.time_var][:]
+        return self._tims
 
     @property
     def pixel_side_length(self):
@@ -94,7 +106,7 @@ class NetCDFToMongo(object):
         :return:
         :rtype: float
         """
-        return 0.001
+        return 0.
 
     def num_or_null(self, value):
         """Represent null values from netCDF as '--' and numeric values
@@ -105,25 +117,25 @@ class NetCDFToMongo(object):
         try:
             return float(value)
         except ValueError:
-            print('*** Encountered uncoercible non-numeric ***\n{}'.format(
+            print('\n*** Encountered uncoercible non-numeric ***\n{}\n\n'.format(
                 value
             ))
             pass
 
     def ingest(self):
         start_time = datetime.datetime.now()
-        print('*** Start Run ***\n{}'.format(start_time))
+        print('\n*** Start Run ***\n{}\n\n'.format(start_time))
 
         try:
-            for lat, lon in itertools.product(self.lats, self.lons):
+            for (lat_idx, lat), (lon_idx, lon) in itertools.product(
+                    enumerate(self.lats), enumerate(self.lons)):
                 new_points = list()
                 try:
-                    for i, t in enumerate(self.tims):
-                        xx = self.num_or_null(self.vals[i, lat, lon])
+                    for i, _ in enumerate(self.tims):
+                        xx = self.num_or_null(self.vals[i, lat_idx, lon_idx])
                         tile = geojson.dumps((
                             GenerateDocument(lon, lat, self.sim_context, i, xx,
-                                             self.pixel_side_length, self.file)
-                        ), sort_keys=True)
+                                             self.pixel_side_length, self.nc_file)))
                         new_points.append(tile)
                         tile = {}
                 except:
@@ -131,7 +143,7 @@ class NetCDFToMongo(object):
                     raise
                 new_points = [json.loads(coords) for coords in new_points]
                 result = points.insert_many(new_points)
-                # print '*** Inserted Points ***'
+                # print '*** Inserted {} Points ***'.format(len(new_points))
                 # print result.inserted_ids
                 # print '*** End Points ***'
                 new_points = []
@@ -143,9 +155,9 @@ class NetCDFToMongo(object):
             raise
 
         end_time = datetime.datetime.now()
-        print('*** End Run ***\n{}'.format(end_time))
+        print('\n*** End Run ***\n{}\n'.format(end_time))
         elapsed_time = end_time - start_time
-        print('*** Elapsed ***\n{}'.format(elapsed_time))
+        print('\n*** Elapsed ***\n{}\n'.format(elapsed_time))
 
 
 # Define GeoJSON standard for ATLAS
@@ -198,11 +210,9 @@ class GenerateDocument(object):
 
 
 if __name__ == '__main__':
+    from atlas.constants import NC_FILE
     try:
-        nc_file = os.path.join(
-            BASE_DIR, 'data', 'netcdf', 'full_global',
-            'papsim_wfdei.cru_hist_default_firr_aet_whe_annual_1979_2012.nc4')
-        mi = NetCDFToMongo(nc_file)
+        mi = NetCDFToMongo(NC_FILE)
         mi.ingest()
     except:
         raise
