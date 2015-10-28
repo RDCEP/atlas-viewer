@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 import json
 
-from flask import Blueprint, render_template, session, jsonify
 import numpy as np
 
-from atlas.data_munger import DataMunger
+from flask import Blueprint, render_template, session, jsonify
+from atlas.utils.data_munger import DataMunger
 from atlas.constants import MODELS, DATASETS, SCENARIOS, IRRIGATION, \
     CROPS, VARIABLES
 
