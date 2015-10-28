@@ -201,7 +201,7 @@ class GenerateDocument(object):
         point_dy = self.y - (self.side_y / 2)
 
         varOutput = {
-            'type': 'Feature', 'centroid': [self.x, self.y],
+            'type': 'Feature',
             'geometry': {'type': 'Polygon', 'coordinates': [
                 [[point_ax, point_ay], [point_bx, point_by],
                  [point_cx, point_cy], [point_dx, point_dy],
@@ -212,7 +212,11 @@ class GenerateDocument(object):
                 'timestamp': datetime.datetime.now().isoformat(),
                 'time': self.time,
                 'value': self.valor,
-            }}
+                'centroid': {
+                    'type': 'Feature',
+                    'geometry': {
+                        'type': 'Polygon',
+                        'coordinates': [self.x, self.y]}}}}
 
         return varOutput
 
