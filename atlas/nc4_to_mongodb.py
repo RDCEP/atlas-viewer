@@ -117,6 +117,8 @@ class NetCDFToMongo(object):
             p = mp.Process(target=self.ingest, args=(n, i))
             jobs.append(p)
             p.start()
+        for j in jobs:
+            j.join()
 
     def ingest(self, sectors=1, sector=0):
 
