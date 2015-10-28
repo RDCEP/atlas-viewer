@@ -208,7 +208,7 @@ class GenerateDocument(object):
         point_dy = self.y - (self.side_y / 2)
 
         varOutput = {
-            'type': 'Feature', 'centroid_x': self.x, 'centroid_y': self.y,
+            'type': 'Feature', 'centroid': [self.x, self.y],
             'geometry': {'type': 'Polygon', 'coordinates': [
                 [[point_ax, point_ay], [point_bx, point_by],
                  [point_cx, point_cy], [point_dx, point_dy],
