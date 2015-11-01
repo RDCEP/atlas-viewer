@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 import json
 
-from flask import Blueprint, render_template, session, jsonify
 import numpy as np
 
-from atlas.data_munger import DataMunger
+from flask import Blueprint, render_template, session, jsonify
+from atlas.utils.data_munger import DataMunger
 from atlas.constants import MODELS, DATASETS, SCENARIOS, IRRIGATION, \
     CROPS, VARIABLES
 
@@ -17,6 +17,19 @@ def initial_session(var=None):
             session[k] = 0 if not session[k] else session[k]
         except KeyError:
             session[k] = 0
+
+
+@mod.route('/api/<tlx>/<tly>/<brx>/<bry>')
+def mongo_test(tlx, tly, brx, bry):
+    from atlas.mongo_read import MongoRead
+    initial_session()
+    mr = MongoRead(float(tlx), float(tly),
+                   float(brx), float(tly),
+                   float(brx), float(bry),
+                   float(tlx), float(bry), 4)
+    print(mr.quadrilateral)
+    return jsonify(mr.quadrilateral)
+
 
 
 @mod.route('/',
