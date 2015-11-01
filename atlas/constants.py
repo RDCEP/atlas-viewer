@@ -1,4 +1,7 @@
 import os
+import urllib
+from ConfigParser import ConfigParser
+
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -6,12 +9,18 @@ NC_FILE = os.path.join(
     BASE_DIR, 'data', 'netcdf', 'full_global',
     'papsim_wfdei.cru_hist_default_firr_aet_whe_annual_1979_2012.nc4')
 
-MONGO = dict(user='username',
-             password='password',
-             domain='domain.tld',
-             database='database',
-             local=True,
-             port=27017,)
+cf = ConfigParser()
+cf.read(os.path.join(
+    BASE_DIR, 'static', 'credentials', 'default.ini'
+))
+
+MONGO = dict(
+    local=False,
+    user=cf.get('user', 'username'),
+    password=cf.get('user', 'password'),
+    domain=cf.get('server', 'domain'),
+    database=cf.get('server', 'database'),
+    port=cf.get('server', 'port'),)
              
 SCENARIOS = [
   (0, 'default', 'Default', ),
