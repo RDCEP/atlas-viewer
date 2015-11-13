@@ -1,6 +1,6 @@
 (function() {
 
-  var world, data, grid_regions
+  var world, data, grid_regions, top_left, bottom_right
     , height = window.innerHeight
     , width = window.innerWidth
     , current_year = 1979
@@ -14,17 +14,19 @@
     , svg = d3.select('#map').append('svg')
       .attr({'width': width, 'height': height})
       .append('g')
-    , defs = svg.append('defs')
+    //, defs = svg.append('defs')
     , ocean_layer = svg.append('g')
     , grid_layer = svg.append('g')
-
+      .attr('id', 'grid_layer')
 
     , color = d3.scale.quantile()
-      .range(['#ffffd4', '#fed98e', '#fe9929', '#d95f0e', '#993404'])
+      .range(['#fff5eb', '#fee6ce', '#fdd0a2', '#fdae6b', '#fd8d3c',
+              '#f16913', '#d94801', '#a63603', '#7f2704'])
+      //.range(['#ffffd4', '#fed98e', '#fe9929', '#d95f0e', '#993404'])
 
     , projection = d3.geo.equirectangular()
       .center([Options.lon, Options.lat])
-      .scale(2900)
+      .scale(1500)
       .translate([width / 2, height / 2])
       .precision(.1)
     , path = d3.geo.path()
@@ -45,11 +47,11 @@
     var λ = d3.event.x * sens
       , φ = d3.event.y * sens
       , c = projection.center()
-      , tl = projection.invert([0,0])
-      , br = projection.invert([width, height])
       , upper_drag_limit = projection([0, 90])[1]
       , lower_drag_limit = projection([0, -90])[1] - height
     ;
+    top_left = projection.invert([0,0]);
+    br = projection.invert([width, height]);
     φ = φ > lower_drag_limit ? lower_drag_limit :
     φ < upper_drag_limit ? upper_drag_limit :
     φ;
@@ -62,13 +64,48 @@
     return (width / 6) * 360 / (42);
   };
 
+  var expand_lon = function(lon, left) {
+    while (lon < left) {
+      lon += 180;
+    }
+    return lon;
+  };
+
+  var compress_lon = function(lon) {
+    return (lon / 180) % 1 * 180;
+  };
+
+  var limit_lat = function (lat) {
+
+  };
+
+  var get_viewport_dimensions = function() {
+    top_left = projection.invert([0,0]);
+    bottom_right = projection.invert([width, height]);
+    top_right = [bottom_right[0], top_left[1]];
+    bottom_left = [top_left[0], bottom_right[1]];
+    center = [
+      compress_lon((
+        expand_lon(bottom_right[0], top_left[0]) - top_left[0])
+        / 2 + top_left[0]),
+      (top_left[1] - bottom_right[1]) / 2 + bottom_right[1]
+    ];
+    return {
+      'top_left': top_left,
+      'top_right': top_right,
+      'bottom_left': bottom_left,
+      'bottom_right': bottom_right,
+      'center': center
+    }
+  };
+
   var resize = function() {
     width = window.innerWidth;
     height = window.innerHeight;
     d3.select('svg').attr({height: height, width: width});
     projection.translate([width / 2, height / 2]);
-    projection.scale(update_projection(width, height, data));
-    projection.center(data.center);
+    //projection.scale(update_projection(width, height, data));
+    projection.center(dims.center);
     d3.selectAll('.boundary').attr('d', path);
   };
 
@@ -76,8 +113,8 @@
     grid_regions.each(function(d, i) {
       d3.select(this).style({
         fill: function() {
-          if (d.properties.var[_time] < 1000000) {
-            return color(d.properties.var[_time]);
+          if (d.properties.time == _time) {
+            return color(d.properties.value);
           }
           return 'transparent';
         }
@@ -87,12 +124,18 @@
 
   var atlas = function(error, queued_data) {
 
-    world = queued_data[0];
-    data = Options.data;
-    projection.scale(update_projection(width, height, data));
-    projection.center(data.center);
+    data = queued_data[0];
+    world = queued_data[1];
+    data.forEach(function(d) {
+      d.geometry.coordinates[0].reverse();
+    });
 
-    color.domain([data.min, data.max]);
+    //projection.scale(update_projection(width, height, data));
+    projection.center(dims.center);
+
+    color.domain([
+      d3.min(data, function(d) { return d.properties.value; }),
+      d3.max(data, function(d) { return d.properties.value; })]);
 
     var sphere = [
       ocean_layer.append('path')
@@ -115,14 +158,21 @@
         fill: 'transparent'
       });
 
-    grid_regions = grid_layer.selectAll('.grid-boundary')
-      .data(data.data)
+    ocean_layer.selectAll('path.countries')
+      .data(world.features)
       .enter()
       .append('path')
-      .filter(function(d) {
-        //Leave out cells that contain NaNs
-        return d.properties.var.reduce(function(a, b){ return a + b; }) >= 0;
-      })
+      .attr('d', path)
+      .attr('class', 'countries boundary')
+      .style({
+        stroke: 'none',
+        fill: '#dddddd'
+      });
+
+    grid_regions = grid_layer.selectAll('.grid-boundary')
+      .data(data)
+      .enter()
+      .append('path')
       .attr('class', 'grid-boundary boundary')
       .attr('d', path);
 
@@ -131,9 +181,13 @@
 
   };
 
+  var dims = get_viewport_dimensions();
+
   queue()
-    .defer(d3.json, '/static/topojson/atlas_gadm1.json')
-    .defer(d3.json, '/api/'+tl[0]+'/'+tl[1]+'/'+br[0]+'/'+br[1])
+    .defer(d3.json, '/api/'+
+      dims['top_left'][0]+'/'+ dims['top_left'][1]+'/'+
+      dims['bottom_right'][0]+'/'+dims['bottom_right'][1])
+    .defer(d3.json, '/static/json/countries_110.geojson')
     .awaitAll(atlas);
 
   var time_opt = d3.select('#time_select');
