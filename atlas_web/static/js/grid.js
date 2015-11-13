@@ -14,7 +14,6 @@
     , svg = d3.select('#map').append('svg')
       .attr({'width': width, 'height': height})
       .append('g')
-    //, defs = svg.append('defs')
     , ocean_layer = svg.append('g')
     , grid_layer = svg.append('g')
       .attr('id', 'grid_layer')
@@ -22,7 +21,6 @@
     , color = d3.scale.quantile()
       .range(['#fff5eb', '#fee6ce', '#fdd0a2', '#fdae6b', '#fd8d3c',
               '#f16913', '#d94801', '#a63603', '#7f2704'])
-      //.range(['#ffffd4', '#fed98e', '#fe9929', '#d95f0e', '#993404'])
 
     , projection = d3.geo.equirectangular()
       .center([Options.lon, Options.lat])
@@ -41,6 +39,7 @@
       .scale(projection.scale())
       .scaleExtent([height, 8 * height])
       .on('zoom', null)
+    , hover_legend = d3.select('#hover_legend')
     ;
 
   function dragged() {
@@ -50,8 +49,6 @@
       , upper_drag_limit = projection([0, 90])[1]
       , lower_drag_limit = projection([0, -90])[1] - height
     ;
-    top_left = projection.invert([0,0]);
-    br = projection.invert([width, height]);
     φ = φ > lower_drag_limit ? lower_drag_limit :
     φ < upper_drag_limit ? upper_drag_limit :
     φ;
@@ -104,7 +101,6 @@
     height = window.innerHeight;
     d3.select('svg').attr({height: height, width: width});
     projection.translate([width / 2, height / 2]);
-    //projection.scale(update_projection(width, height, data));
     projection.center(dims.center);
     d3.selectAll('.boundary').attr('d', path);
   };
@@ -122,6 +118,18 @@
     });
   };
 
+  var grid_hover = function(d) {
+    var q = d.properties.centroid.coordinates[0] + ', ';
+    q += d.properties.centroid.coordinates[1] + ': ';
+    q += d.properties.value;
+    hover_legend.select('p').text(q);
+    hover_legend.style({
+      left: d3.event.mouse[0] + 'px',
+      top: d3.event.mouse[1] + 'px',
+      display: 'block'
+    });
+  };
+
   var atlas = function(error, queued_data) {
 
     data = queued_data[0];
@@ -130,7 +138,6 @@
       d.geometry.coordinates[0].reverse();
     });
 
-    //projection.scale(update_projection(width, height, data));
     projection.center(dims.center);
 
     color.domain([
@@ -174,7 +181,10 @@
       .enter()
       .append('path')
       .attr('class', 'grid-boundary boundary')
-      .attr('d', path);
+      .attr('d', path)
+      .on('mouseover', grid_hover)
+      .on('mouseout', function() { hover_legend.style({display: 'none'})})
+    ;
 
     update_data_fills(data);
     svg.call(drag_rotate);
