@@ -11,88 +11,6 @@
     <nav>
       <ul id="top_nav" class="clearfix">
         <li><a href="/">ATLAS</a></li>
-        <li id="menu_crop"><a href>Crop</a><ul>
-          {% for c in crops %}
-          <li{% if crop == c[1] %} class="active"{% endif %}>
-            <a href="/{{ map_type }}/{{ lon }}/{{ lat }}/{{ model }}/{{ dataset }}/{{ scenario }}/{{ irrigation }}/{{ c[1]|nbsp }}/{{ var }}"
-               class="data-ajax" data-type="crop" data-value="{{ c[0] }}">{{ c[2] }}</a>
-          </li>
-          {% endfor %}
-        </ul></li>
-        <li id="menu_model"><a href>Model</a><ul>
-          {% for m in models %}
-          <li{% if model == m[1] %} class="active"{% endif %}>
-            <a href="/{{ map_type }}/{{ lon }}/{{ lat }}/{{ m[1] }}/{{ dataset }}/{{ scenario }}/{{ irrigation }}/{{ crop }}/{{ var }}"
-               class="data-ajax" data-type="variable" data-value="{{ m[0] }}">{{ m[2]|nbsp }}</a>
-          </li>
-          {% endfor %}
-        </ul></li>
-        <li id="menu_dataset"><a href>Climate</a><ul>
-          {% for d in datasets %}
-          <li{% if dataset == d[1] %} class="active"{% endif %}>
-            <a href="/{{ map_type }}/{{ lon }}/{{ lat }}/{{ model }}/{{ d[1] }}/{{ scenario }}/{{ irrigation }}/{{ crop }}/{{ var }}"
-               class="data-ajax" data-type="variable" data-value="{{ d[0] }}">{{ d[2]|nbsp }}</a>
-          </li>
-          {% endfor %}
-        </ul></li>
-        <li id="menu_scenario"><a href>Scenarios</a><ul>
-          {% for s in scenarios %}
-          <li{% if scenario == s[1] %} class="active"{% endif %}>
-            <a href="/{{ map_type }}/{{ lon }}/{{ lat }}/{{ model }}/{{ dataset }}/{{ s[1] }}/{{ irrigation }}/{{ crop }}/{{ var }}"
-               class="data-ajax" data-type="variable" data-value="{{ s[0] }}">{{ s[2]|nbsp }}</a>
-          </li>
-          {% endfor %}
-        </ul></li>
-        <li id="menu_irrigation"><a href>Irrigation</a><ul>
-          {% for i in irrigations %}
-          <li{% if irrigation == i[1] %} class="active"{% endif %}>
-            <a href="/{{ map_type }}/{{ lon }}/{{ lat }}/{{ model }}/{{ dataset }}/{{ scenario }}/{{ i[1] }}/{{ crop }}/{{ var }}"
-               class="data-ajax" data-type="variable" data-value="{{ i[0] }}">{{ i[2]|nbsp }}</a>
-          </li>
-          {% endfor %}
-        </ul></li>
-        <li id="menu_time"><a href>Year</a>
-          <div>
-            <input id="time_select" type="range" min="0" max="33" step="1" value="0">
-            <label class="active">1979</label>
-          </div>
-        </li>
-        <li id="menu_variable"><a href>Variable</a><ul>
-          {% for v in vars %}
-          <li{% if var == v[1] %} class="active"{% endif %}>
-            <a href="/{{ map_type }}/{{ lon }}/{{ lat }}/{{ model }}/{{ dataset }}/{{ scenario }}/{{ irrigation }}/{{ crop }}/{{ v[1] }}"
-               class="data-ajax" data-type="variable" data-value="{{ v[0] }}">{{ v[2]|nowrap }}</a>
-          </li>
-          {% endfor %}
-        </ul></li>
-        <li id="menu_comparison"><a href>+</a><ul>
-          <li id="menu_model_compare"><a href>Model</a><ul>
-            {% for x in models %}
-            <li><a href="/{{ map_type }}/{{ lon }}/{{ lat }}/{{ model }}/{{ dataset }}/{{ scenario }}/{{ irrigation }}/{{ crop }}/{{ var }}/{{ x[1] }}"
-                   class="data-ajax" >{{ x[2]|nbsp }}</a></li>
-            {% endfor %}
-          </ul></li>
-          <li id="menu_scenario_compare"><a href>Scenarios</a><ul>
-            {% for x in scenarios %}
-            <li><a href="/{{ map_type }}/{{ lon }}/{{ lat }}/{{ model }}/{{ dataset }}/{{ scenario }}/{{ irrigation }}/{{ crop }}/{{ var }}/{{ x[1] }}"
-                   class="data-ajax">{{ x[2]|nbsp }}</a></li>
-            {% endfor %}
-          </ul></li>
-          <li id="menu_irrigation_compare"><a href>Irrigation</a><ul>
-            {% for x in irrigations %}
-            <li><a href="/{{ map_type }}/{{ lon }}/{{ lat }}/{{ model }}/{{ dataset }}/{{ scenario }}/{{ irrigation }}/{{ crop }}/{{ var }}/{{ x[1] }}"
-                   class="data-ajax">{{ x[2]|nbsp }}</a></li>
-            {% endfor %}
-          </ul></li>
-          <li id="menu_variable"><a href>Variable</a><ul>
-            {% for x in vars %}
-            <li><a href="/{{ map_type }}/{{ lon }}/{{ lat }}/{{ model }}/{{ dataset }}/{{ scenario }}/{{ irrigation }}/{{ crop }}/{{ var }}/{{ x[1] }}"
-                   class="data-ajax">{{ x[2]|nowrap }}</a></li>
-            {% endfor %}
-          </ul></li>
-        </ul></li>
-        <li id="menu_glossary"><a href>Glossary</a></li>
-        <li id="menu_documentation"><a href>Documentation</a></li>
       </ul>
     </nav>
     <div id="title_legend_wrap">
@@ -104,7 +22,6 @@
 <script>
 {% block jsoptions %}
   Options = window.Options || {};
-  Options.var = '{{ var }}';
 {% endblock %}
 </script>
 <script src="{{ url_for('static', filename='js/vendor/d3.v3.min.js') }}"></script>
@@ -112,7 +29,7 @@
 <script src="{{ url_for('static', filename='js/vendor/topojson.v1.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/vendor/queue.v1.min.js') }}"></script>
 {% block bodyjs %}
-<script src="{{ url_for('static', filename='js/atlas_000.js') }}?3" charset="utf-8" ></script>
+{#<script src="{{ url_for('static', filename='js/atlas_000.js') }}?3" charset="utf-8" ></script>#}
 {% endblock %}
 </body>
 </html>
