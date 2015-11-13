@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 import json
 
-from flask import Blueprint, render_template, session, jsonify
+from flask import Blueprint, render_template, session, jsonify, Response
 import numpy as np
+from bson import json_util
 
-from atlas.data_munger import DataMunger
 from atlas.constants import MODELS, DATASETS, SCENARIOS, IRRIGATION, \
     CROPS, VARIABLES
+
 
 mod = Blueprint('atlas', __name__,)
 
@@ -26,14 +27,17 @@ def mongo_test(tlx, tly, brx, bry):
     mr = MongoRead(float(tlx), float(tly),
                    float(brx), float(tly),
                    float(brx), float(bry),
-                   float(tlx), float(bry), 4)
-    print(mr.quadrilateral)
-    return jsonify(mr.quadrilateral)
+                   float(tlx), float(bry), 4,
+                   )
+    return Response(
+        json_util.dumps(mr.quadrilateral),
+        mimetype='application/json',
+    )
 
 
 
 @mod.route('/',
-           defaults={'lon': 0, 'lat': 0, 'model': 'papsim', 'dataset': 'wfdei.cru',
+           defaults={'lon': 80, 'lat': 20, 'model': 'papsim', 'dataset': 'wfdei.cru',
                      'scenario': 'fullharm', 'irrigation': 'firr',
                      'crop': 'whe', 'var': 'yield', 'compare': None})
 def index(lon, lat, model, dataset, scenario, irrigation, crop, var, compare):
@@ -47,15 +51,6 @@ def index(lon, lat, model, dataset, scenario, irrigation, crop, var, compare):
     session['scenario'] = scenario
     session['crop'] = crop
     session['compare'] = compare
-    damn = DataMunger(
-        model=[a for a, b, c in MODELS if b == model][0],
-        dataset=[a for a, b, c, d, e in DATASETS if b == dataset][0],
-        scenario=[a for a, b, c in SCENARIOS if b == scenario][0],
-        irr=[a for a, b, c in IRRIGATION if b == irrigation][0],
-        crop=[a for a, b, c in CROPS if b == crop][0],
-        var=[a for a, b, c in VARIABLES if b == var][0],
-        adm=1,
-    )
     return render_template(
         'grid/grid.html',
         map_type='grid',
@@ -68,7 +63,6 @@ def index(lon, lat, model, dataset, scenario, irrigation, crop, var, compare):
         crop=session['crop'],
         lon=session['lon'],
         lat=session['lat'],
-        json=damn.grid_to_json(0., 0.),
     )
 
 
