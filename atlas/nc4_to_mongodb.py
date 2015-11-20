@@ -132,7 +132,6 @@ class NetCDFToMongo(object):
 
         lonlats = itertools.product(enumerate(self.lats), enumerate(self.lons))
         lonlats = np.array_split(np.array([x for x in lonlats]), sectors)[sector]
-        print(len(lonlats), lonlats[0])
 
         try:
             for (lat_idx, lat), (lon_idx, lon) in lonlats:
