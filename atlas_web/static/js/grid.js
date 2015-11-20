@@ -134,6 +134,7 @@
 
     data = queued_data[0];
     world = queued_data[1];
+    data.filter(function (d) { return d.properties.value != null; });
     data.forEach(function(d) {
       d.geometry.coordinates[0].reverse();
     });
