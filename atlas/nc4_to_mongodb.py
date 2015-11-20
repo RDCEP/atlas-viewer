@@ -130,15 +130,16 @@ class NetCDFToMongo(object):
         start_time = datetime.datetime.now()
         print('*** Start Run ***\n{}\n\n'.format(start_time))
 
-        _tims = np.array_split(np.arange(len(self.tims)), sectors)[sector]
+        lonlats = itertools.product(enumerate(self.lats), enumerate(self.lons))
+        lonlats = np.array_split(np.array([x for x in lonlats]), sectors)[sector]
+        print(len(lonlats), lonlats[0])
 
         try:
-            for (lat_idx, lat), (lon_idx, lon) in itertools.product(
-                    enumerate(self.lats), enumerate(self.lons)):
+            for (lat_idx, lat), (lon_idx, lon) in lonlats:
                 new_values = list()
                 all_null = True
                 try:
-                    for i in _tims:
+                    for i in self.tims:
                         xx = self.num_or_null(self.vals[i, lat_idx, lon_idx])
                         if xx is not None:
                             all_null = False
@@ -147,11 +148,10 @@ class NetCDFToMongo(object):
                     if all_null:
                         continue
 
-                    tile = geojson.dumps((
-                        GenerateDocument(lon, lat, self.sim_context,
-                                         new_values, self.pixel_side_length[0],
-                                         self.pixel_side_length[1],
-                                         self.nc_file)))
+                    tile = GenerateDocument(
+                        lon, lat, self.sim_context, new_values,
+                        self.pixel_side_length[0], self.pixel_side_length[1],
+                        self.nc_file).as_dict
                     result = points.insert_one(tile)
 
                 except:
@@ -170,11 +170,11 @@ class NetCDFToMongo(object):
             print('Unexpected error:', sys.exc_info()[0])
             raise
 
-        start_index = datetime.datetime.now()
-        print('\n*** Start Indexing ***\n{}\n'.format(start_index))
-        points.create_index([('geometry', GEOSPHERE)])
-        end_index = datetime.datetime.now()
-        print('\n*** Elapsed ***\n{}\n'.format(end_index - start_index))
+        # start_index = datetime.datetime.now()
+        # print('\n*** Start Indexing ***\n{}\n'.format(start_index))
+        # points.create_index([('geometry', GEOSPHERE)])
+        # end_index = datetime.datetime.now()
+        # print('\n*** Elapsed ***\n{}\n'.format(end_index - start_index))
 
         end_time = datetime.datetime.now()
         print('\n*** End Run ***\n{}\n'.format(end_time))
@@ -221,6 +221,11 @@ class GenerateDocument(object):
                 }}}
 
         return document
+
+    @property
+    def as_dict(self):
+        return self.__geo_interface__
+
 
 
 if __name__ == '__main__':
