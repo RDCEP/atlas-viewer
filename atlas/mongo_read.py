@@ -65,42 +65,22 @@ class MongoRead(object):
         """
         geojsonfiles = []
         cursor = self.collection.find(
-            {"geometry": {"$geoIntersects": {
+            {"geometry": {"$geoWithin": {
                 "$geometry": {"type": "Polygon", "coordinates": [
                     [[self.a_x, self.a_y], [self.b_x, self.b_y],
                      [self.c_x, self.c_y], [self.d_x, self.d_y],
-                     [self.a_x, self.a_y]]]}}},
-            'properties.time': 0,
-            'properties.value': {"$ne": None},
-             })
+                     [self.a_x, self.a_y]]]}}}},
+            projection={"_id": False, "type": True, "geometry": True,
+                        "properties.value": True, })
         for document in cursor:
-            document['properties']['_id'] = document['_id']
-            del(document['_id'])
-            # geojsonfiles.append(json.dumps(document, default=json_util.default))
             geojsonfiles.append(document)
 
         return geojsonfiles
-        # return json.dumps(geojsonfiles, default=json_util)
 
     @property
     def multiscale(self):
         geojsonfiles = []
         return geojsonfiles
-
-    def get_point(self, x, y):
-        documents = []
-        cursor = self.collection.find(
-            { "geometry": { "$near": {
-              "$geometry": {"type": "Point",
-                              "coordinates": [x, y],},
-            "$maxDistance": .25} } } )
-        for document in cursor:
-            document['properties']['_id'] = document['_id']
-            del(document['_id'])
-            # documents.append(json.dumps(document, default=json_util.default))
-            documents.append(document)
-
-        return documents
 
 
 if __name__ == '__main__':
