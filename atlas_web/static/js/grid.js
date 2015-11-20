@@ -4,7 +4,7 @@
     , height = window.innerHeight
     , width = window.innerWidth
     , current_year = 1979
-    , sens = .5
+    , sens = 1
     , _time = 0
     //, start_year = 1979
     //, end_year = 2012
@@ -23,15 +23,34 @@
               '#f16913', '#d94801', '#a63603', '#7f2704'])
 
     , projection = d3.geo.equirectangular()
+      //.rotate([Options.lon, 0])
       .center([Options.lon, Options.lat])
-      .scale(1500)
+      .scale(height * 2)
       .translate([width / 2, height / 2])
       .precision(.1)
     , path = d3.geo.path()
       .projection(projection)
     , graticule = d3.geo.graticule()
 
-    , drag_rotate = d3.behavior.drag()
+    , hover_legend = d3.select('#hover_legend')
+    ;
+
+  var dragged = function dragged() {
+    var λ = d3.event.x * sens
+      , φ = d3.event.y * sens
+      , upper_drag_limit = projection([0, 90])[1]
+      , lower_drag_limit = projection([0, -90])[1] - height
+    ;
+
+    φ = φ > lower_drag_limit ? lower_drag_limit
+      : φ < upper_drag_limit ? upper_drag_limit
+      : φ;
+    projection.center(projection.invert([width / 2 - λ, height / 2 - φ]));
+    //path.projection(projection);
+    svg.selectAll('.boundary').attr('d', path);
+  };
+
+  var drag_rotate = d3.behavior.drag()
       .origin(function() { var r = projection.rotate(); return {x: r[0] / sens, y: -r[1] / sens}; })
       .on('drag', dragged)
     , scroll_zoom = d3.behavior.zoom()
@@ -39,44 +58,28 @@
       .scale(projection.scale())
       .scaleExtent([height, 8 * height])
       .on('zoom', null)
-    , hover_legend = d3.select('#hover_legend')
     ;
 
-  function dragged() {
-    var λ = d3.event.x * sens
-      , φ = d3.event.y * sens
-      , c = projection.center()
-      , upper_drag_limit = projection([0, 90])[1]
-      , lower_drag_limit = projection([0, -90])[1] - height
-    ;
-    φ = φ > lower_drag_limit ? lower_drag_limit :
-    φ < upper_drag_limit ? upper_drag_limit :
-    φ;
-    projection.center(projection.invert([width / 2 - λ, height / 2 - φ]));
-    path.projection(projection);
-    svg.selectAll('.boundary').attr('d', path);
-  }
-
-  var update_projection = function(w, h, d) {
+  var update_projection = function update_projection(w, h, d) {
     return (width / 6) * 360 / (42);
   };
 
-  var expand_lon = function(lon, left) {
+  var expand_lon = function expand_lon(lon, left) {
     while (lon < left) {
       lon += 180;
     }
     return lon;
   };
 
-  var compress_lon = function(lon) {
+  var compress_lon = function compress_lon(lon) {
     return (lon / 180) % 1 * 180;
   };
 
-  var limit_lat = function (lat) {
+  var limit_lat = function limit_lat(lat) {
 
   };
 
-  var get_viewport_dimensions = function() {
+  var get_viewport_dimensions = function get_viewport_dimensions() {
     top_left = projection.invert([0,0]);
     bottom_right = projection.invert([width, height]);
     top_right = [bottom_right[0], top_left[1]];
@@ -96,16 +99,17 @@
     }
   };
 
-  var resize = function() {
+  var resize = function resize() {
     width = window.innerWidth;
     height = window.innerHeight;
     d3.select('svg').attr({height: height, width: width});
-    projection.translate([width / 2, height / 2]);
-    projection.center(dims.center);
+    projection.translate([width / 2, height / 2])
+      .center(dims.center)
+      .scale(height * 2);
     d3.selectAll('.boundary').attr('d', path);
   };
 
-  var update_data_fills = function() {
+  var update_data_fills = function update_data_fills() {
     grid_regions.each(function(d, i) {
       d3.select(this).style({
         fill: function() {
@@ -116,7 +120,7 @@
     });
   };
 
-  var grid_hover = function(d) {
+  var grid_hover = function grid_hover(d) {
     var q = d.geometry.coordinates[0] + ', ';
     q += d.geometry.coordinates[1] + ': ';
     q += d.properties.value;
@@ -128,7 +132,7 @@
     });
   };
 
-  var atlas = function(error, queued_data) {
+  var atlas = function atlas(error, queued_data) {
 
     data = queued_data[0];
     world = queued_data[1];
@@ -136,7 +140,6 @@
     data.forEach(function(d) {
       d.geometry.coordinates.reverse();
     });
-    console.log(data);
 
     projection.center(dims.center);
 
