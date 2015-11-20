@@ -109,18 +109,16 @@
     grid_regions.each(function(d, i) {
       d3.select(this).style({
         fill: function() {
-          if (d.properties.time == _time) {
-            return color(d.properties.value);
-          }
-          return 'transparent';
+          return d.properties.value.values[_time] == null
+            ? 'transparent' : color(d.properties.value.values[_time]);
         }
       });
     });
   };
 
   var grid_hover = function(d) {
-    var q = d.properties.centroid.coordinates[0] + ', ';
-    q += d.properties.centroid.coordinates[1] + ': ';
+    var q = d.geometry.coordinates[0] + ', ';
+    q += d.geometry.coordinates[1] + ': ';
     q += d.properties.value;
     hover_legend.select('p').text(q);
     hover_legend.style({
@@ -134,15 +132,19 @@
 
     data = queued_data[0];
     world = queued_data[1];
+    data.filter(function (d) { return d.properties.value != null; });
     data.forEach(function(d) {
-      d.geometry.coordinates[0].reverse();
+      d.geometry.coordinates.reverse();
     });
+    console.log(data);
 
     projection.center(dims.center);
 
     color.domain([
-      d3.min(data, function(d) { return d.properties.value; }),
-      d3.max(data, function(d) { return d.properties.value; })]);
+      d3.min(data, function(d) {
+        return d3.min(d.properties.value.values, function(dd) {return dd; }); }),
+      d3.max(data, function(d) {
+        return d3.max(d.properties.value.values, function(dd) {return dd; }); })]);
 
     var sphere = [
       ocean_layer.append('path')

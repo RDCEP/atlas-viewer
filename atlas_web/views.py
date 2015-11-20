@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-import json
-
+try:
+    import simplejson as json
+except ImportError:
+    import json
 from flask import Blueprint, render_template, session, jsonify, Response
 import numpy as np
-from bson import json_util
-
 from atlas.constants import MODELS, DATASETS, SCENARIOS, IRRIGATION, \
     CROPS, VARIABLES
 
@@ -30,7 +30,7 @@ def mongo_test(tlx, tly, brx, bry):
                    float(tlx), float(bry), 4,
                    )
     return Response(
-        json_util.dumps(mr.quadrilateral),
+        json.dumps(mr.quadrilateral),
         mimetype='application/json',
     )
 

@@ -125,36 +125,42 @@ class NetCDFToMongo(object):
         client = MongoClient(uri) if not MONGO['local'] \
             else MongoClient('localhost', MONGO['port'])
         db = client['atlas']
-        points = db.simulation
+        points = db.simulation_poly
 
         start_time = datetime.datetime.now()
         print('*** Start Run ***\n{}\n\n'.format(start_time))
 
-        _tims = np.array_split(np.arange(len(self.tims)), sectors)[sector]
+        lonlats = itertools.product(enumerate(self.lats), enumerate(self.lons))
+        lonlats = np.array_split(np.array([x for x in lonlats]), sectors)[sector]
 
         try:
-            for (lat_idx, lat), (lon_idx, lon) in itertools.product(
-                    enumerate(self.lats), enumerate(self.lons)):
-                new_points = list()
+            for (lat_idx, lat), (lon_idx, lon) in lonlats:
+                new_values = list()
+                all_null = True
                 try:
-                    for i in _tims:
+                    for i in range(len(self.tims)):
                         xx = self.num_or_null(self.vals[i, lat_idx, lon_idx])
-                        tile = geojson.dumps((
-                            GenerateDocument(lon, lat, self.sim_context, i,
-                                             xx, self.pixel_side_length[0],
-                                             self.pixel_side_length[1],
-                                             self.nc_file)))
-                        new_points.append(tile)
-                        tile = {}
+                        if xx is not None:
+                            all_null = False
+                        new_values.append(xx)
+
+                    if all_null:
+                        continue
+
+                    tile = GenerateDocument(
+                        lon, lat, self.sim_context, new_values,
+                        self.pixel_side_length[0], self.pixel_side_length[1],
+                        self.nc_file).as_dict
+                    result = points.insert_one(tile)
+
                 except:
                     print('Unexpected error:', sys.exc_info()[0])
                     raise
-                new_points = [json.loads(coords) for coords in new_points]
-                result = points.insert_many(new_points)
                 # print '*** Inserted {} Points ***'.format(len(new_points))
                 # print result.inserted_ids
                 # print '*** End Points ***'
-                new_points[:] = []
+                tile = {}
+                new_values[:] = []
 
         except PyMongoError:
             print('Error while committing on MongoDB')
@@ -163,11 +169,11 @@ class NetCDFToMongo(object):
             print('Unexpected error:', sys.exc_info()[0])
             raise
 
-        start_index = datetime.datetime.now()
-        print('\n*** Start Indexing ***\n{}\n'.format(start_index))
-        points.create_index([('geometry', GEOSPHERE)])
-        end_index = datetime.datetime.now()
-        print('\n*** Elapsed ***\n{}\n'.format(end_index - start_index))
+        # start_index = datetime.datetime.now()
+        # print('\n*** Start Indexing ***\n{}\n'.format(start_index))
+        # points.create_index([('geometry', GEOSPHERE)])
+        # end_index = datetime.datetime.now()
+        # print('\n*** Elapsed ***\n{}\n'.format(end_index - start_index))
 
         end_time = datetime.datetime.now()
         print('\n*** End Run ***\n{}\n'.format(end_time))
@@ -177,13 +183,12 @@ class NetCDFToMongo(object):
 
 # Define GeoJSON standard for ATLAS
 class GenerateDocument(object):
-    def __init__(self, x, y, simulation_variable, time_calc, valor,
+    def __init__(self, x, y, simulation_variable, value,
                  side_x, side_y, filename):
         self.x = x
         self.y = y
         self.sim = simulation_variable
-        self.time = time_calc
-        self.valor = valor
+        self.value = value
         self.side_x = side_x
         self.side_y = side_y
         self.filename = filename
@@ -199,32 +204,45 @@ class GenerateDocument(object):
         :return: GeoJSON object representing data point
         :rtype: dict
         """
-        point_ax = self.x - (self.side_x / 2)
-        point_ay = self.y + (self.side_y / 2)
-        point_bx = self.x + (self.side_x / 2)
-        point_by = self.y + (self.side_y / 2)
-        point_cx = self.x + (self.side_x / 2)
-        point_cy = self.y - (self.side_y / 2)
-        point_dx = self.x - (self.side_x / 2)
-        point_dy = self.y - (self.side_y / 2)
 
-        varOutput = {
+        x2 = self.side_x / 2
+        y2 = self.side_y / 2
+        x5 = self.side_x / 5
+
+        document = {
             'type': 'Feature',
-            'geometry': {'type': 'Polygon', 'coordinates': [
-                [[point_ax, point_ay], [point_bx, point_by],
-                 [point_cx, point_cy], [point_dx, point_dy],
-                 [point_ax, point_ay]]]},
+            'geometry': {'type': 'Polygon', 'coordinates': [[
+                [self.x - x2, self.y + y2],
+                [self.x - x2 + x5, self.y + y2],
+                [self.x - x2 + 2 * x5, self.y + y2],
+                [self.x - x2 + 3 * x5, self.y + y2],
+                [self.x - x2 + 4 * x5, self.y + y2],
+                [self.x + x2, self.y + y2],
+                [self.x + x2, self.y - y2],
+                [self.x + x2 - x5, self.y - y2],
+                [self.x + x2 - 2 * x5, self.y - y2],
+                [self.x + x2 - 3 * x5, self.y - y2],
+                [self.x + x2 - 4 * x5, self.y - y2],
+                [self.x - x2, self.y - y2],
+                [self.x - x2, self.y + y2]]]},
             'properties': {
-                'nc4filename': ntpath.basename(self.filename),
+                'source': ntpath.basename(self.filename),
                 'simulation': self.sim,
                 'timestamp': datetime.datetime.now().isoformat(),
-                'time': self.time,
-                'value': self.valor,
-                'centroid': {
-                        'type': 'Point',
-                        'coordinates': [self.x, self.y]}}}
+                'centroid': {'geometry': {
+                    'type': 'Point', 'coordinates': [self.x, self.y]}},
+                'value': {
+                    'values': self.value,
+                    'start': [1979, ],
+                    'step': 1,
+                }}}
 
-        return varOutput
+        return document
+
+    @property
+    def as_dict(self):
+        return self.__geo_interface__
+
 
 
 if __name__ == '__main__':
