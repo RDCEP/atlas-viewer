@@ -109,10 +109,8 @@
     grid_regions.each(function(d, i) {
       d3.select(this).style({
         fill: function() {
-          if (d.properties.time == _time) {
-            return color(d.properties.value);
-          }
-          return 'transparent';
+          return d.properties.value.values[_time] == null
+            ? 'transparent' : color(d.properties.value.values[_time]);
         }
       });
     });
@@ -147,12 +145,15 @@
         [_x - .25, _y + .25]
       ]];
     });
+    console.log(data);
 
     projection.center(dims.center);
 
     color.domain([
-      d3.min(data, function(d) { return d.properties.value; }),
-      d3.max(data, function(d) { return d.properties.value; })]);
+      d3.min(data, function(d) {
+        return d3.min(d.properties.value.values, function(dd) {return dd; }); }),
+      d3.max(data, function(d) {
+        return d3.max(d.properties.value.values, function(dd) {return dd; }); })]);
 
     var sphere = [
       ocean_layer.append('path')
