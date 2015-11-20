@@ -64,7 +64,7 @@ class MongoRead(object):
         """
         geojsonfiles = []
         cursor = self.collection.find(
-            {'geometry': {'$geoWithin': {
+            {'geometry': {'$geoIntersects': {
                 '$geometry': {'type': 'Polygon', 'coordinates': [
                     [[self.a_x, self.a_y], [self.b_x, self.b_y],
                      [self.c_x, self.c_y], [self.d_x, self.d_y],

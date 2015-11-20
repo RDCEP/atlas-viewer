@@ -134,16 +134,7 @@
     world = queued_data[1];
     data.filter(function (d) { return d.properties.value != null; });
     data.forEach(function(d) {
-      d.geometry.type = 'Polygon';
-      var _x = d.geometry.coordinates[0];
-      var _y = d.geometry.coordinates[1];
-      d.geometry.coordinates = [[
-        [_x - .25, _y + .25],
-        [_x + .25, _y + .25],
-        [_x + .25, _y - .25],
-        [_x - .25, _y - .25],
-        [_x - .25, _y + .25]
-      ]];
+      d.geometry.coordinates.reverse();
     });
     console.log(data);
 

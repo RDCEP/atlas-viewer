@@ -206,14 +206,32 @@ class GenerateDocument(object):
         :rtype: dict
         """
 
+        x2 = self.side_x / 2
+        y2 = self.side_y / 2
+        x5 = self.side_x / 5
+
         document = {
             'type': 'Feature',
-            'geometry': {'type': 'Point', 'coordinates': [self.x, self.y]},
+            'geometry': {'type': 'Polygon', 'coordinates': [[
+                [self.x - x2, self.y + y2],
+                [self.x - x2 + x5, self.y + y2],
+                [self.x - x2 + 2 * x5, self.y + y2],
+                [self.x - x2 + 3 * x5, self.y + y2],
+                [self.x - x2 + 4 * x5, self.y + y2],
+                [self.x + x2, self.y + y2],
+                [self.x + x2, self.y - y2],
+                [self.x + x2 - x5, self.y - y2],
+                [self.x + x2 - 2 * x5, self.y - y2],
+                [self.x + x2 - 3 * x5, self.y - y2],
+                [self.x + x2 - 4 * x5, self.y - y2],
+                [self.x - x2, self.y - y2],
+                [self.x - x2, self.y + y2]]]},
             'properties': {
                 'source': ntpath.basename(self.filename),
                 'simulation': self.sim,
                 'timestamp': datetime.datetime.now().isoformat(),
-                'dims': [self.side_x, self.side_y],
+                'centroid': {'geometry': {
+                    'type': 'Point', 'coordinates': [self.x, self.y]}},
                 'value': {
                     'values': self.value,
                     'start': [1979, ],
