@@ -119,8 +119,8 @@
   };
 
   var grid_hover = function(d) {
-    var q = d.properties.centroid.coordinates[0] + ', ';
-    q += d.properties.centroid.coordinates[1] + ': ';
+    var q = d.geometry.coordinates[0] + ', ';
+    q += d.geometry.coordinates[1] + ': ';
     q += d.properties.value;
     hover_legend.select('p').text(q);
     hover_legend.style({
@@ -136,7 +136,16 @@
     world = queued_data[1];
     data.filter(function (d) { return d.properties.value != null; });
     data.forEach(function(d) {
-      d.geometry.coordinates[0].reverse();
+      d.geometry.type = 'Polygon';
+      var _x = d.geometry.coordinates[0];
+      var _y = d.geometry.coordinates[1];
+      d.geometry.coordinates = [[
+        [_x - .25, _y + .25],
+        [_x + .25, _y + .25],
+        [_x + .25, _y - .25],
+        [_x - .25, _y - .25],
+        [_x - .25, _y + .25]
+      ]];
     });
 
     projection.center(dims.center);
