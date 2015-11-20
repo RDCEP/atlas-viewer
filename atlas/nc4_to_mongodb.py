@@ -139,7 +139,7 @@ class NetCDFToMongo(object):
                 new_values = list()
                 all_null = True
                 try:
-                    for i in self.tims:
+                    for i in range(len(self.tims)):
                         xx = self.num_or_null(self.vals[i, lat_idx, lon_idx])
                         if xx is not None:
                             all_null = False
