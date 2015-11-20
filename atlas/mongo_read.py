@@ -4,7 +4,6 @@ except ImportError:
     import json
 from pymongo import MongoClient
 from pymongo.errors import PyMongoError
-from bson import json_util
 from atlas.constants import MONGO
 
 
@@ -65,13 +64,13 @@ class MongoRead(object):
         """
         geojsonfiles = []
         cursor = self.collection.find(
-            {"geometry": {"$geoWithin": {
-                "$geometry": {"type": "Polygon", "coordinates": [
+            {'geometry': {'$geoWithin': {
+                '$geometry': {'type': 'Polygon', 'coordinates': [
                     [[self.a_x, self.a_y], [self.b_x, self.b_y],
                      [self.c_x, self.c_y], [self.d_x, self.d_y],
                      [self.a_x, self.a_y]]]}}}},
-            projection={"_id": False, "type": True, "geometry": True,
-                        "properties.value": True, })
+            projection={'_id': False, 'type': True, 'geometry': True,
+                        'properties.value': True, })
         for document in cursor:
             geojsonfiles.append(document)
 
