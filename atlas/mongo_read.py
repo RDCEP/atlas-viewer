@@ -52,7 +52,7 @@ class MongoRead(object):
                 else MongoClient('localhost', MONGO['port'])
 
             db = client['atlas']
-            collection = db['simulation']
+            collection = db['simulation_poly']
         self.collection = collection
 
     @property
