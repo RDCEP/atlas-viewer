@@ -152,7 +152,7 @@ class NetCDFToMongo(object):
                                          new_values, self.pixel_side_length[0],
                                          self.pixel_side_length[1],
                                          self.nc_file)))
-                    result = points.insert(tile)
+                    result = points.insert_one(tile)
 
                 except:
                     print('Unexpected error:', sys.exc_info()[0])
