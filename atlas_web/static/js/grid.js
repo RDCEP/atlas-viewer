@@ -10,6 +10,10 @@
     //, end_year = 2012
     //, _scen = 0
     //, _irr = 0
+    , resize_time
+    , resize_timeout = false
+    , resize_delta = 200
+    , resize_reload = false
 
     , svg = d3.select('#map').append('svg')
       .attr({'width': width, 'height': height})
@@ -18,6 +22,8 @@
       .attr('id', 'ocean_layer')
     , grid_layer = svg.append('g')
       .attr('id', 'grid_layer')
+    , edges_layer = svg.append('g')
+      .attr('id', 'edges_layer')
 
     , color = d3.scale.quantile()
       .range(['#fff5eb', '#fee6ce', '#fdd0a2', '#fdae6b', '#fd8d3c',
@@ -120,12 +126,29 @@
   };
 
   var resize = function resize() {
+    resize_time = new Date();
+    if (resize_timeout === false) {
+      resize_timeout = true;
+      setTimeout(resize_end, resize_delta);
+    }
     width = window.innerWidth;
     height = window.innerHeight;
     d3.select('svg').attr({height: height, width: width});
+    resize_reload = height * 2 < projection.scale();
     projection.translate([width / 2, height / 2])
       .scale(height * 2);
     d3.selectAll('.boundary').attr('d', path);
+  };
+
+  var resize_end = function resize_end() {
+    if (new Date() - resize_time < resize_delta) {
+      setTimeout(resize_end, resize_delta);
+    } else {
+      resize_timeout = false;
+      if (resize_reload) {
+        get_data_for_viewport();
+      }
+    }
   };
 
   var show_loader = function show_loader() {
@@ -176,6 +199,19 @@
         .style({
           stroke: 'none',
           fill: '#dddddd'
+        });
+
+      edges_layer.selectAll('path.countries')
+        .data(world.features)
+        .enter()
+        .append('path')
+        .attr('d', path)
+        .attr('class', 'countries boundary')
+        .style({
+          stroke: 'black',
+          'stroke-width': 1,
+          'stroke-line-join': 'round',
+          fill: 'none'
         });
 
     });
@@ -256,12 +292,12 @@
 
   var time_opt = d3.select('#time_select');
   var time_label = d3.select('#menu_time label');
-  time_opt.on('change', function() {
+  time_opt.on('input', function() {
     _time = +d3.select(this).property('value');
-    var _ctime = time_label.text();
+    //var _ctime = time_label.text();
     current_year = 1979 + _time;
-    time_label.text(current_year);
-    d3.select('#corner_legend [data-type="time"]').text(current_year);
+    //time_label.text(current_year);
+    //d3.select('#corner_legend [data-type="time"]').text(current_year);
     update_data_fills(data);
   });
   d3.select(window).on('resize', resize);
