@@ -126,7 +126,7 @@ class NetCDFToMongo(object):
         client = MongoClient(uri) if not MONGO['local'] \
             else MongoClient('localhost', MONGO['port'])
         db = client['atlas']
-        points = db.simulation_poly
+        points = db[MONGO['collection']]
 
         start_time = datetime.datetime.now()
         print('*** Start Run ***\n{}\n\n'.format(start_time))

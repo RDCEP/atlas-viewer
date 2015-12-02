@@ -20,6 +20,7 @@ MONGO = dict(
     password=cf.get('user', 'password'),
     domain=cf.get('server', 'domain'),
     database=cf.get('server', 'database'),
+    collection=cf.get('server', 'collection'),
     port=int(cf.get('server', 'port')),)
              
 SCENARIOS = [
