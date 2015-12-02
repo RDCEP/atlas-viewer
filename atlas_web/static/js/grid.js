@@ -8,8 +8,7 @@
     , _time = 0
     //, start_year = 1979
     //, end_year = 2012
-    //, _scen = 0
-    //, _irr = 0
+
     , resize_time
     , resize_timeout = false
     , resize_delta = 200
@@ -29,10 +28,12 @@
       .range(['#fff5eb', '#fee6ce', '#fdd0a2', '#fdae6b', '#fd8d3c',
               '#f16913', '#d94801', '#a63603', '#7f2704'])
 
+    , get_scale = function get_scale() { return d3.max([height, width]); }
+
     , projection = d3.geo.equirectangular()
       .rotate([-Options.lon, 0])
       .center([0, Options.lat])
-      .scale(height * 2)
+      .scale(get_scale())
       .translate([width / 2, height / 2])
       .precision(.1)
     , path = d3.geo.path()
@@ -41,6 +42,24 @@
 
     , hover_legend = d3.select('#hover_legend')
     ;
+
+  var drag_rotate = d3.behavior.drag()
+      .origin(function() {
+        var r = projection.rotate();
+        return {x: r[0] / sens, y: -r[1] / sens}; })
+      .on('dragstart', drag_start)
+      .on('drag', dragged)
+      .on('dragend', drag_end)
+    , scroll_zoom = d3.behavior.zoom()
+      .translate(projection.translate())
+      .scale(projection.scale())
+      .scaleExtent([height, 8 * height])
+      .on('zoom', null)
+    ;
+
+  var drag_start = function drag_start() {
+
+  };
 
   var dragged = function dragged() {
 
@@ -64,43 +83,13 @@
     svg.selectAll('.boundary').attr('d', path);
   };
 
-  var dragend = function dragend() {
+  var drag_end = function drag_end() {
+    grid_regions.remove();
     get_data_for_viewport();
   };
 
-  var drag_rotate = d3.behavior.drag()
-      .origin(function() {
-        var r = projection.rotate();
-        return {x: r[0] / sens, y: -r[1] / sens}; })
-      .on('drag', dragged)
-      .on('dragend', dragend)
-    , scroll_zoom = d3.behavior.zoom()
-      .translate(projection.translate())
-      .scale(projection.scale())
-      .scaleExtent([height, 8 * height])
-      .on('zoom', null)
-    ;
-
-  var update_projection = function update_projection(w, h, d) {
-    return (width / 6) * 360 / (42);
-  };
-
-  var expand_lon = function expand_lon(lon, left) {
-    while (lon < left) {
-      lon += 180;
-    }
-    return lon;
-  };
-
-  var compress_lon = function compress_lon(lon) {
-    return (lon / 180) % 1 * 180;
-  };
-
-  var limit_lat = function limit_lat(lat) {
-
-  };
-
   var get_viewport_dimensions = function get_viewport_dimensions() {
+
     top_left = projection.invert([0,0]);
     bottom_right = projection.invert([width, height]);
 
@@ -109,34 +98,35 @@
 
     top_right = [bottom_right[0], top_left[1]];
     bottom_left = [top_left[0], bottom_right[1]];
-    center = [
-      compress_lon((
-        expand_lon(bottom_right[0], top_left[0]) - top_left[0])
-        / 2 + top_left[0]),
-      (top_left[1] - bottom_right[1]) / 2 + bottom_right[1]
-    ];
 
     return {
       'top_left': top_left,
       'top_right': top_right,
       'bottom_left': bottom_left,
-      'bottom_right': bottom_right,
-      'center': center
+      'bottom_right': bottom_right
     }
   };
 
   var resize = function resize() {
+
+    //Check for end of resize event
     resize_time = new Date();
     if (resize_timeout === false) {
       resize_timeout = true;
       setTimeout(resize_end, resize_delta);
     }
+
+    //Resize SVG
     width = window.innerWidth;
     height = window.innerHeight;
     d3.select('svg').attr({height: height, width: width});
-    resize_reload = height * 2 < projection.scale();
+
+    //Set reload switch
+    resize_reload = get_scale() < projection.scale();
+
+    //Re-project
     projection.translate([width / 2, height / 2])
-      .scale(height * 2);
+      .scale(get_scale());
     d3.selectAll('.boundary').attr('d', path);
   };
 
