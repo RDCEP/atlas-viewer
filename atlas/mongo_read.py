@@ -62,7 +62,6 @@ class MongoRead(object):
         :return: List of GeoJSON files
         :rtype: list
         """
-        geojsonfiles = []
         cursor = self.collection.find(
             {'geometry': {'$geoIntersects': {
                 '$geometry': {'type': 'Polygon', 'coordinates': [
@@ -71,10 +70,8 @@ class MongoRead(object):
                      [self.a_x, self.a_y]]]}}}},
             projection={'_id': False, 'type': True, 'geometry': True,
                         'properties.value': True, })
-        for document in cursor:
-            geojsonfiles.append(document)
 
-        return geojsonfiles
+        return list(cursor)
 
     @property
     def multiscale(self):
