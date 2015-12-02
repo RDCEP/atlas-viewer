@@ -18,7 +18,7 @@ Version 0.1 - Implantation
 * Ian Foster <foster@anl.gov>
 * Joshua Elliott <jelliott@ci.uchicago.edu>
 * Nathan Matteson <matteson@obstructures.org>
-* Ricardo Barros Lourenço <rblourenco@uchicago.edu>
+* Ricardo Barros Lourenço <rlourenc@mail.depaul.edu>
 
 
 ## License

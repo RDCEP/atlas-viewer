@@ -87,7 +87,7 @@ class MongoRead(object):
         for document in cursor:
             geojsonfiles.append(document)
 
-        return geojsonfiles
+        return toJson(geojsonfiles)
 
     @property
     def multiscale(self):
