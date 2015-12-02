@@ -11,19 +11,6 @@ __author__ = 'rblourenco@uchicago.edu'
 # 2015-09-04 - Initial commit
 
 
-uri = "mongodb://{}:{}@{}/{}?authMechanism=SCRAM-SHA-1".format(
-    MONGO['user'], MONGO['password'], MONGO['domain'], MONGO['database']
-)
-client = MongoClient(uri) if not MONGO['local'] \
-    else MongoClient('localhost', MONGO['port'])
-
-db = client['atlas']
-collection = db['simulation']
-
-def toJson(data):
-    """Convert Mongo object(s) to JSON"""
-    return json.dumps(data, default=json_util.default)
-
 class MongoRead(object):
     def __init__(self, a_x, a_y, b_x, b_y, c_x, c_y, d_x, d_y, dpmm,
                  collection=None):
@@ -75,7 +62,6 @@ class MongoRead(object):
         :return: List of GeoJSON files
         :rtype: list
         """
-        geojsonfiles = []
         cursor = self.collection.find(
             {'geometry': {'$geoIntersects': {
                 '$geometry': {'type': 'Polygon', 'coordinates': [
@@ -84,10 +70,8 @@ class MongoRead(object):
                      [self.a_x, self.a_y]]]}}}},
             projection={'_id': False, 'type': True, 'geometry': True,
                         'properties.value': True, })
-        for document in cursor:
-            geojsonfiles.append(document)
 
-        return toJson(geojsonfiles)
+        return list(cursor)
 
     @property
     def multiscale(self):

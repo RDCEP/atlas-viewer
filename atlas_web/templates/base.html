@@ -14,10 +14,18 @@
       </ul>
     </nav>
     <div id="title_legend_wrap">
+      <div id=title_legend>
+        <label>
+          <span>1979</span>
+          <input id=time_select type=range min=0 max=33 step=1 value=0>
+          <span>2012</span>
+        </label>
+      </div>
     </div>
   </header>
   <div id="map"></div>
   <div id="hover_legend"><p></p></div>
+  <div id=loader><img src={{ url_for('static', filename='images/oval.svg') }} alt></div>
 </div>
 <script>
 {% block jsoptions %}

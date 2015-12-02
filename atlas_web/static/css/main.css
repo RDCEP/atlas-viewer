@@ -15,7 +15,7 @@ a {
   text-decoration: none;
   color: #666666; }
   a:hover {
-    color: #cccccc !important; }
+    color: #ccc !important; }
 
 h1, h2 {
   margin-bottom: 0.5em; }
@@ -35,11 +35,11 @@ line, path {
   background-color: #eeeeee; }
 
 #sphere {
-  fill: #c6eafb; }
+  fill: #C6EAFB; }
 
 .world-path {
   fill: white;
-  stroke: #666666; }
+  stroke: #666; }
 
 path {
   stroke: black;
@@ -61,7 +61,7 @@ path {
 #title_legend_wrap {
   position: absolute;
   top: 2.3em;
-  background-color: white;
+  background-color: #ffffff;
   opacity: 0.8;
   height: 1.8em;
   z-index: -1; }
@@ -165,7 +165,17 @@ path {
       color: #cccccc; }
 
 #title_legend {
-  background-color: white; }
+  background-color: #ffffff;
+  width: 960px;
+  margin: 0 auto;
+  padding: 0.5em 0 0 0;
+  font-size: 0.8em;
+  line-height: 1em; }
+  #title_legend input[type=range] {
+    position: relative;
+    top: 0.2em; }
+  #title_legend span {
+    margin: 0 1em; }
 
 .world-boundary {
   stroke: #eeeeee;
@@ -201,13 +211,18 @@ path {
 
 #hover_legend {
   background-color: black;
-  opacity: 0.8;
+  border-radius: 2px;
   padding: 0.5em;
   color: white;
   display: none;
   position: absolute;
-  font-size: 0.8em;
-  pointer-events: none; }
+  font-size: 0.7em;
+  pointer-events: none;
+  opacity: 0.8; }
+
+#loader {
+  display: none;
+  position: fixed; }
 
 .y.axis line {
   stroke-dasharray: 2, 2;
@@ -225,3 +240,5 @@ path {
 
 .nowrap {
   white-space: nowrap; }
+
+/*# sourceMappingURL=main.css.map */
