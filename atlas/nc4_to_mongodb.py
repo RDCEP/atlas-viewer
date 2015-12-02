@@ -12,7 +12,6 @@ import numpy as np
 from pymongo.errors import PyMongoError
 from pymongo import MongoClient, GEOSPHERE
 from netCDF4 import Dataset
-import geojson
 from atlas.constants import MONGO
 
 
@@ -100,10 +99,12 @@ class NetCDFToMongo(object):
         """Represent null values from netCDF as '--' and numeric values
         as floats.
         """
+
         if value is np.ma.masked:
             return None
         try:
-            return float(value)
+            # FIXME: round to significant figures
+            return round(float(value), 1)
         except ValueError:
             print('\n*** Encountered uncoercible non-numeric ***\n{}\n\n'.format(
                 value
