@@ -4,7 +4,6 @@ except ImportError:
     import json
 from pymongo import MongoClient
 from pymongo.errors import PyMongoError
-from bson import json_util
 from atlas.constants import MONGO
 
 
@@ -26,7 +25,8 @@ def toJson(data):
     return json.dumps(data, default=json_util.default)
 
 class MongoRead(object):
-    def __init__(self, a_x, a_y, b_x, b_y, c_x, c_y, d_x, d_y, dpmm):
+    def __init__(self, a_x, a_y, b_x, b_y, c_x, c_y, d_x, d_y, dpmm,
+                 collection=None):
         """Class for geospatial information retrieval on MongoDB
 
         :param a_x: Top left decimal longitude
@@ -57,6 +57,16 @@ class MongoRead(object):
         self.d_x = d_x
         self.d_y = d_y
         self.dpmm = dpmm
+        if collection is None:
+            uri = "mongodb://{}:{}@{}/{}?authMechanism=SCRAM-SHA-1".format(
+                MONGO['user'], MONGO['password'], MONGO['domain'], MONGO['database']
+            )
+            client = MongoClient(uri) if not MONGO['local'] \
+                else MongoClient('localhost', MONGO['port'])
+
+            db = client['atlas']
+            collection = db['simulation_poly']
+        self.collection = collection
 
     @property
     def quadrilateral(self):
@@ -66,18 +76,18 @@ class MongoRead(object):
         :rtype: list
         """
         geojsonfiles = []
-        cursor = collection.find(
-            {"geometry": {"$geoIntersects": {
-                "$geometry": {"type": "Polygon", "coordinates": [
+        cursor = self.collection.find(
+            {'geometry': {'$geoIntersects': {
+                '$geometry': {'type': 'Polygon', 'coordinates': [
                     [[self.a_x, self.a_y], [self.b_x, self.b_y],
                      [self.c_x, self.c_y], [self.d_x, self.d_y],
-                     [self.a_x, self.a_y]]]}}}})
+                     [self.a_x, self.a_y]]]}}}},
+            projection={'_id': False, 'type': True, 'geometry': True,
+                        'properties.value': True, })
         for document in cursor:
-            document['properties']['_id'] = document['_id']
-            del(document['_id'])
-            geojsonfiles.append(json.dumps(document, default=json_util.default))
+            geojsonfiles.append(document)
 
-        return toJson(geojsonfiles)
+        return geojsonfiles
 
     @property
     def multiscale(self):
