@@ -12,7 +12,7 @@ import numpy as np
 from pymongo.errors import PyMongoError
 from pymongo import MongoClient, GEOSPHERE
 from netCDF4 import Dataset
-from atlas.constants import MONGO
+from constants import MONGO
 
 
 __author__ = "rblourenco@uchicago.edu"
@@ -236,9 +236,8 @@ class GenerateDocument(object):
         return self.__geo_interface__
 
 
-
 if __name__ == '__main__':
-    from atlas.constants import NC_FILE
+    from constants import NC_FILE
     try:
         mi = NetCDFToMongo(NC_FILE)
         mi.parallel_ingest()
