@@ -249,7 +249,14 @@
     data = queued_data[0];
     data.filter(function (d) { return d.properties.value != null; });
     data.forEach(function(d) {
-      d.geometry.coordinates.reverse();
+      var x = d.properties.centroid.geometry.coordinates[0];
+      var y = d.properties.centroid.geometry.coordinates[1];
+      // FIXME: Need dynamic resolution
+      var s = .25;
+      d.geometry = {
+        type: 'Polygon',
+        coordinates: [[[x-s, y+s], [x+s, y+s], [x+s, y-s], [x-s, y-s], [x-s, y+s]]]
+      }
     });
 
     color.domain([
