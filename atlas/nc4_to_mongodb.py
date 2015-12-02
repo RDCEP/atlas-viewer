@@ -207,22 +207,13 @@ class GenerateDocument(object):
 
         x2 = self.side_x / 2
         y2 = self.side_y / 2
-        x5 = self.side_x / 5
 
         document = {
             'type': 'Feature',
             'geometry': {'type': 'Polygon', 'coordinates': [[
                 [self.x - x2, self.y + y2],
-                [self.x - x2 + x5, self.y + y2],
-                [self.x - x2 + 2 * x5, self.y + y2],
-                [self.x - x2 + 3 * x5, self.y + y2],
-                [self.x - x2 + 4 * x5, self.y + y2],
                 [self.x + x2, self.y + y2],
                 [self.x + x2, self.y - y2],
-                [self.x + x2 - x5, self.y - y2],
-                [self.x + x2 - 2 * x5, self.y - y2],
-                [self.x + x2 - 3 * x5, self.y - y2],
-                [self.x + x2 - 4 * x5, self.y - y2],
                 [self.x - x2, self.y - y2],
                 [self.x - x2, self.y + y2]]]},
             'properties': {
