@@ -4,7 +4,7 @@ except ImportError:
     import json
 from pymongo import MongoClient
 from pymongo.errors import PyMongoError
-from atlas.constants import MONGO
+from constants import MONGO
 
 
 __author__ = 'rblourenco@uchicago.edu'
@@ -52,7 +52,7 @@ class MongoRead(object):
                 else MongoClient('localhost', MONGO['port'])
 
             db = client['atlas']
-            collection = db['simulation_poly']
+            collection = db[MONGO['collection']]
         self.collection = collection
 
     @property
@@ -68,7 +68,8 @@ class MongoRead(object):
                     [[self.a_x, self.a_y], [self.b_x, self.b_y],
                      [self.c_x, self.c_y], [self.d_x, self.d_y],
                      [self.a_x, self.a_y]]]}}}},
-            projection={'_id': False, 'type': True, 'geometry': True,
+            projection={'_id': False, 'type': True,
+                        'properties.centroid': True,
                         'properties.value': True, })
 
         return list(cursor)
