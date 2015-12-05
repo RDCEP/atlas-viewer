@@ -65,7 +65,7 @@ class NetCDFToMongo(object):
     @property
     def sim_context(self):
         if self._sim_context is None:
-            self._sim_context = 'aet_whe'
+            self._sim_context = MONGO['variable_name']
         return self._sim_context
 
     @property
