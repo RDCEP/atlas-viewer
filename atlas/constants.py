@@ -5,10 +5,6 @@ from ConfigParser import ConfigParser
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
-NC_FILE = os.path.join(
-    BASE_DIR, 'data', 'netcdf', 'full_global',
-    'papsim_wfdei.cru_hist_default_firr_aet_whe_annual_1979_2012.nc4')
-
 cf = ConfigParser()
 cf.read(os.path.join(
     BASE_DIR, 'static', 'config.ini'
@@ -30,7 +26,7 @@ MONGO = dict(
         cf.get('nc4', 'harms'), cf.get('nc4', 'irrigation'),
         cf.get('nc4', 'variable'), cf.get('nc4', 'crop'), ),
     port=int(cf.get('server', 'port')),
-    variable_name=''.format(cf.get('nc4', 'variable'), cf.get('nc4', 'crop')))
+    variable_name='{}_{}'.format(cf.get('nc4', 'variable'), cf.get('nc4', 'crop')))
              
 SCENARIOS = [
   (0, 'default', 'Default', ),
