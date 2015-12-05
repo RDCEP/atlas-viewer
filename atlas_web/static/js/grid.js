@@ -14,13 +14,20 @@
     , resize_delta = 200
     , resize_reload = false
 
-    , svg = d3.select('#map').append('svg')
+    , svgroot = d3.select('#map').append('svg')
       .attr({'width': width, 'height': height})
-      .append('g')
+    , filter = svgroot.append('defs')
+      .append('filter').attr({id: 'grid_filter', x: 0, y: 0})
+      .append('feGaussianBlur').attr({in: 'SourceGraphic', stdDeviation: '5'})
+      //.append('feConvolveMatrix').attr({
+      //  in: 'SourceGraphic',
+      //  order: '3 3',
+      //  kernelMatrix: '1 3 1 3 5 3 1 3 1'})
+    , svg = svgroot.append('g')
     , ocean_layer = svg.append('g')
       .attr('id', 'ocean_layer')
     , grid_layer = svg.append('g')
-      .attr('id', 'grid_layer')
+      .attr({id: 'grid_layer', filter: 'url(#grid_filter)'})
     , edges_layer = svg.append('g')
       .attr('id', 'edges_layer')
 
@@ -41,20 +48,6 @@
     , graticule = d3.geo.graticule()
 
     , hover_legend = d3.select('#hover_legend')
-    ;
-
-  var drag_rotate = d3.behavior.drag()
-      .origin(function() {
-        var r = projection.rotate();
-        return {x: r[0] / sens, y: -r[1] / sens}; })
-      .on('dragstart', drag_start)
-      .on('drag', dragged)
-      .on('dragend', drag_end)
-    , scroll_zoom = d3.behavior.zoom()
-      .translate(projection.translate())
-      .scale(projection.scale())
-      .scaleExtent([height, 8 * height])
-      .on('zoom', null)
     ;
 
   var drag_start = function drag_start() {
@@ -87,6 +80,20 @@
     grid_regions.remove();
     get_data_for_viewport();
   };
+
+  var drag_rotate = d3.behavior.drag()
+      .origin(function() {
+        var r = projection.rotate();
+        return {x: r[0] / sens, y: -r[1] / sens}; })
+      .on('dragstart', drag_start)
+      .on('drag', dragged)
+      .on('dragend', drag_end)
+    , scroll_zoom = d3.behavior.zoom()
+      .translate(projection.translate())
+      .scale(projection.scale())
+      .scaleExtent([height, 8 * height])
+      .on('zoom', null)
+    ;
 
   var get_viewport_dimensions = function get_viewport_dimensions() {
 
@@ -249,10 +256,13 @@
     data = queued_data[0];
     data.filter(function (d) { return d.properties.value != null; });
     data.forEach(function(d) {
+
       var x = d.properties.centroid.geometry.coordinates[0];
       var y = d.properties.centroid.geometry.coordinates[1];
-      // FIXME: Need dynamic resolution
+
+      // TODO: Need dynamic resolution
       var s = .25;
+
       d.geometry = {
         type: 'Polygon',
         coordinates: [[[x-s, y+s], [x+s, y+s], [x+s, y-s], [x-s, y-s], [x-s, y+s]]]
@@ -280,7 +290,7 @@
     grid_regions.exit().remove();
 
     update_data_fills(data);
-    svg.call(drag_rotate);
+    svgroot.call(drag_rotate);
 
     svg.selectAll('.boundary').attr('d', path);
     hide_loader();
@@ -297,8 +307,8 @@
     //d3.select('#corner_legend [data-type="time"]').text(current_year);
     update_data_fills(data);
   });
-  d3.select(window).on('resize', resize);
 
+  d3.select(window).on('resize', resize);
   get_data_for_viewport();
 
   draw_map_basics();
