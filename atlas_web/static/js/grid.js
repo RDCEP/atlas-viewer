@@ -16,13 +16,14 @@
     , resize_delta = 200
     , resize_reload = false
 
-    , total_pan = {x: 0, y: 0}
+    , total_pan = {x: 0, y: 0, d: 0}
+    , get_map_scale = function get_map_scale() { return d3.max([height, width]) * 2; }
 
     , svgroot = d3.select('#map').append('svg')
       .attr({'width': width, 'height': height})
     , filter = svgroot.append('defs')
       .append('filter').attr({id: 'grid_filter', x: 0, y: 0})
-      .append('feGaussianBlur').attr({in: 'SourceGraphic', stdDeviation: '5'})
+      .append('feGaussianBlur').attr({in: 'SourceGraphic', stdDeviation: get_map_scale()/250})
       //.append('feConvolveMatrix').attr({
       //  in: 'SourceGraphic',
       //  order: '3 3',
@@ -38,8 +39,6 @@
     , color = d3.scale.quantile()
       .range(['#fff5eb', '#fee6ce', '#fdd0a2', '#fdae6b', '#fd8d3c',
               '#f16913', '#d94801', '#a63603', '#7f2704'])
-
-    , get_map_scale = function get_map_scale() { return d3.max([height, width]) * 2; }
 
     , projection = d3.geo.equirectangular()
       .rotate([-Options.lon, 0])
@@ -67,13 +66,12 @@
       , lower_drag_limit = projection([0, -90])[1] - height
     ;
 
-    if (Math.abs(total_pan.x) > 10 || Math.abs(total_pan.y) > 10) {
+    if (Math.abs(total_pan.d) > 10) {
       grid_regions.remove();
-      console.log(total_pan);
     } else {
       total_pan.x += λ;
       total_pan.y += φ;
-      console.log(total_pan);
+      total_pan.d = Math.sqrt(λ * λ + φ * φ);
     }
 
 
@@ -92,8 +90,9 @@
   };
 
   var drag_end = function drag_end() {
-    grid_regions.remove();
-    get_data_for_viewport();
+    if (total_pan.d > 10) {
+      get_data_for_viewport();
+    }
   };
 
   var drag_rotate = d3.behavior.drag()
