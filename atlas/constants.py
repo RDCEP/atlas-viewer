@@ -17,7 +17,7 @@ _filename = 'papsim_wfdei.cru_hist_{}_{}_{}_{}_annual_1979_2012.nc4'.format(
 NC_FILE = os.path.join(BASE_DIR, 'data', 'netcdf', 'full_global', _filename)
 
 MONGO = dict(
-    local=False,
+    local=True,
     user=cf.get('user', 'username'),
     password=cf.get('user', 'password'),
     domain=cf.get('server', 'domain'),
