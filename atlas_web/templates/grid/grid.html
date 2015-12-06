@@ -3,6 +3,8 @@
 {{ super() }}
 Options.lat = {{ lat }};
 Options.lon = {{ lon }};
+Options.var = '{{ var }}';
+Options.crop = '{{ crop }}';
 {% endblock %}
 {% block bodyjs %}
 <script src="{{ url_for('static', filename='js/grid.js') }}?3" charset="utf-8" ></script>

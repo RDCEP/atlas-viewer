@@ -44,15 +44,19 @@ class MongoRead(object):
         self.d_x = d_x
         self.d_y = d_y
         self.dpmm = dpmm
-        if collection is None:
-            uri = "mongodb://{}:{}@{}/{}?authMechanism=SCRAM-SHA-1".format(
-                MONGO['user'], MONGO['password'], MONGO['domain'], MONGO['database']
-            )
-            client = MongoClient(uri) if not MONGO['local'] \
-                else MongoClient('localhost', MONGO['port'])
 
-            db = client['atlas']
+        uri = "mongodb://{}:{}@{}/{}?authMechanism=SCRAM-SHA-1".format(
+            MONGO['user'], MONGO['password'], MONGO['domain'], MONGO['database']
+        )
+        client = MongoClient(uri) if not MONGO['local'] \
+            else MongoClient('localhost', MONGO['port'])
+
+        db = client['atlas']
+
+        if collection is None:
             collection = db[MONGO['collection']]
+        else:
+            collection = db[collection]
         self.collection = collection
 
     @property

@@ -35,7 +35,7 @@
       .range(['#fff5eb', '#fee6ce', '#fdd0a2', '#fdae6b', '#fd8d3c',
               '#f16913', '#d94801', '#a63603', '#7f2704'])
 
-    , get_scale = function get_scale() { return d3.max([height, width]); }
+    , get_scale = function get_scale() { return d3.max([height, width]) * 2; }
 
     , projection = d3.geo.equirectangular()
       .rotate([-Options.lon, 0])
@@ -218,10 +218,7 @@
   var update_data_fills = function update_data_fills() {
     grid_regions.each(function(d, i) {
       d3.select(this).style({
-        fill: function() {
-          return d.properties.value.values[_time] == null
-            ? 'transparent' : color(d.properties.value.values[_time]);
-        }
+        fill: color(d3.mean(d.properties.values))
       });
     });
   };
@@ -247,14 +244,20 @@
     queue()
       .defer(d3.json, '/api/'+
         dims['top_left'][0]+'/'+ dims['top_left'][1]+'/'+
-        dims['bottom_right'][0]+'/'+dims['bottom_right'][1])
+        dims['bottom_right'][0]+'/'+dims['bottom_right'][1]+'/default_firr_'+
+        Options.var+'_'+Options.crop)
       .awaitAll(atlas);
   };
 
-  var atlas = function atlas(error, queued_data) {
+  var draw_areas_by_time = function draw_areas_by_time(data, idx) {
 
-    data = queued_data[0];
-    data.filter(function (d) { return d.properties.value != null; });
+    var grouped_data = new Array(color.range().length);
+    color.range().forEach( function(d, i) {
+      grouped_data[i] = {'type': 'Feature', 'geometry': {
+        'type': 'MultiPolygon', 'coordinates': []
+      }, 'properties': {'values': []}}
+    });
+
     data.forEach(function(d) {
 
       var x = d.properties.centroid.geometry.coordinates[0];
@@ -263,11 +266,22 @@
       // TODO: Need dynamic resolution
       var s = .25;
 
-      d.geometry = {
-        type: 'Polygon',
-        coordinates: [[[x-s, y+s], [x+s, y+s], [x+s, y-s], [x-s, y-s], [x-s, y+s]]]
-      }
+      idx = color.range().indexOf(color(d.properties.value.values[_time]));
+      grouped_data[idx].geometry.coordinates.push(
+        [[[x-s, y+s], [x+s, y+s], [x+s, y-s], [x-s, y-s], [x-s, y+s]]]
+      );
+      grouped_data[idx].properties.values.push(d.properties.value.values[_time]);
     });
+
+    return grouped_data;
+
+  };
+
+  var atlas = function atlas(error, queued_data) {
+
+    data = queued_data[0];
+
+    data.filter(function (d) { return d.properties.value != null; });
 
     color.domain([
       d3.min(data, function(d) {
@@ -275,8 +289,22 @@
       d3.max(data, function(d) {
         return d3.max(d.properties.value.values, function(dd) {return dd; }); })]);
 
-     grid_regions = grid_layer.selectAll('.grid-boundary')
-      .data(data);
+    //data.forEach(function(d) {
+    //
+    //  var x = d.properties.centroid.geometry.coordinates[0];
+    //  var y = d.properties.centroid.geometry.coordinates[1];
+    //
+    //  // TODO: Need dynamic resolution
+    //  var s = .25;
+    //
+    //  d.geometry = {
+    //    type: 'Polygon',
+    //    coordinates: [[[x-s, y+s], [x+s, y+s], [x+s, y-s], [x-s, y-s], [x-s, y+s]]]
+    //  }
+    //});
+
+    grid_regions = grid_layer.selectAll('.grid-boundary')
+      .data(draw_areas_by_time(data));
     grid_regions.enter()
       .append('path')
       .attr('class', 'grid-boundary boundary')

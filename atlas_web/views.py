@@ -20,32 +20,34 @@ def initial_session(var=None):
             session[k] = 0
 
 
-@mod.route('/api/<tlx>/<tly>/<brx>/<bry>')
-def mongo_test(tlx, tly, brx, bry):
+@mod.route('/api/<tlx>/<tly>/<brx>/<bry>/<collection>')
+def mongo_test(tlx, tly, brx, bry, collection):
     from atlas.mongo_read import MongoRead
     initial_session()
-    mr = MongoRead(float(tlx), float(tly),
-                   float(brx), float(tly),
-                   float(brx), float(bry),
-                   float(tlx), float(bry), 4,
-                   )
+    mr = MongoRead(float(tlx), float(tly), float(brx), float(tly),
+                   float(brx), float(bry), float(tlx), float(bry),
+                   4, str(collection))
     return Response(
         json.dumps(mr.quadrilateral),
         mimetype='application/json',
     )
 
 
-@mod.route('/', defaults={'lon': 80, 'lat': 20,})
-@mod.route('/<lon>/<lat>/')
-def index(lon, lat):
+@mod.route('/', defaults={'lon': 80, 'lat': 20, 'var': 'yield'})
+@mod.route('/map/<lon>/<lat>/', defaults={'var': 'yield'})
+@mod.route('/map/<lon>/<lat>/<var>')
+def index(lon, lat, var):
     initial_session()
     session['lon'] = lon
     session['lat'] = lat
+    session['var'] = var
     return render_template(
         'grid/grid.html',
         map_type='grid',
         lon=session['lon'],
         lat=session['lat'],
+        var=session['var'],
+        crop='whe',
     )
 
 
@@ -59,16 +61,3 @@ def menu_options():
         crops=CROPS,
         vars=VARIABLES,
     )
-
-
-@mod.route('/update/<_data_type>/adm/<_adm>/var/<_var>/type/<_type>/value/<_value>', methods=['POST',])
-# This is used in atlas_001.js
-def update(_data_type, _adm, _var, _type, _value):
-    with open('./atlas/static/json/{}/gadm{}/{}_gadm{}.json'.format(_data_type, _adm, _var, _adm), 'r') as f:
-        data = json.loads(f.read())
-    session[_type] = _value
-    data['data'] = {
-        k: np.array(v)[:, session['scenario'], session['irrigation']].tolist()
-        for k, v in data['data'].iteritems()
-    }
-    return jsonify(data)
