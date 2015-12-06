@@ -1,5 +1,7 @@
 (function() {
 
+  var group_data_test = false;
+
   var world, data, grid_regions, top_left, bottom_right, dims
     , height = window.innerHeight
     , width = window.innerWidth
@@ -13,6 +15,8 @@
     , resize_timeout = false
     , resize_delta = 200
     , resize_reload = false
+
+    , total_pan = {x: 0, y: 0}
 
     , svgroot = d3.select('#map').append('svg')
       .attr({'width': width, 'height': height})
@@ -35,12 +39,12 @@
       .range(['#fff5eb', '#fee6ce', '#fdd0a2', '#fdae6b', '#fd8d3c',
               '#f16913', '#d94801', '#a63603', '#7f2704'])
 
-    , get_scale = function get_scale() { return d3.max([height, width]) * 2; }
+    , get_map_scale = function get_map_scale() { return d3.max([height, width]) * 2; }
 
     , projection = d3.geo.equirectangular()
       .rotate([-Options.lon, 0])
       .center([0, Options.lat])
-      .scale(get_scale())
+      .scale(get_map_scale())
       .translate([width / 2, height / 2])
       .precision(.1)
     , path = d3.geo.path()
@@ -51,7 +55,8 @@
     ;
 
   var drag_start = function drag_start() {
-
+    total_pan.x = 0;
+    total_pan.y = 0;
   };
 
   var dragged = function dragged() {
@@ -61,6 +66,16 @@
       , upper_drag_limit = projection([0, 90])[1]
       , lower_drag_limit = projection([0, -90])[1] - height
     ;
+
+    if (Math.abs(total_pan.x) > 10 || Math.abs(total_pan.y) > 10) {
+      grid_regions.remove();
+      console.log(total_pan);
+    } else {
+      total_pan.x += λ;
+      total_pan.y += φ;
+      console.log(total_pan);
+    }
+
 
     φ = -φ > lower_drag_limit ? -lower_drag_limit
       : -φ < upper_drag_limit ? -upper_drag_limit
@@ -129,11 +144,11 @@
     d3.select('svg').attr({height: height, width: width});
 
     //Set reload switch
-    resize_reload = get_scale() < projection.scale();
+    resize_reload = get_map_scale() < projection.scale();
 
     //Re-project
     projection.translate([width / 2, height / 2])
-      .scale(get_scale());
+      .scale(get_map_scale());
     d3.selectAll('.boundary').attr('d', path);
   };
 
@@ -218,7 +233,13 @@
   var update_data_fills = function update_data_fills() {
     grid_regions.each(function(d, i) {
       d3.select(this).style({
-        fill: color(d3.mean(d.properties.values))
+        fill: function() {
+          if (group_data_test) {
+            return color(d3.mean(d.properties.values))
+          }
+          return d.properties.value.values[_time] == null
+            ? 'transparent' : color(d.properties.value.values[_time]);
+        }
       });
     });
   };
@@ -289,22 +310,27 @@
       d3.max(data, function(d) {
         return d3.max(d.properties.value.values, function(dd) {return dd; }); })]);
 
-    //data.forEach(function(d) {
-    //
-    //  var x = d.properties.centroid.geometry.coordinates[0];
-    //  var y = d.properties.centroid.geometry.coordinates[1];
-    //
-    //  // TODO: Need dynamic resolution
-    //  var s = .25;
-    //
-    //  d.geometry = {
-    //    type: 'Polygon',
-    //    coordinates: [[[x-s, y+s], [x+s, y+s], [x+s, y-s], [x-s, y-s], [x-s, y+s]]]
-    //  }
-    //});
+    if (!group_data_test) {
+      data.forEach(function (d) {
 
-    grid_regions = grid_layer.selectAll('.grid-boundary')
-      .data(draw_areas_by_time(data));
+        var x = d.properties.centroid.geometry.coordinates[0];
+        var y = d.properties.centroid.geometry.coordinates[1];
+
+        // TODO: Need dynamic resolution
+        var s = .25;
+
+        d.geometry = {
+          type: 'Polygon',
+          coordinates: [[[x - s, y + s], [x + s, y + s], [x + s, y - s], [x - s, y - s], [x - s, y + s]]]
+        }
+      });
+      grid_regions = grid_layer.selectAll('.grid-boundary')
+        .data(data);
+    } else {
+      grid_regions = grid_layer.selectAll('.grid-boundary')
+        .data(draw_areas_by_time(data));
+    }
+
     grid_regions.enter()
       .append('path')
       .attr('class', 'grid-boundary boundary')
