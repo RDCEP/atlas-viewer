@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 from flask import Flask
+from flask.ext.compress import Compress
 from atlas_web.filters import safe_markdown, format_currency, smartypants, \
     nbsp, nowrap
 
 app = Flask(__name__)
+Compress(app)
 app.config.from_object('config')
 app.jinja_env.filters['markdown'] = safe_markdown
 app.jinja_env.filters['format_currency'] = format_currency
