@@ -23,7 +23,7 @@
       .attr({'width': width, 'height': height})
     , filter = svgroot.append('defs')
       .append('filter').attr({id: 'grid_filter', x: 0, y: 0})
-      .append('feGaussianBlur').attr({in: 'SourceGraphic', stdDeviation: get_map_scale()/250})
+      .append('feGaussianBlur').attr({in: 'SourceGraphic', stdDeviation: get_map_scale()/300})
       //.append('feConvolveMatrix').attr({
       //  in: 'SourceGraphic',
       //  order: '3 3',
