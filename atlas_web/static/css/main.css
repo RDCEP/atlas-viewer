@@ -25,25 +25,17 @@ line, path {
   stroke: black;
   stroke-width: 0.5; }
 
+path {
+  stroke: black;
+  stroke-width: 1px; }
+
 #wrapper {
   height: 100%;
   width: 100%; }
 
-#map {
-  height: 100%;
-  width: 100%;
-  background-color: #eeeeee; }
-
-#sphere {
-  fill: #C6EAFB; }
-
-.world-path {
-  fill: white;
-  stroke: #666; }
-
-path {
-  stroke: black;
-  stroke-width: 1px; }
+#loader {
+  display: none;
+  position: fixed; }
 
 #main_nav, #title_legend_wrap {
   width: 100%;
@@ -177,6 +169,18 @@ path {
   #title_legend span {
     margin: 0 1em; }
 
+.world-path {
+  fill: white;
+  stroke: #666; }
+
+#map {
+  height: 100%;
+  width: 100%;
+  background-color: #eeeeee; }
+
+#sphere {
+  fill: #C6EAFB; }
+
 .world-boundary {
   stroke: #eeeeee;
   stroke-width: 0.5;
@@ -219,10 +223,6 @@ path {
   font-size: 0.7em;
   pointer-events: none;
   opacity: 0.8; }
-
-#loader {
-  display: none;
-  position: fixed; }
 
 .y.axis line {
   stroke-dasharray: 2, 2;

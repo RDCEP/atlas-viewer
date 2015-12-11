@@ -1,0 +1,127 @@
+#main_nav, #title_legend_wrap
+  width: 100%
+  position: fixed
+  top: 0
+  z-index: 999
+  -webkit-transform: translateZ(0)
+  a
+    display:  inline-block
+  nav
+    background-color: black
+    opacity: .8
+    padding: .75em 0
+#title_legend_wrap
+  position: absolute
+  top: 2.3em
+  background-color: #ffffff
+  opacity: .8
+  height: 1.8em
+  z-index: -1
+#top_nav
+  font-size: .9em
+  width: 960px
+  margin: 0 auto
+  line-height: 1em
+  position: relative
+  z-index: 999
+  ul
+    list-style-type: none
+  & > li
+    border: none
+    display: inline-block
+    padding: 0 0 0 1em
+    margin: 0
+    & + li
+      position: relative
+      ul
+        //@include columns(2, 2em)
+        border: none
+        position: absolute
+        top: 99%
+        left: 0
+        background-color: black
+        z-index: 999
+        padding: 0 1em
+        height: 0
+        margin: 0
+      li
+        margin-bottom: .5em
+        //position: relative
+        height: 0
+        font-size: 1em
+        overflow: hidden
+        &.active
+          position: absolute
+          height: auto
+          font-size: .8em
+          font-weight: bold
+          top: 1.65em
+          a
+            color: black
+        &:hover
+          overflow: visible
+          height: auto
+      &:hover ul
+        display: block
+        height: auto
+        padding: .75em 1em .5em
+        li
+          height: auto
+          position: relative
+          &.active
+            position: static
+            font-size: 1em
+            font-weight: normal
+            a
+              color: #cccccc
+        ul
+          position: absolute
+          left: 100%
+          top: -.81em
+#menu_comparison
+  padding-right: 1em!important
+#menu_glossary
+  margin-left: 2em!important
+#menu_time
+  position: relative
+  z-index: 990
+  div
+    height: 0
+    position: absolute
+    top: 100%
+    left: 0
+    background-color: black
+    z-index: -1
+    padding: 0 1em
+  input
+    height: 0
+    overflow: hidden
+  label
+    position: absolute
+    height: auto
+    font-size: .8em
+    font-weight: bold
+    top: 1.65em
+    color: black
+  &:hover div
+    height: auto
+    padding: .75em 1em .5em
+    z-index: 999
+    input
+      height: auto
+    .active
+      position: static
+      font-weight: normal
+      color: #cccccc
+#title_legend
+  background-color: #ffffff
+  width: 960px
+  margin: 0 auto
+  padding: .5em 0 0 0
+  font-size: .8em
+  line-height: 1em
+  input[type=range]
+    position: relative
+    top: .2em
+  span
+    margin: 0 1em
