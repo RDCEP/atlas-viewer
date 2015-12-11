@@ -17,13 +17,13 @@
     , resize_reload = false
 
     , total_pan = {x: 0, y: 0, d: 0}
-    , get_map_scale = function get_map_scale() { return d3.max([height, width]) * 2; }
+    , get_map_scale = function get_map_scale() { return d3.max([height, width]) * 1.5; }
 
     , svgroot = d3.select('#map').append('svg')
       .attr({'width': width, 'height': height})
     , filter = svgroot.append('defs')
       .append('filter').attr({id: 'grid_filter', x: 0, y: 0})
-      .append('feGaussianBlur').attr({in: 'SourceGraphic', stdDeviation: get_map_scale()/300})
+      .append('feGaussianBlur').attr({in: 'SourceGraphic', stdDeviation: get_map_scale()/200})
       //.append('feConvolveMatrix').attr({
       //  in: 'SourceGraphic',
       //  order: '3 3',
@@ -178,7 +178,7 @@
 
   var draw_map_basics = function draw_map_basics() {
 
-    d3.json('/static/json/countries_110.geojson', function(world) {
+    d3.json('/static/json/ne_50m_admin_0_countries.geojson', function(world) {
 
       var sphere = [
         ocean_layer.append('path')
@@ -359,6 +359,12 @@
     //time_label.text(current_year);
     //d3.select('#corner_legend [data-type="time"]').text(current_year);
     update_data_fills(data);
+  });
+
+  var smooth_opt = d3.select('#smooth_select');
+  smooth_opt.on('input', function() {
+    d3.select('feGaussianBlur').attr('stdDeviation',
+      +d3.select(this).property('value'));
   });
 
   d3.select(window).on('resize', resize);
