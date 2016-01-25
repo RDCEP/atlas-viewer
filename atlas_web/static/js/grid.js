@@ -2,7 +2,8 @@
 
   var group_data_test = false;
 
-  var world, data, grid_regions, top_left, bottom_right, dims
+  var world, data, grid_regions
+    , top_left, bottom_right, top_right, bottom_left, dims
     , height = window.innerHeight
     , width = window.innerWidth
     , current_year = 1979
@@ -23,11 +24,6 @@
       .attr({'width': width, 'height': height})
     , filter = svgroot.append('defs')
       .append('filter').attr({id: 'grid_filter', x: 0, y: 0})
-      .append('feGaussianBlur').attr({in: 'SourceGraphic', stdDeviation: 0 })
-      //.append('feConvolveMatrix').attr({
-      //  in: 'SourceGraphic',
-      //  order: '3 3',
-      //  kernelMatrix: '1 3 1 3 5 3 1 3 1'})
     , svg = svgroot.append('g')
     , ocean_layer = svg.append('g')
       .attr('id', 'ocean_layer')
@@ -52,6 +48,40 @@
 
     , hover_legend = d3.select('#hover_legend')
     ;
+
+  var fee = 0.8
+    , fea = 1.2
+    , feo = 0.1
+    , fetv = [0, 0.25, 0.5, 0.75, 1]
+    , fetvr = [0.5, 0.65, 0.85, 0.95, 0.99, 0.99, 0.99, 0.99, 1, 1]
+    , fetvg = [0.15, 0.21, 0.28, 0.41, 0.55, 0.68, 0.82, 0.90, 0.96]
+    , fetvb = [0.02, 0.01, 0.00, 0.07, 0.24, 0.42, 0.64, 0.81, 0.92]
+    , ct1, ct2
+  ;
+  filter
+    .append('feGaussianBlur').attr({in: 'SourceGraphic', stdDeviation: 0 });
+    //.append('feColorMatrix').attr({
+    //  type: 'saturate',
+    //  result: 'desat',
+    //  values: .5});
+
+    //  values: 0.35,
+    //  result: 'desat'});
+
+  //ct1 = filter.append('feComponentTransfer');
+  //ct1.append('feFuncR').attr({type: 'gamma', exponent: fee, amplitude: fea, offset: feo});
+  //ct1.append('feFuncG').attr({type: 'gamma', exponent: fee, amplitude: fea, offset: feo});
+  //ct1.append('feFuncB').attr({type: 'gamma', exponent: fee, amplitude: fea, offset: feo});
+  //
+  ct2 = filter.append('feComponentTransfer');
+  ct2.append('feFuncR').attr({type: 'discrete', tableValues: fetvr.join(' ')});
+  ct2.append('feFuncG').attr({type: 'discrete', tableValues: fetvg.join(' ')});
+  ct2.append('feFuncB').attr({type: 'discrete', tableValues: fetvb.join(' ')});
+
+  //filter.append('feConvolveMatrix').attr({
+  //  in: 'SourceGraphic',
+  //  order: '3 3',
+  //  kernelMatrix: '1 3 1 3 5 3 1 3 1'});
 
   var drag_start = function drag_start() {
     total_pan.x = 0;
@@ -111,7 +141,7 @@
 
   var get_viewport_dimensions = function get_viewport_dimensions() {
 
-    top_left = projection.invert([0,0]);
+    top_left = projection.invert([0, 0]);
     bottom_right = projection.invert([width, height]);
 
     top_left[0] = bottom_right[0] > 180 ? top_left[0] - 180 : top_left[0];
@@ -229,6 +259,36 @@
 
   };
 
+  var draw_map_countries = function draw_map_countries() {
+
+    d3.json('/static/json/ne_50m_admin_0_countries.geojson', function(world) {
+
+      ocean_layer.selectAll('path.countries')
+        .data(world.features)
+        .enter()
+        .append('path')
+        .attr('d', path)
+        .attr('class', 'countries boundary')
+        .style({
+          stroke: 'none',
+          fill: '#dddddd'
+        });
+
+      edges_layer.selectAll('path.countries')
+        .data(world.features)
+        .enter()
+        .append('path')
+        .attr('d', path)
+        .attr('class', 'countries boundary')
+        .style({
+          stroke: 'black',
+          'stroke-width': 1,
+          'stroke-line-join': 'round',
+          fill: 'none'
+        });
+    });
+  };
+
   var update_data_fills = function update_data_fills() {
     grid_regions.each(function(d, i) {
       d3.select(this).style({
@@ -316,7 +376,7 @@
         var y = d.properties.centroid.geometry.coordinates[1];
 
         // TODO: Need dynamic resolution
-        var s = .25;
+        var s = 0.25 + .005;
 
         d.geometry = {
           type: 'Polygon',
