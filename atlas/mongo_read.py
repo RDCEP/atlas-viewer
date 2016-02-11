@@ -2,6 +2,7 @@ try:
     import simplejson as json
 except ImportError:
     import json
+import numpy as np
 from pymongo import MongoClient
 from pymongo.errors import PyMongoError
 from constants import MONGO
@@ -12,8 +13,7 @@ __author__ = 'rblourenco@uchicago.edu'
 
 
 class MongoRead(object):
-    def __init__(self, a_x, a_y, b_x, b_y, c_x, c_y, d_x, d_y, dpmm,
-                 collection=None):
+    def __init__(self, dpmm, collection=None):
         """Class for geospatial information retrieval on MongoDB
 
         :param a_x: Top left decimal longitude
@@ -35,14 +35,6 @@ class MongoRead(object):
         :param dpmm: Dots per millimeter
         :type dpmm: float
         """
-        self.a_x = a_x
-        self.a_y = a_y
-        self.b_x = b_x
-        self.b_y = b_y
-        self.c_x = c_x
-        self.c_y = c_y
-        self.d_x = d_x
-        self.d_y = d_y
         self.dpmm = dpmm
 
         uri = "mongodb://{}:{}@{}/{}?authMechanism=SCRAM-SHA-1".format(
@@ -51,16 +43,33 @@ class MongoRead(object):
         client = MongoClient(uri) if not MONGO['local'] \
             else MongoClient('localhost', MONGO['port'])
 
-        db = client['atlas']
+        self.db = client['atlas']
 
         if collection is None:
-            collection = db[MONGO['collection']]
+            collection = self.db[MONGO['collection']]
         else:
-            collection = db[collection]
-        self.collection = collection
+            collection = self.db[collection]
+        self._collection = collection
 
     @property
-    def quadrilateral(self):
+    def collection(self):
+        return self._collection
+
+    @collection.setter
+    def collection(self, value):
+        if value in self.collections:
+            self._collection = self.db[value]
+
+    @property
+    def collections(self):
+        return self.db.collection_names()
+
+    @property
+    def multiscale(self):
+        geojsonfiles = []
+        return geojsonfiles
+
+    def quadrilateral(self, a_x, a_y, b_x, b_y, c_x, c_y, d_x, d_y, ):
         """Returns the GeoJSON documents within a quadrilateral
 
         :return: List of GeoJSON files
@@ -69,27 +78,76 @@ class MongoRead(object):
         cursor = self.collection.find(
             {'geometry': {'$geoIntersects': {
                 '$geometry': {'type': 'Polygon', 'coordinates': [
-                    [[self.a_x, self.a_y], [self.b_x, self.b_y],
-                     [self.c_x, self.c_y], [self.d_x, self.d_y],
-                     [self.a_x, self.a_y]]]}}}},
+                    [[a_x, a_y], [b_x, b_y],
+                     [c_x, c_y], [d_x, d_y],
+                     [a_x, a_y]]]}}}},
             projection={'_id': False, 'type': True,
                         'properties.centroid': True,
                         'properties.value': True, })
 
         return list(cursor)
 
-    @property
-    def multiscale(self):
-        geojsonfiles = []
-        return geojsonfiles
+    def polygon(self, coords, geotype='Polygon'):
+        cursor = self.collection.find(
+            {'geometry': {'$geoIntersects': {
+                '$geometry': {'type': geotype, 'coordinates': coords}}}},
+            projection={'_id': False, 'type': True,
+                        'properties.centroid': True,
+                        'properties.value': True, })
+
+        return list(cursor)
+
+    def regions(self, a_x, a_y, b_x, b_y, c_x, c_y, d_x, d_y):
+        cursor = self.collection.find(
+            {'geometry': {'$geoIntersects': {
+                '$geometry': {'type': 'Polygon', 'coordinates': [
+                    [[a_x, a_y], [b_x, b_y],
+                     [c_x, c_y], [d_x, d_y],
+                     [a_x, a_y]]]}}}},
+            projection={'_id': False, 'type': True,
+                        'geometry.coordinates': True,
+                        'geometry.type': True,
+                        'properties.name_long': True,})
+        return list(cursor)
+
+    def aggregate_grid_to_regions(self, a_x, a_y, b_x, b_y, c_x, c_y, d_x, d_y,
+                                  grid_collection, region_collection):
+        self.collection = region_collection
+        regions = self.regions(a_x, a_y, b_x, b_y, c_x, c_y, d_x, d_y)
+        self.collection = grid_collection
+        n = 0
+        for region in regions:
+            try:
+                a = []
+                grids = self.polygon(region['geometry']['coordinates'],
+                                     geotype=region['geometry']['type'])
+                if len(grids) > 0:
+                    if not n: n = len(grids[0]['properties']['value']['values'])
+                    for grid in grids:
+                        a.append(grid['properties']['value']['values'])
+                    a = np.array(a, dtype=np.float)
+                    if np.all(np.isnan(a)):
+                        region['properties']['value'] = dict(values=[None for i in range(n)])
+                    else:
+                        a = np.nanmean(a, axis=0)
+                        region['properties']['value'] = dict(values=a.tolist())
+                else:
+                    region['properties']['value'] = dict(values=[None for i in range(n)])
+            except:
+                print('fail:', region['properties'])
+        return regions
+
 
 
 if __name__ == '__main__':
     import pprint
     pp = pprint.PrettyPrinter(indent=2)
     try:
-        mr = MongoRead(46., 10., 48., 10., 48., 8., 46., 8., 1)
-        pp.pprint(mr.quadrilateral)
+        mr = MongoRead(1)
+        mr.aggregate_grid_to_regions(
+            0., 10., 10, 10, 10, 0, 0, 0,
+            'default_firr_aet_whe',
+            'ne_50m_admin_0_countries',)
     except PyMongoError, error:
         print 'Error while reading on MongoDB.'
         raise error

@@ -49,39 +49,18 @@
     , hover_legend = d3.select('#hover_legend')
     ;
 
-  var fee = 0.8
-    , fea = 1.2
-    , feo = 0.1
-    , fetv = [0, 0.25, 0.5, 0.75, 1]
-    , fetvr = [0.5, 0.65, 0.85, 0.95, 0.99, 0.99, 0.99, 0.99, 1, 1]
+  var fetvr = [0.5, 0.65, 0.85, 0.95, 0.99, 0.99, 0.99, 0.99, 1, 1]
     , fetvg = [0.15, 0.21, 0.28, 0.41, 0.55, 0.68, 0.82, 0.90, 0.96]
     , fetvb = [0.02, 0.01, 0.00, 0.07, 0.24, 0.42, 0.64, 0.81, 0.92]
-    , ct1, ct2
+    , ct2
   ;
   filter
     .append('feGaussianBlur').attr({in: 'SourceGraphic', stdDeviation: 0 });
-    //.append('feColorMatrix').attr({
-    //  type: 'saturate',
-    //  result: 'desat',
-    //  values: .5});
 
-    //  values: 0.35,
-    //  result: 'desat'});
-
-  //ct1 = filter.append('feComponentTransfer');
-  //ct1.append('feFuncR').attr({type: 'gamma', exponent: fee, amplitude: fea, offset: feo});
-  //ct1.append('feFuncG').attr({type: 'gamma', exponent: fee, amplitude: fea, offset: feo});
-  //ct1.append('feFuncB').attr({type: 'gamma', exponent: fee, amplitude: fea, offset: feo});
-  //
   ct2 = filter.append('feComponentTransfer');
   ct2.append('feFuncR').attr({type: 'discrete', tableValues: fetvr.join(' ')});
   ct2.append('feFuncG').attr({type: 'discrete', tableValues: fetvg.join(' ')});
   ct2.append('feFuncB').attr({type: 'discrete', tableValues: fetvb.join(' ')});
-
-  //filter.append('feConvolveMatrix').attr({
-  //  in: 'SourceGraphic',
-  //  order: '3 3',
-  //  kernelMatrix: '1 3 1 3 5 3 1 3 1'});
 
   var drag_start = function drag_start() {
     total_pan.x = 0;
@@ -323,9 +302,11 @@
 
     queue()
       .defer(d3.json, '/api/'+
-        dims['top_left'][0]+'/'+ dims['top_left'][1]+'/'+
-        dims['bottom_right'][0]+'/'+dims['bottom_right'][1]+'/default_firr_'+
-        Options.var+'_'+Options.crop)
+        dims['top_left'][0]+'/'+dims['top_left'][1]+'/'+
+        dims['bottom_right'][0]+'/'+dims['bottom_right'][1]+'/'+
+        'default_firr_'+Options.var+'_'+Options.crop+'/'+
+        'ne_50m_admin_0_countries')
+        //'default_firr_'+Options.var+'_'+Options.crop)
       .awaitAll(atlas);
   };
 
@@ -359,6 +340,8 @@
 
   var atlas = function atlas(error, queued_data) {
 
+    console.log('atlas queued data:', queued_data);
+
     data = queued_data[0];
 
     data.filter(function (d) { return d.properties.value != null; });
@@ -369,7 +352,7 @@
       d3.max(data, function(d) {
         return d3.max(d.properties.value.values, function(dd) {return dd; }); })]);
 
-    if (!group_data_test) {
+    if (Options.gridded && !group_data_test) {
       data.forEach(function (d) {
 
         var x = d.properties.centroid.geometry.coordinates[0];
@@ -380,9 +363,13 @@
 
         d.geometry = {
           type: 'Polygon',
-          coordinates: [[[x - s, y + s], [x + s, y + s], [x + s, y - s], [x - s, y - s], [x - s, y + s]]]
+          coordinates: [[[x - s, y + s], [x + s, y + s], [x + s, y - s],
+            [x - s, y - s], [x - s, y + s]]]
         }
       });
+      grid_regions = grid_layer.selectAll('.grid-boundary')
+        .data(data);
+    } else if (! group_data_test) {
       grid_regions = grid_layer.selectAll('.grid-boundary')
         .data(data);
     } else {
