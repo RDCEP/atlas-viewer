@@ -63,7 +63,7 @@ class GadmTopo(object):
         with open('topojson_options', 'wa') as f:
             f.write('  -o gadm0_s01.json \\\n  -s .01 -- \\\n')
             for r in self.gadm0_codes.values:
-                f.write('  /Users/njmattes/Documents/code/ggcmi_atlas/atlas/static/gadm_shapefiles/gadm_012/{}_adm0.shp \\\n'.format(r))
+                f.write('  /Users/njmattes/Documents/code/atlas-viewer/atlas/static/gadm_shapefiles/gadm_012/{}_adm0.shp \\\n'.format(r))
 
     def merge_shp(self):
         basedir = '../data/gadm_shp/'
