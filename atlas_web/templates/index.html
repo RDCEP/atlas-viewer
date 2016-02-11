@@ -1,11 +1,12 @@
 {% extends 'base.html' %}
 {% block jsoptions %}
 {{ super() }}
-Options.lon = {{ lon }};
 Options.lat = {{ lat }};
-Options.model = '{{ model }}';
-Options.dataset = '{{ dataset }}';
-Options.scenario = '{{ scenario }}';
-Options.irrigation = '{{ irrigation }}';
+Options.lon = {{ lon }};
+Options.var = '{{ var }}';
 Options.crop = '{{ crop }}';
+Options.gridded = {{ gridded }};
+{% endblock %}
+{% block bodyjs %}
+<script src="{{ url_for('static', filename='js/grid.js') }}?3" charset="utf-8" ></script>
 {% endblock %}

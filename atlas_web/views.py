@@ -41,7 +41,7 @@ def index(lon, lat, var):
     session['lat'] = lat
     session['var'] = var
     return render_template(
-        'grid/grid.html',
+        'index.html',
         map_type='grid',
         lon=session['lon'],
         lat=session['lat'],
