@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
+  <meta charset=utf-8>
   <title></title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+  <link rel=stylesheet href="{{ url_for('static', filename='css/main.css') }}">
 </head>
 <body>
-<div id="wrapper">
-  <header id="main_nav">
+<div id=wrapper>
+  <header id=main_nav>
     <nav>
-      <ul id="top_nav" class="clearfix">
+      <ul id=top_nav class=clearfix>
         <li><a href="/">ATLAS</a></li>
       </ul>
     </nav>
-    <div id="title_legend_wrap">
+    <div id=title_legend_wrap>
       <div id=title_legend>
         <label>
           <span>1979</span>
@@ -27,8 +27,8 @@
       </div>
     </div>
   </header>
-  <div id="map"></div>
-  <div id="hover_legend"><p></p></div>
+  <div id=map></div>
+  <div id=hover_legend><p></p></div>
   <div id=loader><img src={{ url_for('static', filename='images/oval.svg') }} alt></div>
 </div>
 <script>
@@ -41,7 +41,7 @@
 <script src="{{ url_for('static', filename='js/vendor/topojson.v1.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/vendor/queue.v1.min.js') }}"></script>
 {% block bodyjs %}
-{#<script src="{{ url_for('static', filename='js/atlas_000.js') }}?3" charset="utf-8" ></script>#}
+{#<script src="{{ url_for('static', filename='js/atlas_000.js') }}?3" charset=utf-8 ></script>#}
 {% endblock %}
 </body>
 </html>
