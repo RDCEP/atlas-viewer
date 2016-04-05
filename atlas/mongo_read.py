@@ -97,6 +97,11 @@ class MongoRead(object):
 
         return list(cursor)
 
+    def all_metadata(self):
+        self.collection = self.db['grid_meta']
+        cursor = self.collection.find({}, projection={'_id': False})
+        return list(cursor)
+
     def regions(self, a_x, a_y, b_x, b_y, c_x, c_y, d_x, d_y):
         cursor = self.collection.find(
             {'geometry': {'$geoIntersects': {
@@ -116,6 +121,7 @@ class MongoRead(object):
         regions = self.regions(a_x, a_y, b_x, b_y, c_x, c_y, d_x, d_y)
         self.collection = grid_collection
         n = 0
+
         for region in regions:
             try:
                 a = []
@@ -130,6 +136,7 @@ class MongoRead(object):
                         region['properties']['value'] = dict(values=[None for i in range(n)])
                     else:
                         a = np.nanmean(a, axis=0)
+                        # print('a:', a)
                         region['properties']['value'] = dict(values=a.tolist())
                 else:
                     region['properties']['value'] = dict(values=[None for i in range(n)])

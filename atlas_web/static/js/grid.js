@@ -2,7 +2,8 @@
 
   var group_data_test = false;
 
-  var world, data, grid_regions
+  var data_type = 'grid'
+    , world, data, grid_regions
     , top_left, bottom_right, top_right, bottom_left, dims
     , height = window.innerHeight
     , width = window.innerWidth
@@ -100,6 +101,7 @@
 
   var drag_end = function drag_end() {
     if (total_pan.d > 10) {
+      //TODO: last_data_request()
       get_data_for_viewport();
     }
   };
@@ -166,6 +168,7 @@
     } else {
       resize_timeout = false;
       if (resize_reload) {
+        //TODO: last_data_request()
         get_data_for_viewport();
       }
     }
@@ -295,20 +298,50 @@
     hover_legend.classed('hovered', true);
   };
 
-  var get_data_for_viewport = function get_data_for_viewport() {
+  var get_dataset_for_viewport = function get_dataset_for_viewport(url, f) {
+    d3.xhr(url)
+      .send('post', JSON.stringify({
+        tlx: dims['top_left'][0],
+        tly: dims['top_left'][1],
+        brx: dims['bottom_right'][0],
+        bry: dims['bottom_right'][1]}), function(err, data) {
+        console.log(data); f(null, JSON.parse(data.response)); })
+  };
 
+  var get_grid_data_by_bbox = function get_grid_data_by_bbox(dataset) {
     show_loader();
     dims = get_viewport_dimensions();
-
-    queue()
-      .defer(d3.json, '/api/'+
-        dims['top_left'][0]+'/'+dims['top_left'][1]+'/'+
-        dims['bottom_right'][0]+'/'+dims['bottom_right'][1]+'/'+
-        'default_firr_'+Options.var+'_'+Options.crop+'/'+
-        'ne_50m_admin_0_countries')
-        //'default_firr_'+Options.var+'_'+Options.crop)
-      .awaitAll(atlas);
+    d3.xhr('/api/griddata')
+      .header("Content-Type", "application/json")
+      .post(
+        JSON.stringify({bbox: [dims['top_left'][0], dims['top_left'][1],
+          dims['bottom_right'][0], dims['bottom_right'][1]],
+          dataset: dataset}),
+        function(err, rawData){
+          atlas(err, {data_type: 'grid', data: JSON.parse(rawData['response'])});
+        }
+    );
+    //TODO: last_data_request()
   };
+
+  var get_agg_by_regions = function get_agg_by_regions(dataset, regions) {
+    show_loader();
+    dims = get_viewport_dimensions();
+    d3.xhr('/api/aggregate')
+      .header("Content-Type", "application/json")
+      .post(
+        JSON.stringify({bbox: [dims['top_left'][0], dims['top_left'][1],
+          dims['bottom_right'][0], dims['bottom_right'][1]],
+          dataset: dataset, regions: regions}),
+        function(err, rawData){
+          atlas(err, {data_type: 'agg', data: JSON.parse(rawData['response'])});
+        }
+    );
+    //TODO: last_data_request()
+  };
+
+
+
 
   var draw_areas_by_time = function draw_areas_by_time(data, idx) {
 
@@ -340,9 +373,9 @@
 
   var atlas = function atlas(error, queued_data) {
 
-    console.log('atlas queued data:', queued_data);
+    data = queued_data['data'];
 
-    data = queued_data[0];
+    data_type = queued_data['data_type'];
 
     data.filter(function (d) { return d.properties.value != null; });
 
@@ -352,7 +385,7 @@
       d3.max(data, function(d) {
         return d3.max(d.properties.value.values, function(dd) {return dd; }); })]);
 
-    if (Options.gridded && !group_data_test) {
+    if (data_type == 'grid' && !group_data_test) {
       data.forEach(function (d) {
 
         var x = d.properties.centroid.geometry.coordinates[0];
@@ -369,7 +402,7 @@
       });
       grid_regions = grid_layer.selectAll('.grid-boundary')
         .data(data);
-    } else if (! group_data_test) {
+    } else if (data_type == 'agg' && !group_data_test) {
       grid_regions = grid_layer.selectAll('.grid-boundary')
         .data(data);
     } else {
@@ -381,10 +414,10 @@
       .append('path')
       .attr('class', 'grid-boundary boundary')
       .attr('d', path)
-      .on('mouseover', grid_hover)
-      .on('mouseout', function() {
-        hover_legend.style({display: 'none'});
-        hover_legend.classed('hovered', false);})
+      // .on('mouseover', grid_hover)
+      // .on('mouseout', function() {
+      //   hover_legend.style({display: 'none'});
+      //   hover_legend.classed('hovered', false);})
     ;
 
     grid_regions.exit().remove();
@@ -415,7 +448,9 @@
   });
 
   d3.select(window).on('resize', resize);
-  get_data_for_viewport();
+
+  get_grid_data_by_bbox(Options.dataset);
+  // get_agg_by_regions('default_firr_yield_whe', 'ne_110m_admin_0_countries');
 
   draw_map_basics();
 

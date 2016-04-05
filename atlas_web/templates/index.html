@@ -1,4 +1,18 @@
 {% extends 'base.html' %}
+{% block metadata_list %}
+{% if metadata %}
+<div id=metadata_list>
+  <h3>Available datasets</h3>
+  <ul>
+{% for m in metadata %}
+  <li><h4><a href=/map/{{ m.dataset }}>{{ m.dataset }}</a></h4>
+  <dl>{% for k, v in m.items() %}{% if k != 'dataset' %}
+    <dt>{{ k }}</dt><dd>{{ v }}</dd>
+  {% endif %}{% endfor %}</dl></li>
+{% endfor %}
+</ul></div>
+{% endif %}
+{% endblock %}
 {% block jsoptions %}
 {{ super() }}
 Options.lat = {{ lat }};
@@ -6,7 +20,14 @@ Options.lon = {{ lon }};
 Options.var = '{{ var }}';
 Options.crop = '{{ crop }}';
 Options.gridded = {{ gridded }};
+Options.dataset = '{{ dataset }}';
 {% endblock %}
 {% block bodyjs %}
-<script src="{{ url_for('static', filename='js/grid.js') }}?3" charset=utf-8 ></script>
+<script src="{{ url_for('static', filename='js/main.js') }}?3" charset=utf-8 ></script>
+<script src="{{ url_for('static', filename='js/vendor/ace-builds/src-min-noconflict/ace.js') }}" charset=utf-8></script>
+<script>
+  var editor = ace.edit('editor');
+  editor.setTheme('ace/theme/chrome');
+  editor.getSession().setMode('ace/mode/javascript');
+</script>
 {% endblock %}
