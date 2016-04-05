@@ -56,11 +56,11 @@ path {
   background-color: #ffffff;
   opacity: 0.8;
   height: 1.8em;
-  z-index: -1; }
+  z-index: 999; }
 
 #top_nav {
   font-size: 0.9em;
-  width: 960px;
+  width: 900px;
   margin: 0 auto;
   line-height: 1em;
   position: relative;
@@ -70,7 +70,7 @@ path {
   #top_nav > li {
     border: none;
     display: inline-block;
-    padding: 0 0 0 1em;
+    padding: 0;
     margin: 0; }
     #top_nav > li + li {
       position: relative; }
@@ -134,7 +134,7 @@ path {
     left: 0;
     background-color: black;
     z-index: -1;
-    padding: 0 1em; }
+    padding: 0; }
   #menu_time input {
     height: 0;
     overflow: hidden; }
@@ -158,16 +158,19 @@ path {
 
 #title_legend {
   background-color: #ffffff;
-  width: 960px;
+  width: 900px;
   margin: 0 auto;
   padding: 0.5em 0 0 0;
   font-size: 0.8em;
-  line-height: 1em; }
+  line-height: 1em;
+  position: relative;
+  z-index: 999; }
   #title_legend input[type=range] {
     position: relative;
-    top: 0.2em; }
+    top: 0.2em;
+    margin: 0 1em 0 0; }
   #title_legend span {
-    margin: 0 1em; }
+    margin: 0 1em 0 0; }
 
 .world-path {
   fill: white;
@@ -176,7 +179,12 @@ path {
 #map {
   height: 100%;
   width: 100%;
-  background-color: #eeeeee; }
+  background-color: #eeeeee;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0; }
 
 #sphere {
   fill: #C6EAFB; }
@@ -237,6 +245,229 @@ path {
 .domain {
   stroke: transparent;
   fill: transparent; }
+
+#parameters_outerwrap {
+  position: relative;
+  width: 900px;
+  margin: 0 auto;
+  padding: 2em 0; }
+
+#parameters {
+  width: 100%;
+  overflow: auto; }
+  #parameters #parameter_tabs_wrap {
+    width: 870px;
+    margin: 0 45px;
+    position: fixed;
+    z-index: 900;
+    background-color: white; }
+    #parameters #parameter_tabs_wrap #parameter_tabs {
+      margin: 0 0 0 0; }
+      #parameters #parameter_tabs_wrap #parameter_tabs li {
+        display: block;
+        float: left;
+        padding: 0.8em;
+        cursor: pointer; }
+        #parameters #parameter_tabs_wrap #parameter_tabs li.selected {
+          background-color: #eeeeee; }
+  #parameters #parameter_form {
+    clear: both;
+    width: 870px;
+    padding: 60px 30px 15px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 800; }
+    #parameters #parameter_form li, #parameters #parameter_form .range-wrap {
+      position: relative; }
+    #parameters #parameter_form .parameter-pane-intro {
+      width: 810px;
+      margin: 0 auto 30px;
+      font-size: 1.5em;
+      color: #999999; }
+    #parameters #parameter_form .parameter-pane {
+      float: left;
+      margin: 0 30px 30px; }
+      #parameters #parameter_form .parameter-pane.halfs {
+        width: 375px; }
+      #parameters #parameter_form .parameter-pane.thirds {
+        width: 230px; }
+      #parameters #parameter_form .parameter-pane.fourths {
+        width: 157.5px; }
+      #parameters #parameter_form .parameter-pane > label {
+        display: block;
+        margin-bottom: 1em;
+        font-weight: bold; }
+      #parameters #parameter_form .parameter-pane > .range-wrap > label {
+        font-weight: bold; }
+      #parameters #parameter_form .parameter-pane .parameter-pane {
+        margin: 0; }
+        #parameters #parameter_form .parameter-pane .parameter-pane + .parameter-pane {
+          margin-left: 60px; }
+      #parameters #parameter_form .parameter-pane h4 {
+        margin-bottom: 1em;
+        font-weight: bold; }
+        #parameters #parameter_form .parameter-pane h4 .unit {
+          font-weight: normal; }
+      #parameters #parameter_form .parameter-pane li {
+        margin-bottom: 2em; }
+      #parameters #parameter_form .parameter-pane input[type=range] {
+        width: 100%;
+        margin-top: 0.5em; }
+      #parameters #parameter_form .parameter-pane .max-range-val, #parameters #parameter_form .parameter-pane .min-range-val {
+        position: absolute;
+        bottom: 0.6em;
+        font-size: 0.6em; }
+      #parameters #parameter_form .parameter-pane .current-range-val {
+        padding: 2px 4px;
+        font-weight: bold;
+        color: white;
+        background-color: #ccc; }
+      #parameters #parameter_form .parameter-pane .max-range-val {
+        left: 102%; }
+      #parameters #parameter_form .parameter-pane .min-range-val {
+        right: 102%; }
+      #parameters #parameter_form .parameter-pane .parameter-help {
+        margin-top: 2em;
+        font-size: 0.9em; }
+      #parameters #parameter_form .parameter-pane .parameter-previews {
+        clear: left; }
+      #parameters #parameter_form .parameter-pane .parameter-preview {
+        height: 100px;
+        margin-top: 30px;
+        border: 1px solid #cccccc; }
+        #parameters #parameter_form .parameter-pane .parameter-preview figcaption {
+          font-size: 0.8em;
+          text-transform: uppercase;
+          letter-spacing: 0.03em;
+          font-weight: bold;
+          color: #666666; }
+        #parameters #parameter_form .parameter-pane .parameter-preview .parameter-preview-line {
+          stroke: #0072b2;
+          stroke-width: 3; }
+
+#parameter_form.standard #climate_parameters .max-range-val, #parameter_form.standard #climate_parameters .min-range-val, #parameter_form.standard #economy_parameters .max-range-val, #parameter_form.standard #economy_parameters .min-range-val {
+  position: absolute;
+  bottom: auto;
+  top: 100%; }
+#parameter_form.standard #climate_parameters .max-range-val, #parameter_form.standard #economy_parameters .max-range-val {
+  right: 0;
+  left: auto !important;
+  text-align: right; }
+#parameter_form.standard #climate_parameters .min-range-val, #parameter_form.standard #economy_parameters .min-range-val {
+  left: 0;
+  right: auto !important;
+  text-align: left; }
+
+#run_clear {
+  position: absolute;
+  right: 15px; }
+  #run_clear #run_model, #run_clear #clear_model {
+    border: none;
+    padding: 0.25em 15px;
+    color: #ffffff;
+    font-weight: bold;
+    font-size: 1em;
+    font-family: Helveltica, Arial, sans-serif;
+    z-index: 999;
+    cursor: pointer; }
+  #run_clear #run_model {
+    background-color: #d55e00; }
+  #run_clear #clear_model {
+    background-color: #56b4e9; }
+
+.select-wrap h3 {
+  font-weight: bold;
+  margin-bottom: 10px; }
+.select-wrap label {
+  display: block;
+  position: relative;
+  margin-bottom: 5px; }
+  .select-wrap label input {
+    position: absolute;
+    right: 102%;
+    top: 0;
+    padding: 0 10px 0 0; }
+
+.disabled {
+  color: #dddddd !important; }
+  .disabled .label, .disabled text, .disabled figcaption {
+    color: #dddddd !important; }
+  .disabled path {
+    stroke: #dddddd !important; }
+  .disabled .parameter-preview {
+    border: 1px solid #dddddd; }
+  .disabled .current-range-val {
+    background-color: #eee !important; }
+
+#parameters_wrap {
+  z-index: 997;
+  font-size: 0.8em; }
+
+#parameters_bkgd, #graphs_bkgd, #runs_bkgd, #text_bkgd {
+  background-color: #ffffff;
+  opacity: 0.95;
+  height: 100%;
+  width: 100%;
+  position: absolute; }
+
+.pane {
+  z-index: 3;
+  display: none; }
+  .pane.selected {
+    display: block;
+    z-index: 2; }
+  .pane.graph-pane {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0; }
+    .pane.graph-pane .graph {
+      overflow: visible; }
+    .pane.graph-pane .small-graph {
+      float: left;
+      position: relative;
+      width: 435px;
+      margin: 7.5px; }
+      .pane.graph-pane .small-graph .bkgd {
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        z-index: -1; }
+      .pane.graph-pane .small-graph h3, .pane.graph-pane .small-graph h4 {
+        font-size: 1em;
+        font-weight: bold;
+        position: absolute;
+        top: 0;
+        padding: 15px 0 0 60px; }
+      .pane.graph-pane .small-graph h4 {
+        font-size: 0.8em;
+        font-weight: normal;
+        top: 1.4em; }
+    .pane.graph-pane .large-graph {
+      position: absolute;
+      top: 0;
+      height: 0;
+      pointer-events: none; }
+      .pane.graph-pane .large-graph * {
+        pointer-events: none; }
+      .pane.graph-pane .large-graph h3, .pane.graph-pane .large-graph h4 {
+        font-size: 1em;
+        font-weight: bold;
+        position: absolute;
+        top: 0;
+        padding: 15px 0 0 60px; }
+        .pane.graph-pane .large-graph h3.twin, .pane.graph-pane .large-graph h4.twin {
+          right: 0;
+          padding: 15px 0 0 0; }
+      .pane.graph-pane .large-graph h4 {
+        font-size: 0.8em;
+        font-weight: normal;
+        top: 1.4em; }
+
+#editor {
+  width: 100%;
+  height: 20em; }
 
 .ir {
   background-color: transparent;
@@ -328,6 +559,30 @@ path {
 
   h2, h3 {
     page-break-after: avoid; } }
+#metadata_list {
+  background-color: white;
+  padding: 2rem;
+  position: relative;
+  width: 900px;
+  margin: 6em auto 2em;
+  z-index: 999; }
+  #metadata_list h3 {
+    margin-bottom: 0.5em; }
+  #metadata_list li {
+    margin-bottom: 0.5em;
+    list-style-type: none; }
+  #metadata_list dt, #metadata_list dd {
+    display: inline-block;
+    font-size: 0.8em; }
+  #metadata_list dt {
+    margin-right: 0.2em;
+    background-color: #eeeeee;
+    color: #666666;
+    padding: 0.1em 0.2em 0.1em 0.2em;
+    border-radius: 2px; }
+  #metadata_list dd {
+    margin-right: 1em; }
+
 .nowrap {
   white-space: nowrap; }
 

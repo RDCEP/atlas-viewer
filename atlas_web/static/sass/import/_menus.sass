@@ -1,3 +1,6 @@
+@import "vars_layout"
+@import "vars_color"
+
 #main_nav, #title_legend_wrap
   width: 100%
   position: fixed
@@ -16,10 +19,10 @@
   background-color: #ffffff
   opacity: .8
   height: 1.8em
-  z-index: -1
+  z-index: 999
 #top_nav
   font-size: .9em
-  width: 960px
+  width: $site_width
   margin: 0 auto
   line-height: 1em
   position: relative
@@ -29,7 +32,7 @@
   & > li
     border: none
     display: inline-block
-    padding: 0 0 0 1em
+    padding: 0
     margin: 0
     & + li
       position: relative
@@ -92,7 +95,7 @@
     left: 0
     background-color: black
     z-index: -1
-    padding: 0 1em
+    padding: 0
   input
     height: 0
     overflow: hidden
@@ -115,13 +118,16 @@
       color: #cccccc
 #title_legend
   background-color: #ffffff
-  width: 960px
+  width: $site_width
   margin: 0 auto
   padding: .5em 0 0 0
   font-size: .8em
   line-height: 1em
+  position: relative
+  z-index: 999
   input[type=range]
     position: relative
     top: .2em
+    margin: 0 1em 0 0
   span
-    margin: 0 1em
+    margin: 0 1em 0 0

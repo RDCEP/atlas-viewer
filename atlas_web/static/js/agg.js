@@ -449,8 +449,7 @@
 
   d3.select(window).on('resize', resize);
 
-  get_grid_data_by_bbox(Options.dataset);
-  // get_agg_by_regions('default_firr_yield_whe', 'ne_110m_admin_0_countries');
+  get_agg_by_regions(Options.dataset, Options.regions);
 
   draw_map_basics();
 

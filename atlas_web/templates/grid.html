@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block agg_button %}
+<form action=/agg/{{ dataset }}/ne_110m_admin_0_countries style=display:inline>
+  <label>
+    <span>Aggregate</span>
+    <input type=submit value=GADM0 style=border:none;padding:.2em>
+  </label>
+</form>
+{% endblock %}
+{% block jsoptions %}
+{{ super() }}
+Options.lat = {{ lat }};
+Options.lon = {{ lon }};
+Options.var = '{{ var }}';
+Options.crop = '{{ crop }}';
+Options.gridded = {{ gridded }};
+Options.dataset = '{{ dataset }}';
+{% endblock %}
+{% block bodyjs %}
+<script src="{{ url_for('static', filename='js/grid.js') }}?3" charset=utf-8 ></script>
+<script src="{{ url_for('static', filename='js/vendor/ace-builds/src-min-noconflict/ace.js') }}" charset=utf-8></script>
+{% endblock %}

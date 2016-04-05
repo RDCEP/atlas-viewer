@@ -20,14 +20,19 @@
           <input id=time_select type=range min=0 max=33 step=1 value=0>
           <span>2012</span>
         </label>
+        {% block smoothing_slider %}
         <label>
           <span>Smoothing</span>
           <input id=smooth_select type=range min=0 max=10 step=1 value=0>
         </label>
+        {% endblock %}
+        {% block agg_button %}{% endblock %}
       </div>
     </div>
+{#    {% include 'modules/parameters/parameters.html' %}#}
   </header>
   <div id=map></div>
+  {% block metadata_list %}{% endblock %}
   <div id=hover_legend><p></p></div>
   <div id=loader><img src={{ url_for('static', filename='images/oval.svg') }} alt></div>
 </div>
@@ -40,6 +45,7 @@
 <script src="{{ url_for('static', filename='js/vendor/d3.geo.projection.v0.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/vendor/topojson.v1.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/vendor/queue.v1.min.js') }}"></script>
+{#<script src="https://d3js.org/d3-queue.v2.min.js"></script>#}
 {% block bodyjs %}
 {#<script src="{{ url_for('static', filename='js/atlas_000.js') }}?3" charset=utf-8 ></script>#}
 {% endblock %}
