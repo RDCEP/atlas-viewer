@@ -65,52 +65,54 @@ var draw_map_basics = function draw_map_basics() {
         regions: 'ne_110m_admin_0_countries'}),
         function(err, world) {
 
-      var sphere = [
-        ocean_layer.append('path')
-          .datum({type: 'Sphere'})
-          .attr('id', 'sphere')
-          .attr('d', path)
-          .attr('class', 'boundary'),
-        ocean_layer.append('use')
-          .attr('class', 'stroke')
-          .attr('xlink:href', '#sphere')
-      ];
+          world = JSON.parse(world.response);
 
-      ocean_layer.append('path')
-        .datum(graticule)
-        .attr('class', 'graticule boundary')
-        .attr('d', path)
-        .style({
-          stroke: '#B4D5E5',
-          'stroke-width': '1px',
-          fill: 'transparent'
+          var sphere = [
+            ocean_layer.append('path')
+              .datum({type: 'Sphere'})
+              .attr('id', 'sphere')
+              .attr('d', path)
+              .attr('class', 'boundary'),
+            ocean_layer.append('use')
+              .attr('class', 'stroke')
+              .attr('xlink:href', '#sphere')
+          ];
+
+          ocean_layer.append('path')
+            .datum(graticule)
+            .attr('class', 'graticule boundary')
+            .attr('d', path)
+            .style({
+              stroke: '#B4D5E5',
+              'stroke-width': '1px',
+              fill: 'transparent'
+            });
+
+          ocean_layer.selectAll('path.countries')
+            .data(world)
+            .enter()
+            .append('path')
+            .attr('d', path)
+            .attr('class', 'countries boundary')
+            .style({
+              stroke: 'none',
+              fill: '#dddddd'
+            });
+
+          edges_layer.selectAll('path.countries')
+            .data(world)
+            .enter()
+            .append('path')
+            .attr('d', path)
+            .attr('class', 'countries boundary')
+            .style({
+              stroke: '#666',
+              'stroke-width': 1,
+              'stroke-line-join': 'round',
+              fill: 'none'
+            });
+
         });
-
-      ocean_layer.selectAll('path.countries')
-        .data(world)
-        .enter()
-        .append('path')
-        .attr('d', path)
-        .attr('class', 'countries boundary')
-        .style({
-          stroke: 'none',
-          fill: '#dddddd'
-        });
-
-      edges_layer.selectAll('path.countries')
-        .data(world)
-        .enter()
-        .append('path')
-        .attr('d', path)
-        .attr('class', 'countries boundary')
-        .style({
-          stroke: 'black',
-          'stroke-width': 1,
-          'stroke-line-join': 'round',
-          fill: 'none'
-        });
-
-    });
 
   };
 
