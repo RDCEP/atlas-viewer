@@ -120,6 +120,9 @@ var zoomend = function zoomend() {
 
   // Options.scale = projection.scale();
   Options.scale = projection.scale() / d3.max([height, width]);
+  var new_center = projection.invert([width/2, height/2]);
+  Options.lon = new_center[0];
+  Options.lat = new_center[1];
 
 };
 
