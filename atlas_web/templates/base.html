@@ -20,12 +20,10 @@
           <input id=time_select type=range min=0 max=33 step=1 value=0>
           <span>2012</span>
         </label>
+
         {% block smoothing_slider %}
-        <label>
-          <span>Smoothing</span>
-          <input id=smooth_select type=range min=0 max=10 step=1 value=0>
-        </label>
         {% endblock %}
+
         {% block agg_button %}{% endblock %}
       </div>
     </div>

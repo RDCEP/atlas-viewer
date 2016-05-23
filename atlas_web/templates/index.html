@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+
 {% block metadata_list %}
 {% if metadata %}
 <div id=metadata_list>
@@ -11,6 +12,15 @@
   {% endif %}{% endfor %}</dl></li>
 {% endfor %}
 </ul></div>
+{% endif %}
+{% endblock %}
+
+{% block smoothing_slider %}
+{% if datatype=='raster' %}
+<label>
+  <span>Smoothing</span>
+  <input id=smooth_select type=range min=0 max=10 step=1 value=0>
+</label>
 {% endif %}
 {% endblock %}
 
@@ -38,6 +48,7 @@ Options.var = '{{ var }}';
 Options.crop = '{{ crop }}';
 Options.datatype = '{{ datatype }}';
 Options.dataset = '{{ dataset }}';
+Options.regions = '{{ regions }}';
 Options.datatype = Options.datatype == 'null' ? null : Options.datatype;
 {% endblock %}
 {% block bodyjs %}
