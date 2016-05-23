@@ -53,7 +53,8 @@ var atlas = function atlas(error, queued_data) {
   grid_regions.exit().remove();
 
   update_data_fills(data);
-  svgroot.call(drag_rotate);
+  // svgroot.call(drag_rotate);
+  svgroot.call(zoom);
 
   svg.selectAll('.boundary').attr('d', path);
   hide_loader();

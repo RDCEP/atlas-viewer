@@ -1,7 +1,7 @@
 
 var get_map_scale = function get_map_scale() {
 
-  return d3.max([height, width]) * 1.5;
+  return d3.max([height, width]) * Options.scale;
 
 };
 
@@ -14,8 +14,8 @@ var svgroot = d3.select('#map').append('svg')
     .attr('id', 'ocean_layer')
   , grid_layer = svg.append('g')
     .attr({id: 'grid_layer', filter: 'url(#grid_filter)'})
-  , edges_layer = svg.append('g')
-    .attr('id', 'edges_layer')
+  , boundary_layer = svg.append('g')
+    .attr('id', 'boundary_layer')
   
   , projection = d3.geo.equirectangular()
     .rotate([-Options.lon, 0])
@@ -28,7 +28,30 @@ var svgroot = d3.select('#map').append('svg')
   , graticule = d3.geo.graticule()
   
   , hover_legend = d3.select('#hover_legend')
+
+  , sphere = [
+      ocean_layer.append('path')
+        .datum({type: 'Sphere'})
+        .attr('id', 'sphere')
+        .attr('d', path)
+        .attr('class', 'boundary'),
+      ocean_layer.append('use')
+        .attr('class', 'stroke')
+        .attr('xlink:href', '#sphere')
+    ]
+  , region_boundaries
+  , region_fills
 ;
+
+ocean_layer.append('path')
+.datum(graticule)
+.attr('class', 'graticule boundary')
+.attr('d', path)
+.style({
+  stroke: '#B4D5E5',
+  'stroke-width': '1px',
+  fill: 'transparent'
+});
 
 /***************/
 /* SVG filters */
@@ -55,93 +78,78 @@ ct2.append('feFuncB').attr({type: 'discrete', tableValues: fetvb.join(' ')});
 var draw_map_basics = function draw_map_basics() {
 
   dims = get_viewport_dimensions();
-    // d3.json('/static/json/ne_50m_admin_0_countries.geojson', function(world) {
-    d3.xhr('/api/map')
-      .header("Content-Type", "application/json")
-      .post(
-        JSON.stringify({bbox: [dims['top_left'][0], dims['top_left'][1],
-        dims['bottom_right'][0], dims['bottom_right'][1]],
-          //TODO: get regions from global variable
-        regions: 'ne_110m_admin_0_countries'}),
-        function(err, world) {
 
-          world = JSON.parse(world.response);
+  d3.xhr('/api/map')
+    .header("Content-Type", "application/json")
+    .post(
+      JSON.stringify({bbox: [dims['top_left'][0], dims['top_left'][1],
+      dims['bottom_right'][0], dims['bottom_right'][1]],
+      regions: Options.regions}),
+      function(err, world) {
 
-          var sphere = [
-            ocean_layer.append('path')
-              .datum({type: 'Sphere'})
-              .attr('id', 'sphere')
-              .attr('d', path)
-              .attr('class', 'boundary'),
-            ocean_layer.append('use')
-              .attr('class', 'stroke')
-              .attr('xlink:href', '#sphere')
-          ];
+        world = JSON.parse(world.response);
 
-          ocean_layer.append('path')
-            .datum(graticule)
-            .attr('class', 'graticule boundary')
-            .attr('d', path)
-            .style({
-              stroke: '#B4D5E5',
-              'stroke-width': '1px',
-              fill: 'transparent'
-            });
+        ocean_layer.selectAll('path.countries')
+          .data(world)
+          .enter()
+          .append('path')
+          .attr('d', path)
+          .attr('class', 'countries boundary')
+          .style({
+            stroke: 'none',
+            fill: '#dddddd'
+          });
 
-          ocean_layer.selectAll('path.countries')
-            .data(world)
-            .enter()
-            .append('path')
-            .attr('d', path)
-            .attr('class', 'countries boundary')
-            .style({
-              stroke: 'none',
-              fill: '#dddddd'
-            });
 
-          edges_layer.selectAll('path.countries')
-            .data(world)
-            .enter()
-            .append('path')
-            .attr('d', path)
-            .attr('class', 'countries boundary')
-            .style({
-              stroke: '#666',
-              'stroke-width': 1,
-              'stroke-line-join': 'round',
-              fill: 'none'
-            });
 
-        });
+        boundary_layer.selectAll('path.countries')
+          .data(world)
+          .enter()
+          .append('path')
+          .attr('d', path)
+          .attr('class', 'countries boundary')
+          .style({
+            stroke: '#666',
+            'stroke-width': 1,
+            'stroke-line-join': 'round',
+            fill: 'none'
+          });
 
-  };
+      });
+
+};
 
 var draw_map_countries = function draw_map_countries() {
 
-    d3.json('/static/json/ne_50m_admin_0_countries.geojson', function(world) {
+  //This is unused.
 
-      ocean_layer.selectAll('path.countries')
-        .data(world.features)
-        .enter()
-        .append('path')
-        .attr('d', path)
-        .attr('class', 'countries boundary')
-        .style({
-          stroke: 'none',
-          fill: '#dddddd'
-        });
+  d3.json('/static/json/ne_50m_admin_0_countries.geojson', function(world) {
 
-      edges_layer.selectAll('path.countries')
-        .data(world.features)
-        .enter()
-        .append('path')
-        .attr('d', path)
-        .attr('class', 'countries boundary')
-        .style({
-          stroke: 'black',
-          'stroke-width': 1,
-          'stroke-line-join': 'round',
-          fill: 'none'
-        });
-    });
-  };
+    region_fills = ocean_layer.selectAll('path.countries')
+      .data(world.features);
+    region_fills.enter()
+      .append('path')
+      .attr('d', path)
+      .attr('class', 'countries boundary')
+      .style({
+        stroke: 'none',
+        fill: '#dddddd'
+      });
+    region_fills.exit().remove();
+
+    region_boundaries = boundary_layer.selectAll('path.countries')
+      .data(world.features);
+    region_boundaries.enter()
+      .append('path')
+      .attr('d', path)
+      .attr('class', 'countries boundary')
+      .style({
+        stroke: 'black',
+        'stroke-width': 1,
+        'stroke-line-join': 'round',
+        fill: 'none'
+      });
+    region_boundaries.exit().remove();
+  });
+
+};

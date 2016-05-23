@@ -43,6 +43,12 @@ var resize = function resize() {
   //Re-project
   projection.translate([width / 2, height / 2])
     .scale(get_map_scale());
+
+  if (Options.datatype == 'raster') {
+    get_grid_data_by_bbox(Options.dataset);
+  } else if (Options.datatype == 'polygon') {
+    get_agg_by_regions(Options.dataset, Options.regions);
+  }
   d3.selectAll('.boundary').attr('d', path);
 };
 
@@ -89,7 +95,7 @@ var choose_agregation_regions = function choose_agregation_regions() {
   
   var regions = d3.select('#aggregation_regions li a');
   regions.on('click', function() {
-    //TODO: preventDefault
+    d3.event.preventDefault();
     
   })
   
