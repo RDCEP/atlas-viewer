@@ -39,7 +39,7 @@ def index(lon, lat, var):
         lat=session['lat'],
         var=session['var'],
         crop='whe',
-        gridded='true',
+        datatype='null',
         metadata=metadata,
     )
 
@@ -52,13 +52,13 @@ def gridmap(dataset, lon, lat):
     session['lat'] = lat
     session['dataset'] = dataset
     return render_template(
-        'grid.html',
+        'index.html',
         map_type='grid',
         lon=session['lon'],
         lat=session['lat'],
         var=session['var'],
         crop='whe',
-        gridded='true',
+        datatype='raster',
         dataset=dataset,
     )
 
@@ -71,13 +71,13 @@ def aggmap(dataset, regions, lon, lat):
     session['lat'] = lat
     session['dataset'] = dataset
     return render_template(
-        'agg.html',
+        'index.html',
         map_type='agg',
         lon=session['lon'],
         lat=session['lat'],
         var=session['var'],
         crop='whe',
-        gridded='false',
+        datatype='polygon',
         regions=regions,
         dataset=dataset,
     )
@@ -124,6 +124,27 @@ def get_dataset():
     data = mr.aggregate_grid_to_regions(
         float(tlx), float(tly), float(brx), float(tly), float(brx),
         float(bry), float(tlx), float(bry), collection, regions)
+    return Response(
+        json.dumps(data),
+        mimetype='application/json',
+    )
+
+@mod.route('/api/map', methods=['POST',])
+def get_map():
+    initial_session()
+    data = json.loads(request.data)
+    collection = data['regions']
+    if not 'bbox' in data.keys():
+        tlx = -180
+        tly = 90
+        brx = 180
+        bry = -90
+    else:
+        tlx, tly, brx, bry = data['bbox']
+    mr = MongoRead(4, str(collection))
+    data = mr.regions(
+        float(tlx), float(tly), float(brx), float(tly), float(brx),
+        float(bry), float(tlx), float(bry))
     return Response(
         json.dumps(data),
         mimetype='application/json',

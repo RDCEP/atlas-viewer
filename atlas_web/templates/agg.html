@@ -20,10 +20,5 @@ Options.regions = '{{ regions }}';
 {% endblock %}
 {% block bodyjs %}
 <script src="{{ url_for('static', filename='js/agg.js') }}?3" charset=utf-8 ></script>
-<script src="{{ url_for('static', filename='js/vendor/ace-builds/src-min-noconflict/ace.js') }}" charset=utf-8></script>
-<script>
-  var editor = ace.edit('editor');
-  editor.setTheme('ace/theme/chrome');
-  editor.getSession().setMode('ace/mode/javascript');
-</script>
+{#<script src="{{ url_for('static', filename='js/vendor/ace-builds/src-min-noconflict/ace.js') }}" charset=utf-8></script>#}
 {% endblock %}

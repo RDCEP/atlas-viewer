@@ -13,21 +13,40 @@
 </ul></div>
 {% endif %}
 {% endblock %}
+
+{% block agg_button %}
+{% if datatype == 'raster' %}
+  <ul id=aggregation_regions>
+    <li><a href=/agg/{{ dataset }}/ne_110m_admin_0_countries>NE110</a></li>
+    <li><a href=/agg/{{ dataset }}/ne_50m_admin_0_countries>NE50</a></li>
+  </ul>
+<form action=/agg/{{ dataset }}/ne_110m_admin_0_countries style=display:inline>
+  <label>
+    <span>Aggregate</span>
+    <input type=submit value=GADM0 style=border:none;padding:.2em>
+  </label>
+</form>
+{% endif %}
+{% endblock %}
+
 {% block jsoptions %}
 {{ super() }}
 Options.lat = {{ lat }};
 Options.lon = {{ lon }};
+Options.scale = 1;
 Options.var = '{{ var }}';
 Options.crop = '{{ crop }}';
-Options.gridded = {{ gridded }};
+Options.datatype = '{{ datatype }}';
 Options.dataset = '{{ dataset }}';
+Options.datatype = Options.datatype == 'null' ? null : Options.datatype;
 {% endblock %}
 {% block bodyjs %}
-<script src="{{ url_for('static', filename='js/main.js') }}?3" charset=utf-8 ></script>
-<script src="{{ url_for('static', filename='js/vendor/ace-builds/src-min-noconflict/ace.js') }}" charset=utf-8></script>
-<script>
-  var editor = ace.edit('editor');
-  editor.setTheme('ace/theme/chrome');
-  editor.getSession().setMode('ace/mode/javascript');
-</script>
+  {% assets 'js_app' %}<script src="{{ ASSET_URL }}"></script>{% endassets %}
+{#<script src="{{ url_for('static', filename='js/app/atlas.globals.v0.js') }}?3" charset=utf-8 ></script>#}
+{#<script src="{{ url_for('static', filename='js/app/atlas.map.v0.js') }}?3" charset=utf-8 ></script>#}
+{#<script src="{{ url_for('static', filename='js/app/atlas.ui.v0.js') }}?3" charset=utf-8 ></script>#}
+{#<script src="{{ url_for('static', filename='js/app/atlas.panzoom.v0.js') }}?3" charset=utf-8 ></script>#}
+{#<script src="{{ url_for('static', filename='js/app/atlas.data.v0.js') }}?3" charset=utf-8 ></script>#}
+{#<script src="{{ url_for('static', filename='js/main.js') }}?3" charset=utf-8 ></script>#}
+{#<script src="{{ url_for('static', filename='js/vendor/ace-builds/src-min-noconflict/ace.js') }}" charset=utf-8></script>#}
 {% endblock %}

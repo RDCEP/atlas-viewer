@@ -13,10 +13,11 @@ Options.lat = {{ lat }};
 Options.lon = {{ lon }};
 Options.var = '{{ var }}';
 Options.crop = '{{ crop }}';
-Options.gridded = {{ gridded }};
+Options.datatype = '{{ datatype }}';
 Options.dataset = '{{ dataset }}';
+Options.datatype = Options.datatype == 'null' ? null : Options.datatype;
 {% endblock %}
 {% block bodyjs %}
 <script src="{{ url_for('static', filename='js/grid.js') }}?3" charset=utf-8 ></script>
-<script src="{{ url_for('static', filename='js/vendor/ace-builds/src-min-noconflict/ace.js') }}" charset=utf-8></script>
+{#<script src="{{ url_for('static', filename='js/vendor/ace-builds/src-min-noconflict/ace.js') }}" charset=utf-8></script>#}
 {% endblock %}
