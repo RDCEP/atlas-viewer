@@ -172,6 +172,22 @@ path {
   #title_legend span {
     margin: 0 1em 0 0; }
 
+#aggregation_regions {
+  display: inline-block;
+  position: relative;
+  padding: 0 0.2em; }
+  #aggregation_regions ul {
+    background-color: #fff;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%; }
+    #aggregation_regions ul li {
+      display: none;
+      padding: 0.2em; }
+  #aggregation_regions:hover ul li {
+    display: block; }
+
 .world-path {
   fill: white;
   stroke: #666; }

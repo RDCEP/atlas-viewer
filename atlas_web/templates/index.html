@@ -26,10 +26,14 @@
 
 {% block agg_button %}
 {% if datatype == 'raster' %}
-  <ul id=aggregation_regions>
-    <li><a href=/agg/{{ dataset }}/ne_110m_admin_0_countries>NE110</a></li>
-    <li><a href=/agg/{{ dataset }}/ne_50m_admin_0_countries>NE50</a></li>
-  </ul>
+  <div id=aggregation_regions>
+    <h4>Aggregate</h4>
+    {# TODO: Get available aggregation regions from API #}
+    <ul>
+      <li><a href=/agg/{{ dataset }}/ne_110m_admin_0_countries>NE110</a></li>
+      <li><a href=/agg/{{ dataset }}/ne_50m_admin_0_countries>NE50</a></li>
+    </ul>
+  </div>
 <form action=/agg/{{ dataset }}/ne_110m_admin_0_countries style=display:inline>
   <label>
     <span>Aggregate</span>
