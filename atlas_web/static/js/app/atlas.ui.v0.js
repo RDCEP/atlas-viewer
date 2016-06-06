@@ -53,6 +53,7 @@ var resize = function resize() {
 };
 
 var resize_end = function resize_end() {
+  //TODO: change scale_extent
   if (new Date() - resize_time < resize_delta) {
     setTimeout(resize_end, resize_delta);
   } else {
@@ -61,6 +62,8 @@ var resize_end = function resize_end() {
       //TODO: last_data_request()
       get_data_for_viewport();
     }
+    upper_drag_limit = projection([0, 89])[1];
+    lower_drag_limit = projection([0, -89])[1] - height;
   }
 };
 

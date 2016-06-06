@@ -80,8 +80,6 @@ smooth_opt.on('input', function() {
 
 d3.select(window).on('resize', resize);
 
-// get_grid_data_by_bbox('default_firr_yield_whe');
-console.log(Options.datatype);
 if (Options.datatype == null) {
   get_agg_by_regions('default_firr_yield_whe', 'ne_110m_admin_0_countries');
 } else if (Options.datatype == 'raster') {
@@ -91,3 +89,6 @@ if (Options.datatype == null) {
 }
 
 draw_map_basics();
+
+upper_drag_limit = projection([0, 89])[1];
+lower_drag_limit = projection([0, -89])[1] - height;

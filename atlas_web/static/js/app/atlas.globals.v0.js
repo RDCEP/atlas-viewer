@@ -17,5 +17,12 @@ var data_type = 'grid'
   , resize_delta = 200
   , resize_reload = false
 
+  , upper_drag_limit
+  , lower_drag_limit
+  , last_scale = null
+  , last_trans = [0, 0]
+  , maxlat = 83
+  , scale_extent = [height, 8 * height]
+
   , total_pan = {x: 0, y: 0, d: 0}
 ;
