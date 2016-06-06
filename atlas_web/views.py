@@ -60,6 +60,7 @@ def gridmap(dataset, lon, lat):
         crop='whe',
         datatype='raster',
         dataset=dataset,
+        regions='ne_110m_admin_0_countries',
     )
 
 
