@@ -16,6 +16,8 @@ var svgroot = d3.select('#map').append('svg')
     .attr({id: 'grid_layer', filter: 'url(#grid_filter)'})
   , boundary_layer = svg.append('g')
     .attr('id', 'boundary_layer')
+  , legend_layer = svg.append('g')
+    .attr({id: 'legend_layer'})
   
   , projection = d3.geo.equirectangular()
     .rotate([-Options.lon, 0])
@@ -57,7 +59,7 @@ ocean_layer.append('path')
 /* SVG filters */
 /***************/
 
-var fetvr = [0.5, 0.65, 0.85, 0.95, 0.99, 0.99, 0.99, 0.99, 1, 1]
+var fetvr = [0.5, 0.65, 0.85, 0.95, 0.99, 0.99, 0.99, 0.99, 1]
   , fetvg = [0.15, 0.21, 0.28, 0.41, 0.55, 0.68, 0.82, 0.90, 0.96]
   , fetvb = [0.02, 0.01, 0.00, 0.07, 0.24, 0.42, 0.64, 0.81, 0.92]
   , ct2

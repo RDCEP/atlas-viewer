@@ -1,3 +1,6 @@
+/*
+var color = d3.scaleOrdinal(d3.schemeAccent);
+*/
 
 var color = d3.scale.quantile()
     .range(['#fff5eb', '#fee6ce', '#fdd0a2', '#fdae6b', '#fd8d3c',
@@ -90,16 +93,75 @@ var show_chart_options = function show_chart_options() {
   });
 };
 
-var color_legend = function color_legend() {
+var draw_color_legend = function color_legend(block_size) {
+  var h = color.range().length * block_size + (color.range().length-1) + 70;
+  d3.selectAll('.legend_bkgd').remove();
+  d3.selectAll('.legend_region').remove();
+  d3.selectAll('.legend-block').remove();
+  d3.selectAll('.legend-data').remove();
 
+  legend_layer.append('rect')
+      .attr({
+        height: h,
+        width: 160,
+        x: width - 240,
+        y: height - (h + 81),
+        class: 'legend_bkgd'})
+      .style({
+        opacity: .8,
+        fill: 'white'});
+
+  legend_layer.append('text')
+      .text('GADM 0')
+      .attr({
+        x: width - 240 + 15,
+        y: height - (h + 58),
+        class: 'legend_region'})
+      .style({
+          fill: 'black',
+          opacity: .65,
+          'font-weight': 600});
+
+  var legend_blocks = legend_layer.selectAll('.legend-block')
+      .data(color.range())
+      .enter()
+      .append('rect')
+      .attr({
+        width: block_size,
+        height: block_size,
+        class: 'legend-block',
+        x: width - 240 + 15 })
+      .attr('fill', function (d) { return d; })
+      .attr('y', function (d, i) { return height - (h + 60) + 17 * (i + 1) + i; });
+
+  var legend_data = legend_layer.selectAll('.legend-data')
+      .data(color.domain())
+      .enter()
+      .append('text')
+      .attr({
+        width: color.domain().length,
+        height: h,
+        x: width - 240 + 35,
+        class: 'legend-data'})
+      .style({
+        opacity: .75})
+      .text(function(d) {return d;})
+      .attr('y', function (d, i) { return height - (h + 467) + 145 * (i + 3)  ; });
 };
 
+d3.select('#legend_settings')
+    .on('click', function() {
+        var l = d3.select('#legend_layer');
+        if (l.style('visibility') == 'visible'){
+            l.style('visibility', 'hidden');
+        } else {
+            l.style('visibility', 'visible')
+        }});
+
 var choose_agregation_regions = function choose_agregation_regions() {
-  
   var regions = d3.select('#aggregation_regions li a');
   regions.on('click', function() {
     d3.event.preventDefault();
-    
   })
   
 };

@@ -54,7 +54,7 @@ path {
   position: absolute;
   top: 2.3em;
   background-color: #ffffff;
-  opacity: 0.8;
+  opacity: 0.86;
   height: 1.8em;
   z-index: 999; }
 
@@ -160,33 +160,20 @@ path {
   background-color: #ffffff;
   width: 900px;
   margin: 0 auto;
-  padding: 0.5em 0 0 0;
+  padding: 0.25em 0 0 0;
   font-size: 0.8em;
   line-height: 1em;
   position: relative;
   z-index: 999; }
   #title_legend input[type=range] {
     position: relative;
-    top: 0.2em;
+    top: 0.3em;
     margin: 0 1em 0 0; }
   #title_legend span {
-    margin: 0 1em 0 0; }
-
-#aggregation_regions {
-  display: inline-block;
-  position: relative;
-  padding: 0 0.2em; }
-  #aggregation_regions ul {
-    background-color: #fff;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    width: 100%; }
-    #aggregation_regions ul li {
-      display: none;
-      padding: 0.2em; }
-  #aggregation_regions:hover ul li {
-    display: block; }
+    margin: 0 1em 0 0;}
+  #title_legend h4 {
+    margin: 0 2.5em;
+  }
 
 .world-path {
   fill: white;

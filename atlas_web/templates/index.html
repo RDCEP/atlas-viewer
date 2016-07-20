@@ -8,7 +8,7 @@
 {% for m in metadata %}
   <li><h4><a href=/map/{{ m.dataset }}>{{ m.dataset }}</a></h4>
   <dl>{% for k, v in m.items() %}{% if k != 'dataset' %}
-    <dt>{{ k }}</dt><dd>{{ v }}</dd>
+	<dt>{{ k }}</dt><dd>{{ v }}</dd>
   {% endif %}{% endfor %}</dl></li>
 {% endfor %}
 </ul></div>
@@ -17,23 +17,61 @@
 
 {% block smoothing_slider %}
 {% if datatype=='raster' %}
-<label>
-  <span>Smoothing</span>
-  <input id=smooth_select type=range min=0 max=10 step=1 value=0>
-</label>
+
+<div class="nav_dropdown" id="appearance">
+    <h4>Appearance</h4>
+    <ul>
+        <li id="drop_special" class="drop_main">Bins<input id="input_buckets" type="number" name="buckets" ></li>
+
+        <li id="drop_main">
+            <img src="{{ url_for('static', filename='images/SequentialColorTheme.png') }}" alt="Sequential Color Theme" class="theme_img">
+        </li>
+        <li id="drop_label"><a>Sequential</a></li>
+
+        <li id="drop_main">
+            <img src="{{ url_for('static', filename='images/DivergingColorTheme.png') }}" alt="Color Theme" class="theme_img">
+        </li>
+        <li id="drop_label"><a>Diverging</a></li>
+
+        <li id="drop_last">
+            <input id=smooth_select type=range min=0 max=10 step=1 value=0>
+            <div id="drop_main">Smoothing</div>
+        </li>
+
+    </ul>
+</div>
+
+
+<div class="nav_dropdown">
+    <h4>Regions</h4>
+    <ul>
+        <li id="drop_special"><a>GADM 0</a></li>
+        <li id="drop_label"><a>GADM 1</a></li>
+        <li id="drop_last"> <a>GADM 2</a></li>
+    </ul>
+</div>
+
 {% endif %}
 {% endblock %}
 
 {% block agg_button %}
 {% if datatype == 'raster' %}
-  <div id=aggregation_regions>
-    <h4>Aggregate</h4>
-    {# TODO: Get available aggregation regions from API #}
-    <ul>
-      <li><a href=/agg/{{ dataset }}/ne_110m_admin_0_countries>NE110</a></li>
-      <li><a href=/agg/{{ dataset }}/ne_50m_admin_0_countries>NE50</a></li>
-    </ul>
+  <div class="nav_dropdown">
+	<h4>Aggregate</h4>
+	{# TODO: Get available aggregation regions from API #}
+	<ul>
+	  <li id="drop_special"><a href=/agg/{{ dataset }}/ne_110m_admin_0_countries>NE110</a></li>
+	  <li id="drop_last"><a href=/agg/{{ dataset }}/ne_50m_admin_0_countries>NE50</a></li>
+	</ul>
   </div>
+
+  <label id="pixel_pointer">
+    <i id="icon" class="fa fa-mouse-pointer fa-lg" aria-hidden="true" ></i>
+  </label>
+
+  <label id="legend_settings">
+    <i id="icon" class="fa fa-eye fa-lg" aria-hidden="true" ></i>
+  </label>
 {% endif %}
 {% endblock %}
 

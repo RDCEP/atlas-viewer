@@ -3,7 +3,9 @@
 <head>
   <meta charset=utf-8>
   <title></title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.min.css') }}">
   <link rel=stylesheet href="{{ url_for('static', filename='css/main.css') }}">
+  <link rel=stylesheet href="{{ url_for('static', filename='css/key_styling.css') }}">
 </head>
 <body>
 <div id=wrapper>
@@ -46,7 +48,7 @@
 <script src="{{ url_for('static', filename='js/vendor/queue.v1.min.js') }}"></script>
 {#<script src="https://d3js.org/d3-queue.v2.min.js"></script>#}
 {% block bodyjs %}
-{#<script src="{{ url_for('static', filename='js/atlas_000.js') }}?3" charset=utf-8 ></script>#}
+    {#<script src="{{ url_for('static', filename='js/atlas_000.js') }}?3" charset=utf-8 ></script>#}
 {% endblock %}
 </body>
 </html>
