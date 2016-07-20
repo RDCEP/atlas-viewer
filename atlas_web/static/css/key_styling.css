@@ -1,0 +1,114 @@
+
+.legend-data {
+    font-size: .8em;  }
+
+.legend_region {
+    font-size: .9em;}
+
+.nav_dropdown{
+  display: inline-block;
+  position: relative;
+  padding: 0 0.2em; }
+  .nav_dropdown ul {
+    background-color: #fff;
+    position: absolute;
+    top: 1.2em;
+    left: 2.1em;
+    width: 100%; }
+    .nav_dropdown ul li {
+      display: none;
+      padding: .1em; }
+  .nav_dropdown:hover ul li {
+    display: block;  }
+  .nav_dropdown input[type=range] {
+    position: relative;
+    top: .5em;
+    margin: .5em .5em 0; }
+
+#drop_special{
+    margin-top: .5em;
+    padding: 0 .5em .3em;
+    color: #666666;}
+
+#input_buckets{
+    width: 4em;
+    margin-left: .5em;
+    border: 1px solid lightgrey;  }
+    #input_buckets:focus{
+        border: 1.5px solid darkgray;}
+
+#drop_main {
+    padding: .25em .5em 0;
+    color: #666666;}
+    #drop_main div{
+        margin: 1em 0 0 0;}
+
+#drop_label{
+    padding: 0 .5em .3em; }
+
+#drop_last{
+    padding: 0 .5em .75em;}
+
+#pixel_pointer {
+    padding-left: 15em;}
+
+#legend_settings {
+    padding-left: 2em;}
+
+.theme_img{
+    opacity: 100;}
+
+
+/*
+
+.theme {
+    page-break-inside: initial;
+    max-width: none;
+    position: relative;}
+
+#legend_bar{
+    width: 160px;
+    height: 20px;
+    background-color: #000000;
+    opacity: .75;
+    margin-left: 81.25%;
+    margin-top: 46.5%;
+    position: relative;}
+
+#icon{
+    padding: .2em;
+    padding-left: 20em;}
+
+#nav_appearance {
+  display: inline-block;
+  position: relative;
+  padding: 0 0.2em; }
+  #nav_appearance ul {
+    background-color: #fff;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%; }
+    #nav_appearance ul li {
+      display: none;}
+  #nav_appearance:hover ul li {
+    display: block; }
+
+#aggregation_regions {
+  display: inline-block;
+  position: relative;
+  padding: 0 0.2em; }
+  #aggregation_regions ul {
+    background-color: #fff;
+    position: absolute;
+    top: 100%;
+    left: 2.5em;
+    width: 100%; }
+    #aggregation_regions ul li {
+      display: none;
+      padding: .1em; }
+  #aggregation_regions:hover ul li {
+    display: block;
+    margin: 0 2.5em;}
+
+*/
