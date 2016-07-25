@@ -1,11 +1,32 @@
 /*
 var color = d3.scaleOrdinal(d3.schemeAccent);
+
+var color = d3.scale.quantile()
+    .range(['#d73027', '#f46d43', '#fdae61', '#fee090', '#ffffbf',
+            '#e0f3f8', '#abd9e9', '#74add1', '#4575b4'])
+  ;
+
 */
 
 var color = d3.scale.quantile()
     .range(['#fff5eb', '#fee6ce', '#fdd0a2', '#fdae6b', '#fd8d3c',
             '#f16913', '#d94801', '#a63603', '#7f2704'])
   ;
+
+/*
+d3.select('#diverging')
+    .on('click', function() {
+       var color = d3.scale. quantile()
+           .range(['#d73027', '#f46d43', '#fdae61', '#fee090', '#ffffbf',
+            '#e0f3f8', '#abd9e9', '#74add1', '#4575b4'])});
+
+d3.select('#sequential')
+    .on('click', function() {
+       var color = d3.scale. quantile()
+            .range(['#fff5eb', '#fee6ce', '#fdd0a2', '#fdae6b', '#fd8d3c',
+            '#f16913', '#d94801', '#a63603', '#7f2704'])} );
+            */
+
 
 var get_viewport_dimensions = function get_viewport_dimensions() {
 

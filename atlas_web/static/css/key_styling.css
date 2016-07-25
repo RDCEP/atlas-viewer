@@ -27,13 +27,22 @@
 
 #drop_special{
     margin-top: .5em;
-    padding: 0 .5em .3em;
+    padding: 0 .5em .5em;
     color: #666666;}
+
+.theme_img{
+    cursor: pointer;
+    color: #666666; }
+    .theme_img:hover img{
+        opacity: .5;  }
+    .theme_img:hover li{
+        color: #ccc;}
 
 #input_buckets{
     width: 4em;
     margin-left: .5em;
-    border: 1px solid lightgrey;  }
+    border: 1px solid lightgrey;
+    text-align: right}
     #input_buckets:focus{
         border: 1.5px solid darkgray;}
 
@@ -47,13 +56,14 @@
     padding: 0 .5em .3em; }
 
 #drop_last{
-    padding: 0 .5em .75em;}
+    padding: 0 .5em .5em;}
 
 #pixel_pointer {
     padding-left: 15em;}
 
 #legend_settings {
-    padding-left: 2em;}
+    padding-left: 2em;
+    cursor: pointer}
 
 .theme_img{
     opacity: 100;}

@@ -23,15 +23,19 @@
     <ul>
         <li id="drop_special" class="drop_main">Bins<input id="input_buckets" type="number" name="buckets" ></li>
 
-        <li id="drop_main">
-            <img src="{{ url_for('static', filename='images/SequentialColorTheme.png') }}" alt="Sequential Color Theme" class="theme_img">
-        </li>
-        <li id="drop_label"><a>Sequential</a></li>
+        <div id="sequential" class="theme_img">
+            <li id="drop_main">
+                <img src="{{ url_for('static', filename='images/SequentialColorTheme.png') }}" alt="Sequential Color Theme">
+            </li>
+            <li id="drop_label">Sequential</li>
+        </div>
 
-        <li id="drop_main">
-            <img src="{{ url_for('static', filename='images/DivergingColorTheme.png') }}" alt="Color Theme" class="theme_img">
-        </li>
-        <li id="drop_label"><a>Diverging</a></li>
+        <div id="diverging" class="theme_img">
+            <li id="drop_main">
+                <img src="{{ url_for('static', filename='images/DivergingColorTheme.png') }}" alt="Color Theme" >
+            </li>
+            <li id="drop_label">Diverging</li>
+        </div>
 
         <li id="drop_last">
             <input id=smooth_select type=range min=0 max=10 step=1 value=0>
@@ -46,7 +50,7 @@
     <h4>Regions</h4>
     <ul>
         <li id="drop_special"><a>GADM 0</a></li>
-        <li id="drop_label"><a>GADM 1</a></li>
+        <li id="drop_last"><a>GADM 1</a></li>
         <li id="drop_last"> <a>GADM 2</a></li>
     </ul>
 </div>
