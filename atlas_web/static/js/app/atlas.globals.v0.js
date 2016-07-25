@@ -3,9 +3,12 @@
  */
 
 // Application state
-var data_type = 'grid'
-  , world, data, grid_regions
-  , top_left, bottom_right, top_right, bottom_left, dims
+var data_type = 'raster'
+  , world
+  , data = []
+  , grid_regions
+  , top_left, bottom_right, top_right, bottom_left
+  , dims
   , height = window.innerHeight
   , width = window.innerWidth
   , current_year = 1979

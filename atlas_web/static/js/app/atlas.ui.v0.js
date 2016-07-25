@@ -35,7 +35,9 @@ var resize = function resize() {
   //Resize SVG
   width = window.innerWidth;
   height = window.innerHeight;
-  d3.select('svg').attr({height: height, width: width});
+  svgroot.attrs({
+    height: height,
+    width: width});
 
   //Set reload switch
   resize_reload = get_map_scale() < projection.scale();

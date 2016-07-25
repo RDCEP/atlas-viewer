@@ -3,54 +3,29 @@ var group_data_test = false;
 
 var atlas = function atlas(error, queued_data) {
 
+  Options.datatype = queued_data['data_type'];
+
   data = queued_data['data'];
-
-  data_type = queued_data['data_type'];
-
+  data = Options.datatype == 'raster' ? process_raster_geometry(data) : data;
   data.filter(function (d) { return d.properties.value != null; });
 
-  color.domain([
-    d3.min(data, function(d) {
-      return d3.min(d.properties.value.values, function(dd) {return dd; }); }),
-    d3.max(data, function(d) {
-      return d3.max(d.properties.value.values, function(dd) {return dd; }); })]);
+  // color.domain([
+  //   d3.min(data, function(d) {
+  //     return d3.min(d.properties.value.values,
+  //       function(dd) {return dd; }); }),
+  //   d3.max(data, function(d) {
+  //     return d3.max(d.properties.value.values, function(dd) {return dd; }); })]);
+  color.domain([0, 1000]);
 
-  if (data_type == 'grid' && !group_data_test) {
-    data.forEach(function (d) {
-
-      var x = d.properties.centroid.geometry.coordinates[0];
-      var y = d.properties.centroid.geometry.coordinates[1];
-
-      // TODO: Need dynamic resolution
-      var s = 0.25 + .005;
-
-      d.geometry = {
-        type: 'Polygon',
-        coordinates: [[[x - s, y + s], [x + s, y + s], [x + s, y - s],
-          [x - s, y - s], [x - s, y + s]]]
-      }
-    });
-    grid_regions = grid_layer.selectAll('.grid-boundary').data(data)
-      .enter().append('path');
-  } else if (data_type == 'agg' && !group_data_test) {
-    grid_regions = grid_layer.selectAll('.grid-boundary').data(data)
-      .enter().append('path');
-  } else {
-    grid_regions = grid_layer.selectAll('.grid-boundary')
-      .data(draw_areas_by_time(data))
-      .enter().append('path');
-  }
-  grid_regions.attr('class', 'grid-boundary boundary')
-    .attr('d', path)
-    // .on('mouseover', grid_hover)
-    // .on('mouseout', function() {
-    //   hover_legend.style({display: 'none'});
-    //   hover_legend.classed('hovered', false);})
+  grid_regions = grid_layer.selectAll('.grid-boundary')
+    .data(data)
+    .enter().append('path')
+    .attr('class', 'grid-boundary boundary')
   ;
 
-  // grid_regions.exit().remove();
+  grid_regions.exit().remove();
+  update_data_fills();
 
-  update_data_fills(data);
   // svgroot.call(drag_rotate);
   // svgroot.call(zoom);
 

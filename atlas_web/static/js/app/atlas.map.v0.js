@@ -70,9 +70,9 @@ filter
   .append('feGaussianBlur').attr({in: 'SourceGraphic', stdDeviation: 0 });
 
 ct2 = filter.append('feComponentTransfer');
-ct2.append('feFuncR').attr({type: 'discrete', tableValues: fetvr.join(' ')});
-ct2.append('feFuncG').attr({type: 'discrete', tableValues: fetvg.join(' ')});
-ct2.append('feFuncB').attr({type: 'discrete', tableValues: fetvb.join(' ')});
+ct2.append('feFuncR').attrs({type: 'discrete', tableValues: fetvr.join(' ')});
+ct2.append('feFuncG').attrs({type: 'discrete', tableValues: fetvg.join(' ')});
+ct2.append('feFuncB').attrs({type: 'discrete', tableValues: fetvb.join(' ')});
 
 /*****************/
 /* Map functions */
