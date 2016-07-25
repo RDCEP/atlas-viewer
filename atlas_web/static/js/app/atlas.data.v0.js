@@ -1,14 +1,12 @@
 
 var update_data_fills = function update_data_fills() {
   grid_regions.each(function(d, i) {
-    d3.select(this).style({
-      fill: function() {
-        if (group_data_test) {
-          return color(d3.mean(d.properties.values))
-        }
-        return d.properties.value.values[_time] == null
-          ? 'transparent' : color(d.properties.value.values[_time]);
+    d3.select(this).style('fill', function() {
+      if (group_data_test) {
+        return color(d3.mean(d.properties.values))
       }
+      return d.properties.value.values[_time] == null
+        ? 'transparent' : color(d.properties.value.values[_time]);
     });
   });
 };
@@ -27,7 +25,7 @@ var grid_hover = function grid_hover(d) {
 };
 
 var get_dataset_for_viewport = function get_dataset_for_viewport(url, f) {
-  d3.xhr(url)
+  d3.request(url)
     .send('post', JSON.stringify({
       tlx: dims['top_left'][0],
       tly: dims['top_left'][1],
@@ -39,7 +37,7 @@ var get_dataset_for_viewport = function get_dataset_for_viewport(url, f) {
 var get_grid_data_by_bbox = function get_grid_data_by_bbox(dataset) {
   show_loader();
   dims = get_viewport_dimensions();
-  d3.xhr('/api/griddata')
+  d3.request('/api/griddata')
     .header("Content-Type", "application/json")
     .post(
       JSON.stringify({bbox: [dims['top_left'][0], dims['top_left'][1],

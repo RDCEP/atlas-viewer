@@ -68,11 +68,16 @@ var zoomend = function zoomend() {
 
 };
 
-var zoom = d3.behavior.zoom()
-    .translate(projection.translate())
-    .scale(projection.scale())
-    .scaleExtent(scale_extent)
-    .on('zoom', zooming)
-    .on('zoomend', zoomend)
-;
+// var t = d3.transition()
+//     .duration(750)
+//     .ease(d3.easeLinear);
+
+// var zoom = d3.zoom()
+//     .translateBy(t, function() { console.log(projection.translate()); return projection.translate(); }, projection.translate()[1])
+//     .translateBy(t, projection.translate()[0], projection.translate()[1])
+//     .scaleBy(t, projection.scale())
+//     .scaleExtent(scale_extent)
+//     .on('zoom', zooming)
+//     .on('zoomend', zoomend)
+// ;
 

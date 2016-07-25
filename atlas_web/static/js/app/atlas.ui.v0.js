@@ -8,7 +8,7 @@ var color = d3.scale.quantile()
 
 */
 
-var color = d3.scale.quantile()
+var color = d3.scaleQuantile()
     .range(['#fff5eb', '#fee6ce', '#fdd0a2', '#fdae6b', '#fd8d3c',
             '#f16913', '#d94801', '#a63603', '#7f2704'])
   ;
@@ -84,7 +84,7 @@ var resize_end = function resize_end() {
     resize_timeout = false;
     if (resize_reload) {
       //TODO: last_data_request()
-      get_data_for_viewport();
+      get_dataset_for_viewport();
     }
     upper_drag_limit = projection([0, 89])[1];
     lower_drag_limit = projection([0, -89])[1] - height;
@@ -93,25 +93,21 @@ var resize_end = function resize_end() {
 
 var show_loader = function show_loader() {
   var loader = d3.select('#loader');
-  loader.style({
-    display: 'block',
-    top: (height - loader.node().getBoundingClientRect().height) / 2 + 'px',
-    left: (width - loader.node().getBoundingClientRect().width) / 2 + 'px'
-  });
+  loader.style('display', 'block')
+    .style('top', (height - loader.node().getBoundingClientRect().height) / 2 + 'px')
+    .style('left', (width - loader.node().getBoundingClientRect().width) / 2 + 'px');
 };
 
 var hide_loader = function show_loader() {
   var loader = d3.select('#loader');
-  loader.style({ display: 'none' });
+  loader.style('display', 'none');
 };
 
 var show_chart_options = function show_chart_options() {
   var chart_options = d3.select('#chart_options');
-  chart_options.style({
-    display: 'block',
-    top: (height - loader.node().getBoundingClientRect().height) / 2 + 'px',
-    left: (width - loader.node().getBoundingClientRect().width) / 2 + 'px'
-  });
+  chart_options.style('display', 'block')
+    .style('top', (height - loader.node().getBoundingClientRect().height) / 2 + 'px')
+    .style('left', (width - loader.node().getBoundingClientRect().width) / 2 + 'px');
 };
 
 var draw_color_legend = function color_legend(block_size) {

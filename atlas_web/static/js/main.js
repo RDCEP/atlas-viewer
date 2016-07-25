@@ -32,19 +32,17 @@ var atlas = function atlas(error, queued_data) {
           [x - s, y - s], [x - s, y + s]]]
       }
     });
-    grid_regions = grid_layer.selectAll('.grid-boundary')
-      .data(data);
+    grid_regions = grid_layer.selectAll('.grid-boundary').data(data)
+      .enter().append('path');
   } else if (data_type == 'agg' && !group_data_test) {
-    grid_regions = grid_layer.selectAll('.grid-boundary')
-      .data(data);
+    grid_regions = grid_layer.selectAll('.grid-boundary').data(data)
+      .enter().append('path');
   } else {
     grid_regions = grid_layer.selectAll('.grid-boundary')
-      .data(draw_areas_by_time(data));
+      .data(draw_areas_by_time(data))
+      .enter().append('path');
   }
-
-  grid_regions.enter()
-    .append('path')
-    .attr('class', 'grid-boundary boundary')
+  grid_regions.attr('class', 'grid-boundary boundary')
     .attr('d', path)
     // .on('mouseover', grid_hover)
     // .on('mouseout', function() {
@@ -52,11 +50,11 @@ var atlas = function atlas(error, queued_data) {
     //   hover_legend.classed('hovered', false);})
   ;
 
-  grid_regions.exit().remove();
+  // grid_regions.exit().remove();
 
   update_data_fills(data);
   // svgroot.call(drag_rotate);
-  svgroot.call(zoom);
+  // svgroot.call(zoom);
 
   svg.selectAll('.boundary').attr('d', path);
   hide_loader();
