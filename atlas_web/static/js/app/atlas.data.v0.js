@@ -27,7 +27,7 @@ var grid_hover = function grid_hover(d) {
 };
 
 var get_dataset_for_viewport = function get_dataset_for_viewport(url, f) {
-  d3.xhr(url)
+  d3.request(url)
     .send('post', JSON.stringify({
       tlx: dims['top_left'][0],
       tly: dims['top_left'][1],
@@ -39,7 +39,7 @@ var get_dataset_for_viewport = function get_dataset_for_viewport(url, f) {
 var get_grid_data_by_bbox = function get_grid_data_by_bbox(dataset) {
   show_loader();
   dims = get_viewport_dimensions();
-  d3.xhr('/api/griddata')
+  d3.request('/api/griddata')
     .header("Content-Type", "application/json")
     .post(
       JSON.stringify({bbox: [dims['top_left'][0], dims['top_left'][1],

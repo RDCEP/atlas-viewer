@@ -54,7 +54,7 @@ var atlas = function atlas(error, queued_data) {
 
   update_data_fills(data);
   // svgroot.call(drag_rotate);
-  svgroot.call(zoom);
+  // svgroot.call(zoom);
 
   svg.selectAll('.boundary').attr('d', path);
   hide_loader();

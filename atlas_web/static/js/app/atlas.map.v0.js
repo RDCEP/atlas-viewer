@@ -6,26 +6,31 @@ var get_map_scale = function get_map_scale() {
 };
 
 var svgroot = d3.select('#map').append('svg')
-    .attr({'width': width, 'height': height})
+    .attr('width', width)
+    .attr('height', height)
   , filter = svgroot.append('defs')
-    .append('filter').attr({id: 'grid_filter', x: 0, y: 0})
+    .append('filter')
+    .attr('id', 'grid_filter')
+    .attr('x', 0)
+    .attr('y', 0)
   , svg = svgroot.append('g')
   , ocean_layer = svg.append('g')
     .attr('id', 'ocean_layer')
   , grid_layer = svg.append('g')
-    .attr({id: 'grid_layer', filter: 'url(#grid_filter)'})
+    .attr('id', 'grid_layer')
+    .attr('filter', 'url(#grid_filter)')
   , boundary_layer = svg.append('g')
-    .attr('id', 'boundary_layer')
+    .attr('id', 'boundary_layer');
   
-  , projection = d3.geo.equirectangular()
+var projection = d3.geoEquirectangular()
     .rotate([-Options.lon, 0])
     .center([0, Options.lat])
     .scale(get_map_scale())
     .translate([width / 2, height / 2])
     .precision(.1)
-  , path = d3.geo.path()
+  , path = d3.geoPath()
     .projection(projection)
-  , graticule = d3.geo.graticule()
+  , graticule = d3.geoGraticule()
   
   , hover_legend = d3.select('#hover_legend')
 
@@ -44,14 +49,12 @@ var svgroot = d3.select('#map').append('svg')
 ;
 
 ocean_layer.append('path')
-.datum(graticule)
-.attr('class', 'graticule boundary')
-.attr('d', path)
-.style({
-  stroke: '#B4D5E5',
-  'stroke-width': '1px',
-  fill: 'transparent'
-});
+  .datum(graticule)
+  .attr('class', 'graticule boundary')
+  .attr('d', path)
+  .style('stroke', '#B4D5E5')
+  .style('stroke-width', '1px')
+  .style('fill', 'transparent');
 
 /***************/
 /* SVG filters */
@@ -79,7 +82,7 @@ var draw_map_basics = function draw_map_basics() {
 
   dims = get_viewport_dimensions();
 
-  d3.xhr('/api/map')
+  d3.request('/api/map')
     .header("Content-Type", "application/json")
     .post(
       JSON.stringify({bbox: [dims['top_left'][0], dims['top_left'][1],
@@ -95,10 +98,8 @@ var draw_map_basics = function draw_map_basics() {
           .append('path')
           .attr('d', path)
           .attr('class', 'countries boundary')
-          .style({
-            stroke: 'none',
-            fill: '#dddddd'
-          });
+          .style('stroke', 'none')
+          .style('fill', '#dddddd');
 
 
 
@@ -108,15 +109,12 @@ var draw_map_basics = function draw_map_basics() {
           .append('path')
           .attr('d', path)
           .attr('class', 'countries boundary')
-          .style({
-            stroke: '#666',
-            'stroke-width': 1,
-            'stroke-line-join': 'round',
-            fill: 'none'
-          });
+          .style('stroke', '#666')
+          .style('stroke-width', 1)
+          .style('stroke-line-join', 'round')
+          .style('fill', 'none');
 
       });
-
 };
 
 var draw_map_countries = function draw_map_countries() {
@@ -131,10 +129,9 @@ var draw_map_countries = function draw_map_countries() {
       .append('path')
       .attr('d', path)
       .attr('class', 'countries boundary')
-      .style({
-        stroke: 'none',
-        fill: '#dddddd'
-      });
+      .style('stroke', 'none')
+      .style('fill', '#dddddd');
+
     region_fills.exit().remove();
 
     region_boundaries = boundary_layer.selectAll('path.countries')
@@ -143,12 +140,11 @@ var draw_map_countries = function draw_map_countries() {
       .append('path')
       .attr('d', path)
       .attr('class', 'countries boundary')
-      .style({
-        stroke: 'black',
-        'stroke-width': 1,
-        'stroke-line-join': 'round',
-        fill: 'none'
-      });
+      .style('stroke', 'black')
+      .style('stroke-width', 1)
+      .style('stroke-line-join', 'round')
+      .style('fill', 'none');
+
     region_boundaries.exit().remove();
   });
 
