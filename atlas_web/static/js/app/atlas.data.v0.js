@@ -1,14 +1,12 @@
 
 var update_data_fills = function update_data_fills() {
   grid_regions.each(function(d, i) {
-    d3.select(this).style({
-      fill: function() {
-        if (group_data_test) {
-          return color(d3.mean(d.properties.values))
-        }
-        return d.properties.value.values[_time] == null
-          ? 'transparent' : color(d.properties.value.values[_time]);
+    d3.select(this).style('fill', function() {
+      if (group_data_test) {
+        return color(d3.mean(d.properties.values))
       }
+      return d.properties.value.values[_time] == null
+        ? 'transparent' : color(d.properties.value.values[_time]);
     });
   });
 };

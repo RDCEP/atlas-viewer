@@ -60,7 +60,7 @@ var resize_end = function resize_end() {
     resize_timeout = false;
     if (resize_reload) {
       //TODO: last_data_request()
-      get_data_for_viewport();
+      get_dataset_for_viewport();
     }
     upper_drag_limit = projection([0, 89])[1];
     lower_drag_limit = projection([0, -89])[1] - height;
