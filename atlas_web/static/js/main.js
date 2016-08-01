@@ -18,15 +18,18 @@ var atlas = function atlas(error, queued_data) {
   color.domain([0, 1000]);
 
   grid_regions = grid_layer.selectAll('.grid-boundary')
-    .data(data)
-    .enter().append('path')
+    .data(data);
+  grid_regions.exit().remove();
+  grid_regions.enter().append('path')
     .attr('class', 'grid-boundary boundary')
     .attr('d', path)
+    .style('fill', function(d) {
+      return d.properties.value.values[_time] == null
+        ? 'transparent' : color(d.properties.value.values[_time]);
+    })
   ;
 
-  grid_regions.exit().remove();
-  update_data_fills();
-
+  // update_data_fills();
   // svgroot.call(drag_rotate);
   // svgroot.call(zoom);
 
