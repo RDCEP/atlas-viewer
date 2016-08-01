@@ -19,6 +19,7 @@ var data_type = 'raster'
   , resize_timeout = false
   , resize_delta = 200
   , resize_reload = false
+  , resize_event
 
   , upper_drag_limit
   , lower_drag_limit

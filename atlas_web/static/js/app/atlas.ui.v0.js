@@ -1,8 +1,7 @@
 
 var color = d3.scaleQuantile()
     .range(['#fff5eb', '#fee6ce', '#fdd0a2', '#fdae6b', '#fd8d3c',
-            '#f16913', '#d94801', '#a63603', '#7f2704'])
-  ;
+            '#f16913', '#d94801', '#a63603', '#7f2704']);
 
 var get_viewport_dimensions = function get_viewport_dimensions() {
 
@@ -23,26 +22,20 @@ var get_viewport_dimensions = function get_viewport_dimensions() {
   }
 };
 
-var resize = function resize() {
+var new_resize_wrapper = function new_resize_wrapper() {
+  console.log(1);
+  clearTimeout(resize_event);
+  resize_event = setTimeout(new_resize, 1000);
+};
 
-  //Check for end of resize event
-  resize_time = new Date();
-  if (resize_timeout === false) {
-    resize_timeout = true;
-    setTimeout(resize_end, resize_delta);
-  }
-
-  //Resize SVG
+var new_resize = function new_resize() {
   width = window.innerWidth;
   height = window.innerHeight;
   svgroot.attrs({
     height: height,
-    width: width});
-
-  //Set reload switch
-  resize_reload = get_map_scale() < projection.scale();
-
-  //Re-project
+    width: width,
+    'viewBox': '0 0 ' + width + ' ' + height})
+  ;
   projection.translate([width / 2, height / 2])
     .scale(get_map_scale());
 
@@ -51,22 +44,7 @@ var resize = function resize() {
   } else if (Options.datatype == 'polygon') {
     get_agg_by_regions(Options.dataset, Options.regions);
   }
-  d3.selectAll('.boundary').attr('d', path);
-};
-
-var resize_end = function resize_end() {
-  //TODO: change scale_extent
-  if (new Date() - resize_time < resize_delta) {
-    setTimeout(resize_end, resize_delta);
-  } else {
-    resize_timeout = false;
-    if (resize_reload) {
-      //TODO: last_data_request()
-      get_dataset_for_viewport();
-    }
-    upper_drag_limit = projection([0, 89])[1];
-    lower_drag_limit = projection([0, -89])[1] - height;
-  }
+  // d3.selectAll('.boundary').attr('d', path);
 };
 
 var show_loader = function show_loader() {

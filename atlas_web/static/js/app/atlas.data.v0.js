@@ -2,9 +2,6 @@
 var update_data_fills = function update_data_fills() {
   grid_regions.each(function(d, i) {
     d3.select(this).style('fill', function() {
-      if (group_data_test) {
-        return color(d3.mean(d.properties.values))
-      }
       return d.properties.value.values[_time] == null
         ? 'transparent' : color(d.properties.value.values[_time]);
     });
@@ -45,7 +42,7 @@ var get_grid_data_by_bbox = function get_grid_data_by_bbox(dataset) {
         dataset: dataset}),
       function(err, rawData){
         //TODO: get datatype from Options object
-        atlas(err, {data_type: 'grid', data: JSON.parse(rawData['response'])});
+        atlas(err, {data_type: 'raster', data: JSON.parse(rawData['response'])});
       }
   );
   //TODO: last_data_request()
@@ -95,3 +92,19 @@ var draw_areas_by_time = function draw_areas_by_time(data, idx) {
 
 };
 
+var process_raster_geometry = function process_raster_geometry(data) {
+  data.forEach(function (d) {
+
+    var x = d.properties.centroid.geometry.coordinates[0];
+    var y = d.properties.centroid.geometry.coordinates[1];
+
+    // TODO: Need dynamic resolution
+    var s = 0.25;
+
+    d.geometry = {
+      type: 'Polygon',
+      coordinates: [[[x - s, y + s], [x + s, y + s], [x + s, y - s],
+        [x - s, y - s], [x - s, y + s]]]}
+  });
+  return data;
+};
