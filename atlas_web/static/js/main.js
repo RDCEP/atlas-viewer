@@ -16,7 +16,7 @@ var atlas = function atlas(error, queued_data) {
       return d3.max(d.properties.value.values, function(dd) {return dd; }); })]);
 
   if (Options.datatype != null) { draw_color_legend(15); }
-  
+
   if (data_type == 'grid' && !group_data_test) {
     data.forEach(function (d) {
 

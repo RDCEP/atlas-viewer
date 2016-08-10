@@ -1,13 +1,8 @@
 
 var update_data_fills = function update_data_fills() {
-  grid_regions.each(function(d, i) {
-    d3.select(this).style('fill', function() {
-      if (group_data_test) {
-        return color(d3.mean(d.properties.values))
-      }
+    d3.selectAll('.grid-boundary').style('fill', function(d) {
       return d.properties.value.values[_time] == null
         ? 'transparent' : color(d.properties.value.values[_time]);
-    });
   });
 };
 
@@ -54,7 +49,7 @@ var get_grid_data_by_bbox = function get_grid_data_by_bbox(dataset) {
 var get_agg_by_regions = function get_agg_by_regions(dataset, regions) {
   show_loader();
   dims = get_viewport_dimensions();
-  d3.xhr('/api/aggregate')
+  d3.request('/api/aggregate')
     .header("Content-Type", "application/json")
     .post(
       JSON.stringify({bbox: [dims['top_left'][0], dims['top_left'][1],
@@ -95,3 +90,36 @@ var draw_areas_by_time = function draw_areas_by_time(data, idx) {
 
 };
 
+var metadata_list = function metadata_list() {
+  d3.request(api_root + 'rastermeta')
+    // .header("Content-Type", "application/json")
+    .get(function(err, rawData){
+      var this_data = JSON.parse(rawData['response']);
+      var md = d3.select('#metadata_list ul');
+      md.data(this_data['response']['data'])
+        .enter()
+        .append('li');
+      md.append('h4')
+        .text(function(d) { return d.long_name; });
+      md = md.append('ul');
+      md.selectAll('li')
+        .data(function(d) { return d.vars; })
+        .enter()
+        .append('li')
+        .styles({display: 'inline-block', margin: '.25em 2em .5em 0'})
+        .append('a')
+        .attr('href', function(d) {
+          return '/map/dataset/' +
+            d3.select(this.parentNode.parentNode).datum().uid +
+            '/var/' +
+            d.uid; })
+        .text(function(d) { return search_metadata_vars('long_name', d.attrs)['value']; })
+    });
+};
+
+var search_metadata_vars = function search_metadata_vars(key, array) {
+    for (var i=0; i < array.length; i++) {
+        if (array[i].name === key) {
+            return array[i]; } }
+};
+    

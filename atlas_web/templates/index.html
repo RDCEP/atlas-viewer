@@ -2,16 +2,135 @@
 
 {% block metadata_list %}
 {% if metadata %}
-<div id=metadata_list>
-  <h3>Available datasets</h3>
-  <ul>
-{% for m in metadata %}
-  <li><h4><a href=/map/{{ m.dataset }}>{{ m.dataset }}</a></h4>
-  <dl>{% for k, v in m.items() %}{% if k != 'dataset' %}
-	<dt>{{ k }}</dt><dd>{{ v }}</dd>
-  {% endif %}{% endfor %}</dl></li>
-{% endfor %}
-</ul></div>
+    <div id="metadata_list_bkgd"></div>
+    <div id="metadata_list">
+    <div id="metadata">
+
+          <div id="search">
+              <input id="search_input" type="text" placeholder="search">
+              <!--button id="search_button"><i id="search_icon" class="fa fa-search fa-lg" aria-hidden="true"></i></button-->
+          </div>
+
+        <div class="metadata_list_section">
+
+        <div id="data">
+            <h2>PSIMS</h2>
+            <h3>The parallel system for integrating impact models and sectors</h3>
+            <ul>
+                <li><a href>AET</a></li>
+                <li><a href>BIOM</a></li>
+                <li><a href>YIELD</a></li>
+            </ul>
+            <h3>Parameters</h3>
+            <dl>
+                <dt>Lat</dt>
+                <dd>-900</dd>
+                <dt>Long</dt>
+                <dd>500</dd>
+                <dt>Lat</dt>
+                <dd>-900</dd>
+                <dt>Long</dt>
+                <dd>500</dd>
+                <dt>Lat</dt>
+                <dd>-900</dd>
+                <dt>Long</dt>
+                <dd>500</dd>
+            </dl>
+            <br/>
+            <h3>Dimensions</h3>
+            <dl>
+                <dt>Lat</dt>
+                <dd>-900</dd>
+                <dt>Long</dt>
+                <dd>500</dd>
+                <dt>Lat</dt>
+                <dd>-900</dd>
+                <dt>Long</dt>
+                <dd>500</dd>
+                <dt>Lat</dt>
+                <dd>-900</dd>
+                <dt>Long</dt>
+                <dd>500</dd>
+                <dt>Lat</dt>
+                <dd>-900</dd>
+                <dt>Long</dt>
+                <dd>500</dd>
+            </dl>
+            </div>
+        <div id="data">
+
+            <h2>WHEAT</h2>
+            <ul>
+                <li><a href>AET</a></li>
+                <li><a href>BIOM</a></li>
+                <li><a href>YIELD</a></li>
+            </ul>
+            <h3>Parameters</h3>
+            <dl>
+                <dt>Lat</dt>
+                <dd>-900</dd>
+                <dt>Long</dt>
+                <dd>500</dd>
+                <dt>Lat</dt>
+                <dd>-900</dd>
+                <dt>Long</dt>
+                <dd>500</dd>
+                <dt>Lat</dt>
+                <dd>-900</dd>
+                <dt>Long</dt>
+                <dd>500</dd>
+            </dl>
+            <br/>
+            <h3>Dimensions</h3>
+            <dl>
+                <dt>Lat</dt>
+                <dd>-900</dd>
+                <dt>Long</dt>
+                <dd>500</dd>
+                <dt>Lat</dt>
+                <dd>-900</dd>
+                <dt>Long</dt>
+                <dd>500</dd>
+                <dt>Lat</dt>
+                <dd>-900</dd>
+                <dt>Long</dt>
+                <dd>500</dd>
+                <dt>Lat</dt>
+                <dd>-900</dd>
+                <dt>Long</dt>
+                <dd>500</dd>
+            </dl>
+        </div>
+
+        </div>
+        <div class="metadata_list_section">
+        <h3>About</h3>
+            <p>The DICE 2010 model, developed by Professor William Nordhaus of Yale University, is the most widely
+                used model of the economics of climate change. webDICE is an online simulation of this model which allows
+                users to see the effects of climate change on the economy and society.<br/><br/>
+                The default values in the model only present the user with one set of projected potential impacts.
+                In order to understand the range of potential impacts as a result of climate change, the user can adjust
+                parameters within the model to reflect differing beliefs about climate, the economy and the future.</p>
+        </div>
+        <div class="metadata_list_section">
+        <h3>Contact</h3>
+          <p>This model has been developed by researchers at the University of Chicago supported by RDCEP.
+              We are continually working to improve the model and the interface. If you have suggestions,
+              contact us at: info-rdcep@ci.uchicago.edu</p>
+        </div>
+        <div class="metadata_list_section" id="data">
+          <ul>
+        {% for m in metadata %}
+          <li><h4><a href=/map/{{ m.dataset }}>{{ m.dataset }}</a></h4>
+          <dl>{% for k, v in m.items() %}{% if k != 'dataset' %}
+            <dt>{{ k }}</dt><dd>{{ v }}</dd>
+          {% endif %}{% endfor %}</dl></li>
+        {% endfor %}
+        </ul>
+        </div>
+
+        </div>
+   </div>
 {% endif %}
 {% endblock %}
 
@@ -21,25 +140,26 @@
 <div class="nav_dropdown" id="appearance">
     <h4>Appearance</h4>
     <ul>
-        <li id="drop_special" class="drop_main">Bins<input id="input_buckets" type="number" name="buckets" ></li>
+        <li id="drop_special" class="drop_main">Bins
+            <input id="input_buckets" type="number" value="9" min="3" max="9" ></li>
 
-        <div id="sequential" class="theme_img">
-            <li id="drop_main">
-                <img src="{{ url_for('static', filename='images/SequentialColorTheme.png') }}" alt="Sequential Color Theme">
-            </li>
-            <li id="drop_label">Sequential</li>
-        </div>
-
-        <div id="diverging" class="theme_img">
+         <div class="color_scheme" id="spectral" >
             <li id="drop_main">
                 <img src="{{ url_for('static', filename='images/DivergingColorTheme.png') }}" alt="Color Theme" >
             </li>
             <li id="drop_label">Diverging</li>
         </div>
 
-        <li id="drop_last">
+        <div class="color_scheme" id="orange" >
+            <li id="drop_main">
+                <img src="{{ url_for('static', filename='images/SequentialColorTheme.png') }}" alt="Sequential Color Theme">
+            </li>
+            <li id="drop_label">Sequential</li>
+        </div>
+
+        <li id="drop_main">
             <input id=smooth_select type=range min=0 max=10 step=1 value=0>
-            <div id="drop_main">Smoothing</div>
+            <div id="drop_slide_label">Smoothing</div>
         </li>
 
     </ul>
@@ -74,7 +194,7 @@
   </label>
 
   <label id="legend_settings">
-    <i id="icon" class="fa fa-eye fa-lg" aria-hidden="true" ></i>
+    <i id="iconSwitch" class="fa fa-eye-slash fa-lg" aria-hidden="true" ></i>
   </label>
 {% endif %}
 {% endblock %}
