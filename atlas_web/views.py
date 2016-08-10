@@ -5,8 +5,6 @@ except ImportError:
     import json
 from flask import Blueprint, render_template, session, jsonify, Response, \
     request
-from atlas.constants import MODELS, DATASETS, SCENARIOS, IRRIGATION, \
-    CROPS, VARIABLES
 from atlas.mongo_read import MongoRead
 
 
@@ -149,18 +147,6 @@ def get_map():
     return Response(
         json.dumps(data),
         mimetype='application/json',
-    )
-
-
-@mod.context_processor
-def menu_options():
-    return dict(
-        models=MODELS,
-        datasets=DATASETS,
-        scenarios=SCENARIOS,
-        irrigations=IRRIGATION,
-        crops=CROPS,
-        vars=VARIABLES,
     )
 
 

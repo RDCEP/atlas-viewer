@@ -13,6 +13,7 @@ from pymongo.errors import PyMongoError
 from pymongo import MongoClient, GEOSPHERE
 from netCDF4 import Dataset
 from constants import MONGO
+from atlas.utils.round_to_n import round_to_n
 
 
 __author__ = "rblourenco@uchicago.edu"
@@ -25,7 +26,7 @@ uri = "mongodb://{}:{}@{}/{}?authMechanism=SCRAM-SHA-1".format(
 
 
 class NetCDFToMongo(object):
-    def __init__(self, nc_file):
+    def __init__(self, nc_file, sigfigs=3):
         """Class for writing geospatial information to Mongo from netCDF files
 
         :param nc_file: Path to netCDF input file
@@ -35,11 +36,14 @@ class NetCDFToMongo(object):
         """
         self.nc_file = nc_file
         self.nc_dataset = Dataset(self.nc_file, 'r')
+        self.sigfigs = sigfigs
         self._lon_var = None
         self._lat_var = None
         self._time_var = None
-        self._sim_context = None
-        self._vals = self.nc_dataset.variables[self.sim_context][:, :, :]
+        # self._sim_context = None
+        self._variables = None
+        self._dimensions = None
+        # self._vals = self.nc_dataset.variables[self.sim_context][:, :, :]
         self._lats = self.nc_dataset.variables[self.lat_var][:]
         self._lons = self.nc_dataset.variables[self.lon_var][:]
         self._tims = self.nc_dataset.variables[self.time_var][:]
@@ -57,16 +61,34 @@ class NetCDFToMongo(object):
         return self._lon_var
 
     @property
+    def variables(self):
+        """List of variables in NetCDF, other than dimensions in NetCDF.
+
+        :return: List of variables in NetCDF file (excluding dimensions)
+         :rtype: list
+        """
+        if self._variables is None:
+            self._variables = [v for v in self.nc_dataset.variables.keys()
+                               if v not in self.nc_dataset.dimensions.keys()]
+        return self._variables
+
+    @property
+    def dimensions(self):
+        """List of dimensions other than longitude and latitude.
+
+        :return: List of dimensions in NetCDF file (excluding lonlat)
+         :rtype: list
+        """
+        if self._dimensions is None:
+            self._dimensions = [d for d in self.nc_dataset.dimensions.keys()
+                                if d not in [self.lon_var, self.lat_var]]
+        return self._dimensions
+
+    @property
     def time_var(self):
         if self._time_var is None:
             self._time_var = 'time'
         return self._time_var
-
-    @property
-    def sim_context(self):
-        if self._sim_context is None:
-            self._sim_context = MONGO['variable_name']
-        return self._sim_context
 
     @property
     def lats(self):
@@ -103,8 +125,7 @@ class NetCDFToMongo(object):
         if value is np.ma.masked:
             return None
         try:
-            # FIXME: round to significant figures
-            return round(float(value), 1)
+            return round_to_n(float(value), self.sigfigs)
         except ValueError:
             print('\n*** Encountered uncoercible non-numeric ***\n{}\n\n'.format(
                 value
@@ -218,9 +239,6 @@ class GenerateDocument(object):
                 [self.x - x2, self.y - y2],
                 [self.x - x2, self.y + y2]]]},
             'properties': {
-                'source': ntpath.basename(self.filename),
-                'simulation': self.sim,
-                'timestamp': datetime.datetime.now().isoformat(),
                 'centroid': {'geometry': {
                     'type': 'Point', 'coordinates': [self.x, self.y]}},
                 'value': {
