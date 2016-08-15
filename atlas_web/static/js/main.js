@@ -9,19 +9,21 @@ var atlas = function atlas(error, queued_data) {
   data = Options.datatype == 'raster' ? process_raster_geometry(data) : data;
   data.filter(function (d) { return d.properties.value != null; });
 
-  // color.domain([
-  //   d3.min(data, function(d) {
-  //     return d3.min(d.properties.value.values,
-  //       function(dd) {return dd; }); }),
-  //   d3.max(data, function(d) {
-  //     return d3.max(d.properties.value.values, function(dd) {return dd; }); })]);
-  color.domain([0, 1000]);
+  color.domain([
+    d3.min(data, function(d) {
+      return d3.min(d.properties.value.values, function(dd) {return dd; }); }),
+    d3.max(data, function(d) {
+      return d3.max(d.properties.value.values, function(dd) {return dd; }); })]);
 
   grid_regions = grid_layer.selectAll('.grid-boundary')
     .data(data);
   grid_regions.exit().remove();
   grid_regions.enter().append('path')
     .attr('class', 'grid-boundary boundary')
+
+  if (Options.datatype != null) { draw_color_legend(15); }
+
+  grid_regions.attr('class', 'grid-boundary boundary')
     .attr('d', path)
     .style('fill', function(d) {
       return d.properties.value.values[_time] == null

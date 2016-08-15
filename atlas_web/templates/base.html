@@ -3,7 +3,9 @@
 <head>
   <meta charset=utf-8>
   <title></title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.min.css') }}">
   <link rel=stylesheet href="{{ url_for('static', filename='css/main.css') }}">
+  <link rel=stylesheet href="{{ url_for('static', filename='css/key_styling.css') }}">
 </head>
 <body>
 <div id=wrapper>
@@ -49,6 +51,8 @@
 <script src="{{ url_for('static', filename='js/vendor/d3/d3-color.v1.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/vendor/d3/d3-format.v1.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/vendor/d3/d3-interpolate.v1.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/vendor/d3/d3-scale-chromatic.v1.min.js') }}"></script>
+
 {#<script src="{{ url_for('static', filename='js/vendor/d3/d3-time.v1.min.js') }}"></script>#}
 {#<script src="{{ url_for('static', filename='js/vendor/d3/d3-time-format.v1.min.js') }}"></script>#}
 <script src="{{ url_for('static', filename='js/vendor/d3/d3-scale.v1.min.js') }}"></script>
