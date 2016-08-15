@@ -23,6 +23,9 @@ __author__ = "rblourenco@uchicago.edu"
 uri = "mongodb://{}:{}@{}/{}?authMechanism=SCRAM-SHA-1".format(
     MONGO['user'], MONGO['password'], MONGO['domain'], MONGO['database']
 )
+client = MongoClient(uri) if not MONGO['local'] \
+    else MongoClient('localhost', MONGO['port'])
+db = client['atlas']
 
 
 class NetCDFToMongo(object):
@@ -37,40 +40,29 @@ class NetCDFToMongo(object):
         self.nc_file = nc_file
         self.nc_dataset = Dataset(self.nc_file, 'r')
         self.sigfigs = sigfigs
+        self.name = None
+        self.human_name = None
         self._lon_var = None
         self._lat_var = None
-        self._time_var = None
-        # self._sim_context = None
         self._variables = None
         self._dimensions = None
-        # self._vals = self.nc_dataset.variables[self.sim_context][:, :, :]
-        self._lats = self.nc_dataset.variables[self.lat_var][:]
-        self._lons = self.nc_dataset.variables[self.lon_var][:]
-        self._tims = self.nc_dataset.variables[self.time_var][:]
+        self._parameters = None
+        try:
+            self._lats = self.nc_dataset.variables[self.lat_var][:]
+        except KeyError:
+            raise Exception('Dataset must have a latitude dimension.')
+        try:
+            self._lons = self.nc_dataset.variables[self.lon_var][:]
+        except KeyError:
+            raise Exception('Dataset must have a longitude dimension.')
 
     @property
-    def lat_var(self):
-        if self._lat_var is None:
-            self._lat_var = 'lat'
-        return self._lat_var
+    def parameters(self):
+        return self._parameters
 
-    @property
-    def lon_var(self):
-        if self._lon_var is None:
-            self._lon_var = 'lon'
-        return self._lon_var
-
-    @property
-    def variables(self):
-        """List of variables in NetCDF, other than dimensions in NetCDF.
-
-        :return: List of variables in NetCDF file (excluding dimensions)
-         :rtype: list
-        """
-        if self._variables is None:
-            self._variables = [v for v in self.nc_dataset.variables.keys()
-                               if v not in self.nc_dataset.dimensions.keys()]
-        return self._variables
+    @parameters.setter
+    def parameters(self, value):
+        self._parameters = value
 
     @property
     def dimensions(self):
@@ -85,10 +77,28 @@ class NetCDFToMongo(object):
         return self._dimensions
 
     @property
-    def time_var(self):
-        if self._time_var is None:
-            self._time_var = 'time'
-        return self._time_var
+    def variables(self):
+        """List of variables in NetCDF, other than dimensions in NetCDF.
+
+        :return: List of variables in NetCDF file (excluding dimensions)
+         :rtype: list
+        """
+        if self._variables is None:
+            self._variables = [v for v in self.nc_dataset.variables.keys()
+                               if v not in self.nc_dataset.dimensions.keys()]
+        return self._variables
+
+    @property
+    def lat_var(self):
+        if self._lat_var is None:
+            self._lat_var = 'lat'
+        return self._lat_var
+
+    @property
+    def lon_var(self):
+        if self._lon_var is None:
+            self._lon_var = 'lon'
+        return self._lon_var
 
     @property
     def lats(self):
@@ -97,14 +107,6 @@ class NetCDFToMongo(object):
     @property
     def lons(self):
         return self._lons
-
-    @property
-    def vals(self):
-        return self._vals
-
-    @property
-    def tims(self):
-        return self._tims
 
     @property
     def pixel_side_length(self):
@@ -117,62 +119,79 @@ class NetCDFToMongo(object):
         """
         return abs(np.diff(self.lons[:2])[0]), abs(np.diff(self.lats[:2])[0])
 
-    def num_or_null(self, value):
+    def num_or_null(self, arr):
         """Represent null values from netCDF as '--' and numeric values
         as floats.
         """
-
-        if value is np.ma.masked:
-            return None
+        print(arr)
+        if np.ma.getmask(arr):
+            if arr.count() == 0:
+                return None
+            arr = np.ma.filled(arr, None)
         try:
-            return round_to_n(float(value), self.sigfigs)
+            return round_to_n(arr, self.sigfigs)
         except ValueError:
             print('\n*** Encountered uncoercible non-numeric ***\n{}\n\n'.format(
-                value
+                arr
             ))
             pass
 
+    @property
+    def metadata(self):
+        return {}
+
     def parallel_ingest(self):
-        jobs = []
-        n = mp.cpu_count()
-        for i in range(n):
-            p = mp.Process(target=self.ingest, args=(n, i))
-            jobs.append(p)
-            p.start()
-        for j in jobs:
-            j.join()
+        self.ingest_metadata()
+        for variable in self.variables:
+            values = self.nc_dataset[variable][:]
+            jobs = []
+            n = mp.cpu_count()
+            for i in range(n):
+                p = mp.Process(target=self.ingest_data, args=(values, variable, n, i))
+                jobs.append(p)
+                p.start()
+            for j in jobs:
+                j.join()
 
-    def ingest(self, sectors=1, sector=0):
+    def ingest_metadata(self):
+        db['raster_meta'].insert_one(self.metadata)
 
-        client = MongoClient(uri) if not MONGO['local'] \
-            else MongoClient('localhost', MONGO['port'])
-        db = client['atlas']
-        points = db[MONGO['collection']]
+    def ingest_data(self, values, variable, sectors=1, sector=0):
 
         start_time = datetime.datetime.now()
         print('*** Start Run ***\n{}\n\n'.format(start_time))
 
-        lonlats = itertools.product(enumerate(self.lats), enumerate(self.lons))
-        lonlats = np.array_split(np.array([x for x in lonlats]), sectors)[sector]
+        lons_lats = itertools.product(
+            enumerate(self.lats), enumerate(self.lons))
+        lons_lats = np.array_split(
+            np.array([x for x in lons_lats]), sectors)[sector]
 
         try:
-            for (lat_idx, lat), (lon_idx, lon) in lonlats:
-                new_values = list()
-                all_null = True
-                try:
-                    for i in range(len(self.tims)):
-                        xx = self.num_or_null(self.vals[i, lat_idx, lon_idx])
-                        if xx is not None:
-                            all_null = False
-                        new_values.append(xx)
 
-                    if all_null:
+            points = db['{}_{}'.format(self.name, variable)]
+
+            values = np.swapaxes(
+                values, self.nc_dataset.variables[variable].dimensions.index(
+                    self.lat_var), 0)
+
+            values = np.swapaxes(
+                values, self.nc_dataset.variables[variable].dimensions.index(
+                    self.lon_var), 1)
+
+            for (lat_idx, lat), (lon_idx, lon) in lons_lats:
+
+                try:
+                    values = self.num_or_null(
+                        values[lat_idx, lon_idx])
+                    if values is None:
                         continue
 
                     tile = GenerateDocument(
-                        lon, lat, self.sim_context, new_values,
-                        self.pixel_side_length[0], self.pixel_side_length[1],
-                        self.nc_file).as_dict
+                        lon, lat, values,
+                        self.pixel_side_length[0],
+                        self.pixel_side_length[1],
+                        self.dimensions,
+                    ).as_dict
                     result = points.insert_one(tile)
 
                 except:
@@ -182,7 +201,7 @@ class NetCDFToMongo(object):
                 # print result.inserted_ids
                 # print '*** End Points ***'
                 tile = {}
-                new_values[:] = []
+                values[:] = []
 
         except PyMongoError:
             print('Error while committing on MongoDB')
@@ -205,15 +224,13 @@ class NetCDFToMongo(object):
 
 # Define GeoJSON standard for ATLAS
 class GenerateDocument(object):
-    def __init__(self, x, y, simulation_variable, value,
-                 side_x, side_y, filename):
+    def __init__(self, x, y, value, side_x, side_y, dimensions):
         self.x = x
         self.y = y
-        self.sim = simulation_variable
         self.value = value
         self.side_x = side_x
         self.side_y = side_y
-        self.filename = filename
+        self.dimensions = dimensions
 
     @property
     def __geo_interface__(self):
@@ -241,11 +258,9 @@ class GenerateDocument(object):
             'properties': {
                 'centroid': {'geometry': {
                     'type': 'Point', 'coordinates': [self.x, self.y]}},
-                'value': {
-                    'values': self.value,
-                    'start': [1979, ],
-                    'step': 1,
-                }}}
+                'values': self.value,
+                'dimensions': self.dimensions,
+            }}
 
         return document
 
