@@ -1,24 +1,10 @@
-/*
-
-var color = d3.scaleQuantile()
-    .range(['#fff5eb', '#fee6ce', '#fdd0a2', '#fdae6b', '#fd8d3c',
-            '#f16913', '#d94801', '#a63603', '#7f2704']);
-
-var oranges = ['#fff5eb', '#fee6ce', '#fdd0a2', '#fdae6b', '#fd8d3c',
-            '#f16913', '#d94801', '#a63603', '#7f2704'];
-
-var diverging = ['#d73027', '#f46d43', '#fdae61', '#fee090', '#ffffbf',
-            '#e0f3f8', '#abd9e9', '#74add1', '#4575b4'];
-
-*/
 
 var all_the_color = {
-    schemes:{
-        'orange': d3.interpolateOranges,
-        'spectral': d3.interpolateSpectral
-    },
-    colors: [d3.rgb(255,245,235), d3.rgb(254,230,206), d3.rgb(253,208,162), d3.rgb(253,174,107),
-            d3.rgb(253,141,60), d3.rgb(241,105,19), d3.rgb(217,72,1), d3.rgb(166,54,3), d3.rgb(127,39,4)]
+  schemes:{
+      'orange': d3.interpolateOranges,
+      'spectral': d3.interpolateSpectral
+  },
+  colors: []
 };
 
 var color_bins = 9;
@@ -26,22 +12,49 @@ var color_bins = 9;
 var color = d3.scaleQuantile()
     .range(all_the_color.colors);
 
-var create_color_scheme = function create_color_scheme(interp, color_bins) {
-  console.log(interp);
-    all_the_color.colors = [];
-    for (var i=0; i < color_bins; ++i){
-        all_the_color.colors.push(interp(i/(color_bins-1)));
+var component_table = function component_table(arr) {
+  var j = 0;
+  while (j < 100) {
+    if (j / 100 < (arr[arr.length - 2] + arr[arr.length - 1]) / 2) {
+      arr.splice(j, 0, arr[arr.length - 1])
+    } else {
+      arr.pop();
+      arr.splice(j, 0, arr[arr.length - 1])
     }
-    color.range(all_the_color.colors);
-    update_data_fills();
-    draw_color_legend(15);
+    j += 1;
+  }
+  return arr.splice(0, 100).join(' ');
+};
+
+var create_color_scheme = function create_color_scheme(interp, color_bins) {
+  all_the_color.colors = [];
+  fetvr = [];
+  fetvg = [];
+  fetvb = [];
+  for (var i=0; i < color_bins; ++i) {
+    var c = d3.rgb(interp(i / (color_bins - 1)));
+    all_the_color.colors.push(c);
+    fetvr.push(Math.round(c.r / 255 * 100) / 100);
+    fetvg.push(Math.round(c.g / 255 * 100) / 100);
+    fetvb.push(Math.round(c.b / 255 * 100) / 100);
+  }
+  fetvr.sort().reverse();
+  fetvg.sort().reverse();
+  fetvb.sort().reverse();
+
+  ct2.select('feFuncR').attr('tableValues', component_table(fetvr));
+  ct2.select('feFuncG').attr('tableValues', component_table(fetvg));
+  ct2.select('feFuncB').attr('tableValues', component_table(fetvb));
+  color.range(all_the_color.colors);
+  update_data_fills();
+  draw_color_legend(15);
 };
 
 d3.selectAll('.color_scheme')
-    .on('click', function() {
-      Options.color_scheme = d3.select(this).attr('id');
-        create_color_scheme(all_the_color.schemes[Options.color_scheme], color_bins);
-    });
+  .on('click', function() {
+    Options.color_scheme = d3.select(this).attr('id');
+    create_color_scheme(all_the_color.schemes[Options.color_scheme], color_bins);
+  });
 
 var get_viewport_dimensions = function get_viewport_dimensions() {
 
@@ -63,7 +76,6 @@ var get_viewport_dimensions = function get_viewport_dimensions() {
 };
 
 var new_resize_wrapper = function new_resize_wrapper() {
-  console.log(1);
   clearTimeout(resize_event);
   resize_event = setTimeout(new_resize, 1000);
 };
@@ -122,73 +134,72 @@ var draw_color_legend = function color_legend(block_size) {
   d3.selectAll('.legend-data').remove();
 
   legend_layer.append('rect')
-      .attrs({
-        height: legend_height,
-        width: 160,
-        x: width - 240,
-        y: height - (legend_height + 81),
-        class: 'legend_bkgd'})
-      .styles({
-        opacity: .8,
-        fill: 'white'});
+    .attrs({
+      height: legend_height,
+      width: 160,
+      x: width - 240,
+      y: height - (legend_height + 81),
+      class: 'legend_bkgd'})
+    .styles({
+      opacity: .8,
+      fill: 'white'});
 
   legend_layer.append('text')
-      .text('GADM 0')
-      .attrs({
-        x: width - 240 + 15,
-        y: height - (legend_height + 58),
-        class: 'legend_region'})
-      .styles({
-          fill: 'black',
-          opacity: .65,
-          'font-weight': 600});
+    .text('GADM 0')
+    .attrs({
+      x: width - 240 + 15,
+      y: height - (legend_height + 58),
+      class: 'legend_region'})
+    .styles({
+      fill: 'black',
+      opacity: .65,
+      'font-weight': 600});
 
   var legend_blocks = legend_layer.selectAll('.legend-block')
-      .data(color.range())
-      .enter()
-      .append('rect')
-      .attrs({
-        width: block_size,
-        height: block_size,
-        class: 'legend-block',
-        x: width - 240 + 15 })
-      .attr('fill', function (d) { return d; })
-      .attr('y', function (d, i) { return height - (legend_height + 60) + top_margin + i * (block_size + gap); });
+    .data(color.range())
+    .enter()
+    .append('rect')
+    .attrs({
+      width: block_size,
+      height: block_size,
+      class: 'legend-block',
+      x: width - 240 + 15 })
+    .attr('fill', function (d) { return d; })
+    .attr('y', function (d, i) { return height - (legend_height + 60) + top_margin + i * (block_size + gap); });
 
   var legend_data = legend_layer.selectAll('.legend-data')
-      .data(color.domain())
-      .enter()
-      .append('text')
-      .attrs({
-        width: color.domain().length,
-        height: legend_height,
-        x: width - 240 + 35,
-        class: 'legend-data'})
-      .styles({
-        opacity: .75})
-      .text(function(d) {return d;})
-      .attr('y', function (d, i) { return height - (legend_height + 60) + top_margin + (block_size - 3) + (i * (color_bins - 1)) * (block_size + gap);});
+    .data(color.domain())
+    .enter()
+    .append('text')
+    .attrs({
+      width: color.domain().length,
+      height: legend_height,
+      x: width - 240 + 35,
+      class: 'legend-data'})
+    .styles({
+      opacity: .75})
+    .text(function(d) {return d;})
+    .attr('y', function (d, i) { return height - (legend_height + 60) + top_margin + (block_size - 3) + (i * (color_bins - 1)) * (block_size + gap);});
 };
 
 d3.select('#input_buckets')
   .on('input', function(){
     // TODO: make options load color scheme on run
     color_bins = d3.select("#input_buckets").node().value;
-
     create_color_scheme(all_the_color['schemes'][Options.color_scheme],color_bins)
   });
 
 d3.select('#legend_settings')
     .on('click', function() {
-        var l = d3.select('#legend_layer');
-        var eye = d3.select('#iconSwitch');
-        if (l.style('visibility') == 'visible'){
-            l.style('visibility', 'hidden');
-            eye.attrs({class: 'fa fa-eye fa-lg'});
-        } else {
-            l.style('visibility', 'visible');
-            eye.attrs({class: 'fa fa-eye-slash fa-lg'});
-        }});
+      var l = d3.select('#legend_layer');
+      var eye = d3.select('#iconSwitch');
+      if (l.style('visibility') == 'visible'){
+        l.style('visibility', 'hidden');
+        eye.attrs({class: 'fa fa-eye fa-lg'});
+      } else {
+        l.style('visibility', 'visible');
+        eye.attrs({class: 'fa fa-eye-slash fa-lg'});
+      }});
 
 var choose_agregation_regions = function choose_agregation_regions() {
   

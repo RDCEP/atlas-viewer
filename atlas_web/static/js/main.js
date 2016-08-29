@@ -5,6 +5,14 @@ var atlas = function atlas(error, queued_data) {
 
   Options.datatype = queued_data['data_type'];
 
+  // console.log(color.range());
+
+  if (Options.datatype != null) {
+    create_color_scheme(
+      all_the_color.schemes[Options.color_scheme], 9);
+    draw_color_legend(15);
+  }
+
   var data = queued_data['data'];
   data = Options.datatype == 'raster' ? process_raster_geometry(data) : data;
   data.filter(function (d) { return d.properties.value != null; });
@@ -15,16 +23,12 @@ var atlas = function atlas(error, queued_data) {
     d3.max(data, function(d) {
       return d3.max(d.properties.value.values, function(dd) {return dd; }); })]);
 
+  grid_layer.selectAll('.grid-boundary').remove();
   grid_regions = grid_layer.selectAll('.grid-boundary')
     .data(data);
-  grid_regions.exit().remove();
+
   grid_regions.enter().append('path')
     .attr('class', 'grid-boundary boundary')
-
-  if (Options.datatype != null) { draw_color_legend(15); }
-
-  grid_regions.attr('class', 'grid-boundary boundary')
-    .attr('d', path)
     .style('fill', function(d) {
       return d.properties.value.values[_time] == null
         ? 'transparent' : color(d.properties.value.values[_time]);

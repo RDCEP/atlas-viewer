@@ -66,18 +66,7 @@ ocean_layer.append('path')
 /***************/
 
 
-var fetvr = [0.84, 0.95, 0.99, 0.99, 1, 0.87, 0.67, 0.45, 0.27]
-  , fetvg = [0.19, 0.43, 0.68, 0.87, 1, 0.95, 0.85, 0.68, 0.46]
-  , fetvb = [0.15, 0.26, 0.38, 0.56, 0.75, 0.97, 0.91, 0.82, 0.71]
-  , ct2
-;
-
-/*
-var fetvr = [0.5, 0.65, 0.85, 0.95, 0.99, 0.99, 0.99, 0.99, 1]
-  , fetvg = [0.15, 0.21, 0.28, 0.41, 0.55, 0.68, 0.82, 0.90, 0.96]
-  , fetvb = [0.02, 0.01, 0.00, 0.07, 0.24, 0.42, 0.64, 0.81, 0.92]
-  , ct2
-;
+var ct2;
 
 var change_rgb_percentages = function(){
     var colorRGB = colors.d3.rgb;
@@ -96,14 +85,13 @@ var change_rgb_percentages = function(){
 };
 
 
-*/
 filter
-  .append('feGaussianBlur').attr({in: 'SourceGraphic', stdDeviation: 0 });
+  .append('feGaussianBlur').attrs({stdDeviation: 0, result: 'gaussian_blur'});
 
-ct2 = filter.append('feComponentTransfer');
-ct2.append('feFuncR').attrs({type: 'discrete', tableValues: fetvr.join(' ')});
-ct2.append('feFuncG').attrs({type: 'discrete', tableValues: fetvg.join(' ')});
-ct2.append('feFuncB').attrs({type: 'discrete', tableValues: fetvb.join(' ')});
+ct2 = filter.append('feComponentTransfer').attr('in', 'gaussian_blur');
+ct2.append('feFuncR').attrs({type: 'discrete'});
+ct2.append('feFuncG').attrs({type: 'discrete'});
+ct2.append('feFuncB').attrs({type: 'discrete'});
 
 /*****************/
 /* Map functions */
@@ -177,6 +165,7 @@ var draw_map_countries = function draw_map_countries() {
       .style('fill', 'none');
 
     region_boundaries.exit().remove();
+
   });
 
 };
