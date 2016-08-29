@@ -4,10 +4,9 @@ var all_the_color = {
       'orange': d3.interpolateOranges,
       'spectral': d3.interpolateSpectral
   },
-  colors: []
+  colors: [],
+  bins: 9
 };
-
-var color_bins = 9;
 
 var color = d3.scaleQuantile()
     .range(all_the_color.colors);
@@ -53,7 +52,8 @@ var create_color_scheme = function create_color_scheme(interp, color_bins) {
 d3.selectAll('.color_scheme')
   .on('click', function() {
     Options.color_scheme = d3.select(this).attr('id');
-    create_color_scheme(all_the_color.schemes[Options.color_scheme], color_bins);
+    create_color_scheme(all_the_color.schemes[Options.color_scheme],
+      all_the_color.bins);
   });
 
 var get_viewport_dimensions = function get_viewport_dimensions() {
@@ -179,14 +179,17 @@ var draw_color_legend = function color_legend(block_size) {
     .styles({
       opacity: .75})
     .text(function(d) {return d;})
-    .attr('y', function (d, i) { return height - (legend_height + 60) + top_margin + (block_size - 3) + (i * (color_bins - 1)) * (block_size + gap);});
+    .attr('y', function (d, i) {
+      return height - (legend_height + 60) + top_margin + (block_size - 3) +
+        (i * (all_the_color.bins - 1)) * (block_size + gap); });
 };
 
 d3.select('#input_buckets')
   .on('input', function(){
     // TODO: make options load color scheme on run
-    color_bins = d3.select("#input_buckets").node().value;
-    create_color_scheme(all_the_color['schemes'][Options.color_scheme],color_bins)
+    all_the_color.bins = d3.select("#input_buckets").node().value;
+    create_color_scheme(all_the_color['schemes'][Options.color_scheme],
+      all_the_color.bins)
   });
 
 d3.select('#legend_settings')
