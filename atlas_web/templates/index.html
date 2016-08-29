@@ -2,161 +2,99 @@
 
 {% block metadata_list %}
 {% if metadata %}
+  <div id="metadata_list">
     <div id="metadata_list_bkgd"></div>
-    <div id="metadata_list">
     <div id="metadata">
 
-          <div id="search">
-              <input id="search_input" type="text" placeholder="search">
-              <!--button id="search_button"><i id="search_icon" class="fa fa-search fa-lg" aria-hidden="true"></i></button-->
-          </div>
+      <div id="search">
+        <input id="search_input" type="text" placeholder="search">
+        <!--button id="search_button"><i id="search_icon" class="fa fa-search fa-lg" aria-hidden="true"></i></button-->
+      </div>
 
-        <div class="metadata_list_section">
+      <ul class="metadata_list_section">
 
-        <div id="data">
-            <h2>PSIMS</h2>
-            <h3>The parallel system for integrating impact models and sectors</h3>
-            <ul>
-                <li><a href>AET</a></li>
-                <li><a href>BIOM</a></li>
-                <li><a href>YIELD</a></li>
-            </ul>
-            <h3>Parameters</h3>
-            <dl>
-                <dt>Lat</dt>
-                <dd>-900</dd>
-                <dt>Long</dt>
-                <dd>500</dd>
-                <dt>Lat</dt>
-                <dd>-900</dd>
-                <dt>Long</dt>
-                <dd>500</dd>
-                <dt>Lat</dt>
-                <dd>-900</dd>
-                <dt>Long</dt>
-                <dd>500</dd>
-            </dl>
-            <br/>
-            <h3>Dimensions</h3>
-            <dl>
-                <dt>Lat</dt>
-                <dd>-900</dd>
-                <dt>Long</dt>
-                <dd>500</dd>
-                <dt>Lat</dt>
-                <dd>-900</dd>
-                <dt>Long</dt>
-                <dd>500</dd>
-                <dt>Lat</dt>
-                <dd>-900</dd>
-                <dt>Long</dt>
-                <dd>500</dd>
-                <dt>Lat</dt>
-                <dd>-900</dd>
-                <dt>Long</dt>
-                <dd>500</dd>
-            </dl>
-            </div>
-        <div id="data">
 
-            <h2>WHEAT</h2>
-            <ul>
-                <li><a href>AET</a></li>
-                <li><a href>BIOM</a></li>
-                <li><a href>YIELD</a></li>
-            </ul>
-            <h3>Parameters</h3>
-            <dl>
-                <dt>Lat</dt>
-                <dd>-900</dd>
-                <dt>Long</dt>
-                <dd>500</dd>
-                <dt>Lat</dt>
-                <dd>-900</dd>
-                <dt>Long</dt>
-                <dd>500</dd>
-                <dt>Lat</dt>
-                <dd>-900</dd>
-                <dt>Long</dt>
-                <dd>500</dd>
-            </dl>
-            <br/>
-            <h3>Dimensions</h3>
-            <dl>
-                <dt>Lat</dt>
-                <dd>-900</dd>
-                <dt>Long</dt>
-                <dd>500</dd>
-                <dt>Lat</dt>
-                <dd>-900</dd>
-                <dt>Long</dt>
-                <dd>500</dd>
-                <dt>Lat</dt>
-                <dd>-900</dd>
-                <dt>Long</dt>
-                <dd>500</dd>
-                <dt>Lat</dt>
-                <dd>-900</dd>
-                <dt>Long</dt>
-                <dd>500</dd>
-            </dl>
-        </div>
+        <li class="data">
 
-        </div>
-        <div class="metadata_list_section">
-        <h3>About</h3>
-            <p>The DICE 2010 model, developed by Professor William Nordhaus of Yale University, is the most widely
-                used model of the economics of climate change. webDICE is an online simulation of this model which allows
-                users to see the effects of climate change on the economy and society.<br/><br/>
-                The default values in the model only present the user with one set of projected potential impacts.
-                In order to understand the range of potential impacts as a result of climate change, the user can adjust
-                parameters within the model to reflect differing beliefs about climate, the economy and the future.</p>
-        </div>
-        <div class="metadata_list_section">
-        <h3>Contact</h3>
-          <p>This model has been developed by researchers at the University of Chicago supported by RDCEP.
-              We are continually working to improve the model and the interface. If you have suggestions,
-              contact us at: info-rdcep@ci.uchicago.edu</p>
-        </div>
-        <div class="metadata_list_section" id="data">
+          <h2>WHEAT</h2>
           <ul>
-        {% for m in metadata %}
-          <li><h4><a href=/map/{{ m.dataset }}>{{ m.dataset }}</a></h4>
-          <dl>{% for k, v in m.items() %}{% if k != 'dataset' %}
-            <dt>{{ k }}</dt><dd>{{ v }}</dd>
-          {% endif %}{% endfor %}</dl></li>
-        {% endfor %}
-        </ul>
-        </div>
+            <li><a href=/map/default_firr_aet_whe>AET</a></li>
+            <li><a href=/map/default_firr_biom_whe>BIOM</a></li>
+            <li><a href=/map/default_firr_yield_whe>YIELD</a></li>
+          </ul>
+          <h3>Parameters</h3>
+          <dl>
+            <dt>Lat</dt><dd>-900</dd>
+            <dt>Long</dt><dd>500</dd>
+            <dt>Lat</dt><dd>-900</dd>
+            <dt>Long</dt><dd>500</dd>
+            <dt>Lat</dt><dd>-900</dd>
+            <dt>Long</dt><dd>500</dd>
+          </dl>
+          <br/>
+          <h3>Dimensions</h3>
+          <dl>
+            <dt>Lat</dt><dd>-900</dd>
+            <dt>Long</dt><dd>500</dd>
+            <dt>Lat</dt><dd>-900</dd>
+            <dt>Long</dt><dd>500</dd>
+            <dt>Lat</dt><dd>-900</dd>
+            <dt>Long</dt><dd>500</dd>
+            <dt>Lat</dt><dd>-900</dd>
+            <dt>Long</dt><dd>500</dd>
+          </dl>
+        </li>
 
-        </div>
-   </div>
+      </ul>
+
+      <div class="metadata_list_section">
+        <h3>About</h3>
+          <p>The DICE 2010 model, developed by Professor William Nordhaus of Yale University, is the most widely
+            used model of the economics of climate change. webDICE is an online simulation of this model which allows
+            users to see the effects of climate change on the economy and society.<br/><br/>
+            The default values in the model only present the user with one set of projected potential impacts.
+            In order to understand the range of potential impacts as a result of climate change, the user can adjust
+            parameters within the model to reflect differing beliefs about climate, the economy and the future.</p>
+      </div>
+
+      <div class="metadata_list_section">
+      <h3>Contact</h3>
+        <p>This model has been developed by researchers at the University of Chicago supported by RDCEP.
+            We are continually working to improve the model and the interface. If you have suggestions,
+            contact us at: info-rdcep@ci.uchicago.edu</p>
+      </div>
+
+    </div>
+  </div>
 {% endif %}
 {% endblock %}
 
 {% block smoothing_slider %}
 {% if datatype=='raster' %}
 
-<div class="nav_dropdown" id="appearance">
+<div class="nav_dropdown" id=appearance>
   <h4>Appearance</h4>
   <ul>
-    <li id="drop_special" class="drop_main"><label>Bins
-        <input id="input_buckets" type="number" value="9" min="3" max="9" >
+
+    <li class="drop main special"><label>Bins
+      <input id=input_buckets type=number value=9 min=3 max=9>
     </label></li>
 
-    <li class="drop_main color_scheme" id="spectral" >
+    <li class="drop main color_scheme" id=spectral>
       <label>
-        <img src="{{ url_for('static', filename='images/DivergingColorTheme.png') }}" alt="Color Theme" >
+        <img src="{{ url_for('static', filename='images/DivergingColorTheme.png') }}"
+             alt="Color Theme" >
         <span>Diverging</span></label>
     </li>
 
-    <li class="drop_main color_scheme" id="orange" >
+    <li class="drop main color_scheme" id=orange >
       <label>
-        <img src="{{ url_for('static', filename='images/SequentialColorTheme.png') }}" alt="Sequential Color Theme">
+        <img src="{{ url_for('static', filename='images/SequentialColorTheme.png') }}"
+             alt="Sequential Color Theme">
         <span>Sequential</span></label>
     </li>
 
-    <li class="drop_slide drop_main">
+    <li class="drop slide main">
       <label>
         <input id=smooth_select type=range min=0 max=10 step=1 value=0>
         <span>Smoothing</span></label>
@@ -165,14 +103,13 @@
   </ul>
 </div>
 
-
-<div class="nav_dropdown">
-    <h4>Regions</h4>
-    <ul>
-        <li id="drop_special"><a>GADM 0</a></li>
-        <li id="drop_last"><a>GADM 1</a></li>
-        <li id="drop_last"> <a>GADM 2</a></li>
-    </ul>
+<div class=nav_dropdown>
+  <h4>Regions</h4>
+  <ul>
+    <li class="drop special"><a>GADM 0</a></li>
+    <li class="drop last"><a>GADM 1</a></li>
+    <li class="drop last"> <a>GADM 2</a></li>
+  </ul>
 </div>
 
 {% endif %}
@@ -180,21 +117,21 @@
 
 {% block agg_button %}
 {% if datatype == 'raster' %}
-  <div class="nav_dropdown">
+  <div class=nav_dropdown>
 	<h4>Aggregate</h4>
 	{# TODO: Get available aggregation regions from API #}
 	<ul>
-	  <li id="drop_special"><a href=/agg/{{ dataset }}/ne_110m_admin_0_countries>NE110</a></li>
-	  <li id="drop_last"><a href=/agg/{{ dataset }}/ne_50m_admin_0_countries>NE50</a></li>
+	  <li class="drop special"><a href=/agg/{{ dataset }}/ne_110m_admin_0_countries>NE110</a></li>
+	  <li class="drop last"><a href=/agg/{{ dataset }}/ne_50m_admin_0_countries>NE50</a></li>
 	</ul>
   </div>
 
-  <label id="pixel_pointer">
-    <i id="icon" class="fa fa-mouse-pointer fa-lg" aria-hidden="true" ></i>
+  <label id=pixel_pointer>
+    <i id=icon class="fa fa-mouse-pointer fa-lg" aria-hidden=true ></i>
   </label>
 
-  <label id="legend_settings">
-    <i id="iconSwitch" class="fa fa-eye-slash fa-lg" aria-hidden="true" ></i>
+  <label id=legend_settings>
+    <i id=iconSwitch class="fa fa-eye-slash fa-lg" aria-hidden=true ></i>
   </label>
 {% endif %}
 {% endblock %}
