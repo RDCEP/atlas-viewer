@@ -111,18 +111,19 @@
     #input_buckets:focus{
         border: 1px solid darkgray;}
 
-#drop_slide_label{
+.drop_slide label span {
+  display: block;
     padding: .4em 0 .5em 0;
     color: #666;  }
 
-#drop_main {
+.drop_main {
     padding: .25em .5em 0;
     color: #666666;}
-  #drop_main input[type=range] {
+  .drop_main input[type=range] {
         margin: 0 .1em 0 0;
         padding-top: 0;  }
 
-#drop_label{
+.drop_main label{
     padding: 0 .5em .3em; }
 
 #drop_last{

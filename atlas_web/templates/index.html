@@ -138,31 +138,31 @@
 {% if datatype=='raster' %}
 
 <div class="nav_dropdown" id="appearance">
-    <h4>Appearance</h4>
-    <ul>
-        <li id="drop_special" class="drop_main">Bins
-            <input id="input_buckets" type="number" value="9" min="3" max="9" ></li>
+  <h4>Appearance</h4>
+  <ul>
+    <li id="drop_special" class="drop_main"><label>Bins
+        <input id="input_buckets" type="number" value="9" min="3" max="9" >
+    </label></li>
 
-         <div class="color_scheme" id="spectral" >
-            <li id="drop_main">
-                <img src="{{ url_for('static', filename='images/DivergingColorTheme.png') }}" alt="Color Theme" >
-            </li>
-            <li id="drop_label">Diverging</li>
-        </div>
+    <li class="drop_main color_scheme" id="spectral" >
+      <label>
+        <img src="{{ url_for('static', filename='images/DivergingColorTheme.png') }}" alt="Color Theme" >
+        <span>Diverging</span></label>
+    </li>
 
-        <div class="color_scheme" id="orange" >
-            <li id="drop_main">
-                <img src="{{ url_for('static', filename='images/SequentialColorTheme.png') }}" alt="Sequential Color Theme">
-            </li>
-            <li id="drop_label">Sequential</li>
-        </div>
+    <li class="drop_main color_scheme" id="orange" >
+      <label>
+        <img src="{{ url_for('static', filename='images/SequentialColorTheme.png') }}" alt="Sequential Color Theme">
+        <span>Sequential</span></label>
+    </li>
 
-        <li id="drop_main">
-            <input id=smooth_select type=range min=0 max=10 step=1 value=0>
-            <div id="drop_slide_label">Smoothing</div>
-        </li>
+    <li class="drop_slide drop_main">
+      <label>
+        <input id=smooth_select type=range min=0 max=10 step=1 value=0>
+        <span>Smoothing</span></label>
+    </li>
 
-    </ul>
+  </ul>
 </div>
 
 
@@ -210,6 +210,7 @@ Options.datatype = '{{ datatype }}';
 Options.dataset = '{{ dataset }}';
 Options.regions = '{{ regions }}';
 Options.datatype = Options.datatype == 'null' ? null : Options.datatype;
+Options.color_scheme = 'spectral';
 {% endblock %}
 {% block bodyjs %}
   {% assets 'js_app' %}<script src="{{ ASSET_URL }}"></script>{% endassets %}
