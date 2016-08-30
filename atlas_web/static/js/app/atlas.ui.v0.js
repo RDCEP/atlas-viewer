@@ -1,3 +1,4 @@
+'use strict';
 
 var all_the_color = {
   /*
@@ -37,9 +38,9 @@ var create_color_scheme = function create_color_scheme(interp, color_bins) {
    Update UI color given scheme and number of bins.
    */
   all_the_color.colors = [];
-  fetvr = [];
-  fetvg = [];
-  fetvb = [];
+  var fetvr = [];
+  var fetvg = [];
+  var fetvb = [];
 
   for (var i=0; i < color_bins; ++i) {
     var c = d3.rgb(interp(i / (color_bins - 1)));
@@ -136,19 +137,11 @@ var hide_loader = function show_loader() {
   loader.style('display', 'none');
 };
 
-var show_chart_options = function show_chart_options() {
-  var chart_options = d3.select('#chart_options');
-  chart_options.style('display', 'block')
-    .style('top', (height - loader.node().getBoundingClientRect().height) / 2 + 'px')
-    .style('left', (width - loader.node().getBoundingClientRect().width) / 2 + 'px');
-};
-
 var draw_color_legend = function color_legend(block_size) {
   /*
    Draw color legend in bottom right corner of map.
    */
   var top_margin = 15
-    , bottom_margin = 70 - top_margin
     , legend_height = color.range().length * block_size + (color.range().length-1) + 70
     , gap = 3;
   d3.selectAll('.legend_bkgd').remove();
@@ -178,7 +171,7 @@ var draw_color_legend = function color_legend(block_size) {
       opacity: .65,
       'font-weight': 600});
 
-  var legend_blocks = legend_layer.selectAll('.legend-block')
+  legend_layer.selectAll('.legend-block')
     .data(color.range())
     .enter()
     .append('rect')
@@ -190,7 +183,7 @@ var draw_color_legend = function color_legend(block_size) {
     .attr('fill', function (d) { return d; })
     .attr('y', function (d, i) { return height - (legend_height + 60) + top_margin + i * (block_size + gap); });
 
-  var legend_data = legend_layer.selectAll('.legend-data')
+  legend_layer.selectAll('.legend-data')
     .data(color.domain())
     .enter()
     .append('text')
@@ -225,13 +218,3 @@ d3.select('#legend_settings')
         l.style('visibility', 'visible');
         eye.attrs({class: 'fa fa-eye-slash fa-lg'});
       }});
-
-var choose_agregation_regions = function choose_agregation_regions() {
-  
-  var regions = d3.select('#aggregation_regions li a');
-  regions.on('click', function() {
-    d3.event.preventDefault();
-    
-  })
-  
-};
