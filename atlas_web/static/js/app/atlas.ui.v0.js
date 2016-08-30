@@ -5,8 +5,12 @@ var all_the_color = {
    Object for storing application's color state.
    */
   schemes: {
-    orange: d3.interpolateOranges,
-    spectral: d3.interpolateSpectral
+    orange: {
+      interp: d3.interpolateOranges,
+      reverse: false },
+    spectral: {
+      interp: d3.interpolateSpectral,
+      reverse: true}
   },
   colors: [],
   bins: 9
@@ -47,16 +51,21 @@ var create_color_scheme = function create_color_scheme(interp, color_bins) {
   ;
 
   for (var i=0; i < color_bins; ++i) {
-    c = d3.rgb(interp(i / (color_bins - 1)));
+    c = d3.rgb(interp.interp(i / (color_bins - 1)));
     all_the_color.colors.push(c);
     r.push(Math.round(c.r / 255 * 100) / 100);
     g.push(Math.round(c.g / 255 * 100) / 100);
     b.push(Math.round(c.b / 255 * 100) / 100);
   }
+  if (!interp.reverse) {
+    r.reverse();
+    g.reverse();
+    b.reverse();
+  }
 
-  ct2.select('feFuncR').attr('tableValues', r.reverse().join(' '));
-  ct2.select('feFuncG').attr('tableValues', g.reverse().join(' '));
-  ct2.select('feFuncB').attr('tableValues', b.reverse().join(' '));
+  ct2.select('feFuncR').attr('tableValues', r.join(' '));
+  ct2.select('feFuncG').attr('tableValues', g.join(' '));
+  ct2.select('feFuncB').attr('tableValues', b.join(' '));
 
   color2.range(all_the_color.colors);
   update_data_fills();
@@ -187,8 +196,6 @@ var draw_color_legend = function color_legend(block_size) {
       return height - (legend_height + 60) +
         top_margin + i * (block_size + gap); });
 
-  console.log(color2.domain());
-
   legend_layer.selectAll('.legend-data')
     .data(color2.range())
     .enter()
@@ -213,7 +220,7 @@ var draw_color_legend = function color_legend(block_size) {
 d3.select('#input_buckets')
   .on('input', function(){
     all_the_color.bins = d3.select("#input_buckets").node().value;
-    create_color_scheme(all_the_color['schemes'][Options.color_scheme],
+    create_color_scheme(all_the_color.schemes[Options.color_scheme],
       all_the_color.bins)
   });
 
