@@ -1,8 +1,6 @@
 
 var get_map_scale = function get_map_scale() {
-
   return d3.max([height, width]) * Options.scale;
-
 };
 
 var svgwrap = d3.select('#map')
@@ -65,7 +63,6 @@ ocean_layer.append('path')
 /* SVG filters */
 /***************/
 
-
 var ct2;
 
 var change_rgb_percentages = function(){
@@ -98,7 +95,9 @@ ct2.append('feFuncB').attrs({type: 'discrete'});
 /*****************/
 
 var draw_map_basics = function draw_map_basics() {
-
+  /*
+   Draw ocean, land background, region boundaries, graticule.
+   */
   dims = get_viewport_dimensions();
 
   d3.request('/api/map')
@@ -119,8 +118,6 @@ var draw_map_basics = function draw_map_basics() {
           .attr('class', 'countries boundary')
           .style('stroke', 'none')
           .style('fill', '#dddddd');
-
-
 
         boundary_layer.selectAll('path.countries')
           .data(world)

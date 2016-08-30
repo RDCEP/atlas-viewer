@@ -1,8 +1,11 @@
 
 var all_the_color = {
-  schemes:{
-      'orange': d3.interpolateOranges,
-      'spectral': d3.interpolateSpectral
+  /*
+   Object for storing application's color state.
+   */
+  schemes: {
+    orange: d3.interpolateOranges,
+    spectral: d3.interpolateSpectral
   },
   colors: [],
   bins: 9
@@ -12,6 +15,10 @@ var color = d3.scaleQuantile()
     .range(all_the_color.colors);
 
 var component_table = function component_table(arr) {
+  /*
+   Generate color tables for SVG component replacement as space-separated
+   strings.
+   */
   var j = 0;
   while (j < 100) {
     if (j / 100 < (arr[arr.length - 2] + arr[arr.length - 1]) / 2) {
@@ -26,10 +33,14 @@ var component_table = function component_table(arr) {
 };
 
 var create_color_scheme = function create_color_scheme(interp, color_bins) {
+  /*
+   Update UI color given scheme and number of bins.
+   */
   all_the_color.colors = [];
   fetvr = [];
   fetvg = [];
   fetvb = [];
+
   for (var i=0; i < color_bins; ++i) {
     var c = d3.rgb(interp(i / (color_bins - 1)));
     all_the_color.colors.push(c);
@@ -37,16 +48,18 @@ var create_color_scheme = function create_color_scheme(interp, color_bins) {
     fetvg.push(Math.round(c.g / 255 * 100) / 100);
     fetvb.push(Math.round(c.b / 255 * 100) / 100);
   }
+
   fetvr.sort().reverse();
   fetvg.sort().reverse();
   fetvb.sort().reverse();
-
   ct2.select('feFuncR').attr('tableValues', component_table(fetvr));
   ct2.select('feFuncG').attr('tableValues', component_table(fetvg));
   ct2.select('feFuncB').attr('tableValues', component_table(fetvb));
+
   color.range(all_the_color.colors);
   update_data_fills();
   draw_color_legend(15);
+
 };
 
 d3.selectAll('.color_scheme')
@@ -57,7 +70,9 @@ d3.selectAll('.color_scheme')
   });
 
 var get_viewport_dimensions = function get_viewport_dimensions() {
-
+  /*
+   Return coordinates of viewport bounding box
+   */
   top_left = projection.invert([0, 0]);
   bottom_right = projection.invert([width, height]);
 
@@ -76,18 +91,23 @@ var get_viewport_dimensions = function get_viewport_dimensions() {
 };
 
 var new_resize_wrapper = function new_resize_wrapper() {
+  /*
+   Wrapper function for debouncing resize events.
+   */
   clearTimeout(resize_event);
   resize_event = setTimeout(new_resize, 1000);
 };
 
 var new_resize = function new_resize() {
+  /*
+   Resize SVG when browser resizes.
+   */
   width = window.innerWidth;
   height = window.innerHeight;
   svgroot.attrs({
     height: height,
     width: width,
-    'viewBox': '0 0 ' + width + ' ' + height})
-  ;
+    'viewBox': '0 0 ' + width + ' ' + height});
   projection.translate([width / 2, height / 2])
     .scale(get_map_scale());
 
@@ -96,10 +116,12 @@ var new_resize = function new_resize() {
   } else if (Options.datatype == 'polygon') {
     get_agg_by_regions(Options.dataset, Options.regions);
   }
-  // d3.selectAll('.boundary').attr('d', path);
 };
 
 var show_loader = function show_loader() {
+  /*
+   Show animated SVG loader element.
+   */
   var loader = d3.select('#loader');
   loader.style('display', 'block')
     .style('top', (height - loader.node().getBoundingClientRect().height) / 2 + 'px')
@@ -107,6 +129,9 @@ var show_loader = function show_loader() {
 };
 
 var hide_loader = function show_loader() {
+  /*
+   Hide animated SVG loader element.
+   */
   var loader = d3.select('#loader');
   loader.style('display', 'none');
 };
@@ -118,12 +143,10 @@ var show_chart_options = function show_chart_options() {
     .style('left', (width - loader.node().getBoundingClientRect().width) / 2 + 'px');
 };
 
-
-metadata_layer.append('rect')
-    .attrs({
-    });
-
 var draw_color_legend = function color_legend(block_size) {
+  /*
+   Draw color legend in bottom right corner of map.
+   */
   var top_margin = 15
     , bottom_margin = 70 - top_margin
     , legend_height = color.range().length * block_size + (color.range().length-1) + 70
@@ -186,17 +209,16 @@ var draw_color_legend = function color_legend(block_size) {
 
 d3.select('#input_buckets')
   .on('input', function(){
-    // TODO: make options load color scheme on run
     all_the_color.bins = d3.select("#input_buckets").node().value;
     create_color_scheme(all_the_color['schemes'][Options.color_scheme],
       all_the_color.bins)
   });
 
 d3.select('#legend_settings')
-    .on('click', function() {
-      var l = d3.select('#legend_layer');
-      var eye = d3.select('#iconSwitch');
-      if (l.style('visibility') == 'visible'){
+  .on('click', function() {
+    var l = d3.select('#legend_layer');
+    var eye = d3.select('#iconSwitch');
+    if (l.style('visibility') == 'visible') {
         l.style('visibility', 'hidden');
         eye.attrs({class: 'fa fa-eye fa-lg'});
       } else {

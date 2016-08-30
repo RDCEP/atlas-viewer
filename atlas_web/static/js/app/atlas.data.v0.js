@@ -1,8 +1,12 @@
+'use strict';
 
 var update_data_fills = function update_data_fills() {
-    d3.selectAll('.grid-boundary').style('fill', function(d) {
-      return d.properties.value.values[_time] == null
-        ? 'transparent' : color(d.properties.value.values[_time]);
+  /*
+   Update color fills of pixels in data raster.
+   */
+  d3.selectAll('.grid-boundary').style('fill', function(d) {
+    return d.properties.value.values[_time] == null
+      ? 'transparent' : color(d.properties.value.values[_time]);
   });
 };
 
@@ -30,6 +34,9 @@ var get_dataset_for_viewport = function get_dataset_for_viewport(url, f) {
 };
 
 var get_grid_data_by_bbox = function get_grid_data_by_bbox(dataset) {
+  /*
+   Retrieve gridded data within bounding box of viewport.
+   */
   show_loader();
   dims = get_viewport_dimensions();
   d3.request('/api/griddata')
@@ -47,6 +54,10 @@ var get_grid_data_by_bbox = function get_grid_data_by_bbox(dataset) {
 };
 
 var get_agg_by_regions = function get_agg_by_regions(dataset, regions) {
+  /*
+   Retrieve spatially aggregated polygons that intersect bounding box of
+   viewport.
+   */
   show_loader();
   dims = get_viewport_dimensions();
   d3.request('/api/aggregate')
@@ -124,6 +135,10 @@ var search_metadata_vars = function search_metadata_vars(key, array) {
 };
 
 var process_raster_geometry = function process_raster_geometry(data) {
+  /*
+   Assuming the API returns centroids of data raster pixels as
+   GeoJSON Point objects, turn them into Polygons.
+   */
   data.forEach(function (d) {
 
     var x = d.properties.centroid.geometry.coordinates[0];

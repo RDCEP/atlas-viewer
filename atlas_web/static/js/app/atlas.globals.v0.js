@@ -1,8 +1,4 @@
-/**
- * Created by njmattes on 5/9/16.
- */
 
-// Application state
 var data_type = 'raster'
   , world
   , data = []
