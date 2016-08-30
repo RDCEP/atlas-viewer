@@ -1,11 +1,8 @@
-
-var group_data_test = false;
+'use strict';
 
 var atlas = function atlas(error, queued_data) {
 
   Options.datatype = queued_data['data_type'];
-
-  // console.log(color.range());
 
   if (Options.datatype != null) {
     create_color_scheme(
@@ -35,17 +32,12 @@ var atlas = function atlas(error, queued_data) {
     })
   ;
 
-  // update_data_fills();
-  // svgroot.call(drag_rotate);
-  // svgroot.call(zoom);
-
   svg.selectAll('.boundary').attr('d', path);
   hide_loader();
 
 };
 
 var time_opt = d3.select('#time_select');
-var time_label = d3.select('#menu_time label');
 time_opt.on('input', function() {
   _time = +d3.select(this).property('value');
   update_data_fills();

@@ -1,6 +1,4 @@
-/**
-* Created by njmattes on 5/9/16.
-*/
+'use strict';
 
 function mercatorBounds(projection, maxlat) {
     var yaw = projection.rotate()[0],
@@ -44,7 +42,7 @@ var zooming = function zooming() {
 
   }
 
-  svgroot.selectAll('path').attr('d', path);
+  svg_root.selectAll('path').attr('d', path);
 
 };
 
