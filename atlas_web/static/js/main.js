@@ -18,7 +18,7 @@ var atlas = function atlas(error, queued_data) {
 
   if (Options.datatype != null) {
     create_color_scheme(
-      all_the_color.schemes[Options.color_scheme], 9);
+      color_options.schemes[Options.color_scheme], color_options.bins);
     draw_color_legend(15);
   }
 

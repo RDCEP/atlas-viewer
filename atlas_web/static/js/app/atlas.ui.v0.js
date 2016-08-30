@@ -1,6 +1,6 @@
 'use strict';
 
-var all_the_color = {
+var color_options = {
   /*
    Object for storing application's color state.
    */
@@ -19,7 +19,7 @@ var all_the_color = {
 var color = d3.scaleLinear()
   .range([d3.rgb('white'), d3.rgb('black')]);
 var color2 = d3.scaleQuantile()
-  .range(all_the_color.colors);
+  .range(color_options.colors);
 
 var component_table = function component_table(arr) {
   /*
@@ -43,7 +43,7 @@ var create_color_scheme = function create_color_scheme(interp, color_bins) {
   /*
    Update UI color given scheme and number of bins.
    */
-  all_the_color.colors = [];
+  color_options.colors = [];
   var r = []
     , g = []
     , b = []
@@ -52,22 +52,23 @@ var create_color_scheme = function create_color_scheme(interp, color_bins) {
 
   for (var i=0; i < color_bins; ++i) {
     c = d3.rgb(interp.interp(i / (color_bins - 1)));
-    all_the_color.colors.push(c);
+    color_options.colors.push(c);
     r.push(Math.round(c.r / 255 * 100) / 100);
     g.push(Math.round(c.g / 255 * 100) / 100);
     b.push(Math.round(c.b / 255 * 100) / 100);
   }
+
   if (!interp.reverse) {
     r.reverse();
     g.reverse();
     b.reverse();
+    color_options.colors.reverse();
   }
 
   ct2.select('feFuncR').attr('tableValues', r.join(' '));
   ct2.select('feFuncG').attr('tableValues', g.join(' '));
   ct2.select('feFuncB').attr('tableValues', b.join(' '));
-
-  color2.range(all_the_color.colors);
+  color2.range(color_options.colors);
   update_data_fills();
   draw_color_legend(15);
 
@@ -76,8 +77,8 @@ var create_color_scheme = function create_color_scheme(interp, color_bins) {
 d3.selectAll('.color_scheme')
   .on('click', function() {
     Options.color_scheme = d3.select(this).attr('id');
-    create_color_scheme(all_the_color.schemes[Options.color_scheme],
-      all_the_color.bins);
+    create_color_scheme(color_options.schemes[Options.color_scheme],
+      color_options.bins);
   });
 
 var get_viewport_dimensions = function get_viewport_dimensions() {
@@ -201,8 +202,6 @@ var draw_color_legend = function color_legend(block_size) {
     .enter()
     .append('text')
     .attrs({
-      width: color2.domain().length, //FIXME: What is this doing?
-      height: legend_height,
       x: width - 240 + 35,
       class: 'legend-data'})
     .text(function (d, i) {
@@ -210,18 +209,18 @@ var draw_color_legend = function color_legend(block_size) {
         r = color2.range().length
       ;
       if (i == 0) { return round2(color2.domain()[0]) + '–' + round2(q[i]); }
-      if (i == r - 1) { return round2(q[r-1]) + '–' + round2(color2.domain()[1]); }
+      if (i == r - 1) { return round2(q[i-1]) + '–' + round2(color2.domain()[1]); }
       return round2(q[i-1]) + '–' + round2(q[i]); })
     .attr('y', function (d, i) {
       return height - (legend_height + 60) + top_margin + (block_size - 3) +
-        i * (block_size + gap); });
+        (color_options.bins - i - 1) * (block_size + gap); });
 };
 
 d3.select('#input_buckets')
   .on('input', function(){
-    all_the_color.bins = d3.select("#input_buckets").node().value;
-    create_color_scheme(all_the_color.schemes[Options.color_scheme],
-      all_the_color.bins)
+    color_options.bins = d3.select("#input_buckets").node().value;
+    create_color_scheme(color_options.schemes[Options.color_scheme],
+      color_options.bins)
   });
 
 d3.select('#legend_settings')
