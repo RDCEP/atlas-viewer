@@ -23,3 +23,11 @@ var data_type = 'raster'
 var round2 = function round2(x) {
   return Math.round(x * 100) / 100;
 };
+
+var round1 = function round1(x) {
+  return Math.round(x * 10) / 10;
+};
+
+var roundn = function roundn(x, n) {
+  return Math.round(x * Math.pow(10, n)) / Math.pow(10, n);
+};

@@ -208,9 +208,9 @@ var draw_color_legend = function color_legend(block_size) {
       var q = color2.quantiles(),
         r = color2.range().length
       ;
-      if (i == 0) { return round2(color2.domain()[0]) + '–' + round2(q[i]); }
-      if (i == r - 1) { return round2(q[i-1]) + '–' + round2(color2.domain()[1]); }
-      return round2(q[i-1]) + '–' + round2(q[i]); })
+      if (i == 0) { return round1(color2.domain()[0]) + '–' + round1(q[i]); }
+      if (i == r - 1) { return round1(q[i-1]) + '–' + round1(color2.domain()[1]); }
+      return round1(q[i-1]) + '–' + round1(q[i]); })
     .attr('y', function (d, i) {
       return height - (legend_height + 60) + top_margin + (block_size - 3) +
         (color_options.bins - i - 1) * (block_size + gap); });
