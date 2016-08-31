@@ -28,7 +28,6 @@
         {% block agg_button %}{% endblock %}
       </div>
     </div>
-{#    {% include 'modules/parameters/parameters.html' %}#}
   </header>
   <div id=map></div>
   {% block metadata_list %}{% endblock %}
@@ -41,39 +40,8 @@
   Options = window.Options || {};
 {% endblock %}
 </script>
-{#<script src="{{ url_for('static', filename='js/vendor/d3/d3.v4.min.js') }}"></script>#}
-<script src="{{ url_for('static', filename='js/vendor/d3/d3-selection.v1.min.js') }}"></script>
-
-<script src="{{ url_for('static', filename='js/vendor/d3/d3-array.v1.min.js') }}"></script>
-<script src="{{ url_for('static', filename='js/vendor/d3/d3-geo.v1.min.js') }}"></script>
-<script src="{{ url_for('static', filename='js/vendor/d3/d3-collection.v1.min.js') }}"></script>
-<script src="{{ url_for('static', filename='js/vendor/d3/d3-color.v1.min.js') }}"></script>
-<script src="{{ url_for('static', filename='js/vendor/d3/d3-format.v1.min.js') }}"></script>
-<script src="{{ url_for('static', filename='js/vendor/d3/d3-interpolate.v1.min.js') }}"></script>
-<script src="{{ url_for('static', filename='js/vendor/d3/d3-scale-chromatic.v1.min.js') }}"></script>
-
-{#<script src="{{ url_for('static', filename='js/vendor/d3/d3-time.v1.min.js') }}"></script>#}
-{#<script src="{{ url_for('static', filename='js/vendor/d3/d3-time-format.v1.min.js') }}"></script>#}
-<script src="{{ url_for('static', filename='js/vendor/d3/d3-scale.v1.min.js') }}"></script>
-
-<script src="{{ url_for('static', filename='js/vendor/d3/d3-ease.v1.min.js') }}"></script>
-<script src="{{ url_for('static', filename='js/vendor/d3/d3-dispatch.v1.min.js') }}"></script>
-<script src="{{ url_for('static', filename='js/vendor/d3/d3-timer.v1.min.js') }}"></script>
-<script src="{{ url_for('static', filename='js/vendor/d3/d3-transition.v1.min.js') }}"></script>
-<script src="{{ url_for('static', filename='js/vendor/d3/d3-drag.v1.min.js') }}"></script>
-<script src="{{ url_for('static', filename='js/vendor/d3/d3-zoom.v1.min.js') }}"></script>
-
-<script src="{{ url_for('static', filename='js/vendor/d3/d3-dsv.v1.min.js') }}"></script>
-<script src="{{ url_for('static', filename='js/vendor/d3/d3-request.v1.min.js') }}"></script>
-
-<script src="{{ url_for('static', filename='js/vendor/d3/d3-selection-multi.v0.4.min.js') }}"></script>
-
-{#<script src="{{ url_for('static', filename='js/vendor/d3.geo.projection.v0.min.js') }}"></script>#}
-{#<script src="{{ url_for('static', filename='js/vendor/topojson.v1.min.js') }}"></script>#}
-<script src="{{ url_for('static', filename='js/vendor/queue.v1.min.js') }}"></script>
-{#<script src="https://d3js.org/d3-queue.v2.min.js"></script>#}
+{% assets 'js_d3' %}<script src="{{ ASSET_URL }}"></script>{% endassets %}
 {% block bodyjs %}
-{#<script src="{{ url_for('static', filename='js/atlas_000.js') }}?3" charset=utf-8 ></script>#}
 {% endblock %}
 </body>
 </html>

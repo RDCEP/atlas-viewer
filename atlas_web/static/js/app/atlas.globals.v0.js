@@ -19,3 +19,7 @@ var data_type = 'raster'
   , scale_extent = [height, 8 * height]
 
 ;
+
+var round2 = function round2(x) {
+  return Math.round(x * 100) / 100;
+};

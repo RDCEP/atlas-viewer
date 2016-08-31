@@ -4,21 +4,23 @@ var atlas = function atlas(error, queued_data) {
 
   Options.datatype = queued_data['data_type'];
 
-  if (Options.datatype != null) {
-    create_color_scheme(
-      all_the_color.schemes[Options.color_scheme], 9);
-    draw_color_legend(15);
-  }
-
   var data = queued_data['data'];
   data = Options.datatype == 'raster' ? process_raster_geometry(data) : data;
   data.filter(function (d) { return d.properties.value != null; });
 
-  color.domain([
+  var domain = [
     d3.min(data, function(d) {
       return d3.min(d.properties.value.values, function(dd) {return dd; }); }),
     d3.max(data, function(d) {
-      return d3.max(d.properties.value.values, function(dd) {return dd; }); })]);
+      return d3.max(d.properties.value.values, function(dd) {return dd; }); })];
+  color.domain(domain);
+  color2.domain(domain);
+
+  if (Options.datatype != null) {
+    create_color_scheme(
+      color_options.schemes[Options.color_scheme], color_options.bins);
+    draw_color_legend(15);
+  }
 
   grid_layer.selectAll('.grid-boundary').remove();
   grid_regions = grid_layer.selectAll('.grid-boundary')

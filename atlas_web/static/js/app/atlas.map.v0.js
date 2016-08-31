@@ -67,6 +67,47 @@ var draw_map_basics = function draw_map_basics() {
     .style('stroke-width', '1px')
     .style('fill', 'transparent');
 
+/***************/
+/* SVG filters */
+/***************/
+
+var ct2;
+
+var change_rgb_percentages = function(){
+    var colorRGB = colors.d3.rgb;
+    fetvr = [];
+    fetvg = [];
+    fetvb = [];
+    for (colorRGB.r in colorRGB){
+        fetvr.push(colorRGB.r/255)
+    }
+    for (colorRGB.g in colorRGB){
+        fetvg.push(colorRGB.g/255)
+    }
+    for (colorRGB.b in colorRGB){
+        fetvb.push(colorRGB.b/255)
+    }
+};
+
+
+filter
+  .append('feGaussianBlur').attrs({stdDeviation: 0, result: 'gaussian_blur'});
+
+ct2 = filter.append('feComponentTransfer').attr('in', 'gaussian_blur');
+ct2.append('feFuncR').attrs({type: 'discrete'});
+ct2.append('feFuncG').attrs({type: 'discrete'});
+ct2.append('feFuncB').attrs({type: 'discrete'});
+
+/*****************/
+/* Map functions */
+/*****************/
+
+var draw_map_basics = function draw_map_basics() {
+  /*
+   Draw ocean, land background, region boundaries, graticule.
+   */
+  dims = get_viewport_dimensions();
+
   d3.request('/api/map')
     .header("Content-Type", "application/json")
     .post(
@@ -98,4 +139,38 @@ var draw_map_basics = function draw_map_basics() {
           .style('fill', 'none');
 
       });
+};
+
+var draw_map_countries = function draw_map_countries() {
+
+  //This is unused.
+
+  d3.json('/static/json/ne_50m_admin_0_countries.geojson', function(world) {
+
+    region_fills = ocean_layer.selectAll('path.countries')
+      .data(world.features);
+    region_fills.enter()
+      .append('path')
+      .attr('d', path)
+      .attr('class', 'countries boundary')
+      .style('stroke', 'none')
+      .style('fill', '#dddddd');
+
+    region_fills.exit().remove();
+
+    region_boundaries = boundary_layer.selectAll('path.countries')
+      .data(world.features);
+    region_boundaries.enter()
+      .append('path')
+      .attr('d', path)
+      .attr('class', 'countries boundary')
+      .style('stroke', 'black')
+      .style('stroke-width', 1)
+      .style('stroke-line-join', 'round')
+      .style('fill', 'none');
+
+    region_boundaries.exit().remove();
+
+  });
+
 };

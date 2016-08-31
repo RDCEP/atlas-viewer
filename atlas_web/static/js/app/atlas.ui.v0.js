@@ -1,19 +1,25 @@
 'use strict';
 
-var all_the_color = {
+var color_options = {
   /*
    Object for storing application's color state.
    */
   schemes: {
-    orange: d3.interpolateOranges,
-    spectral: d3.interpolateSpectral
+    orange: {
+      interp: d3.interpolateOranges,
+      reverse: false },
+    spectral: {
+      interp: d3.interpolateSpectral,
+      reverse: true}
   },
   colors: [],
   bins: 9
 };
 
-var color = d3.scaleQuantile()
-    .range(all_the_color.colors);
+var color = d3.scaleLinear()
+  .range([d3.rgb('white'), d3.rgb('black')]);
+var color2 = d3.scaleQuantile()
+  .range(color_options.colors);
 
 var component_table = function component_table(arr) {
   /*
@@ -37,27 +43,32 @@ var create_color_scheme = function create_color_scheme(interp, color_bins) {
   /*
    Update UI color given scheme and number of bins.
    */
-  all_the_color.colors = [];
-  var fetvr = [];
-  var fetvg = [];
-  var fetvb = [];
+  color_options.colors = [];
+  var r = []
+    , g = []
+    , b = []
+    , c
+  ;
 
   for (var i=0; i < color_bins; ++i) {
-    var c = d3.rgb(interp(i / (color_bins - 1)));
-    all_the_color.colors.push(c);
-    fetvr.push(Math.round(c.r / 255 * 100) / 100);
-    fetvg.push(Math.round(c.g / 255 * 100) / 100);
-    fetvb.push(Math.round(c.b / 255 * 100) / 100);
+    c = d3.rgb(interp.interp(i / (color_bins - 1)));
+    color_options.colors.push(c);
+    r.push(Math.round(c.r / 255 * 100) / 100);
+    g.push(Math.round(c.g / 255 * 100) / 100);
+    b.push(Math.round(c.b / 255 * 100) / 100);
   }
 
-  fetvr.sort().reverse();
-  fetvg.sort().reverse();
-  fetvb.sort().reverse();
-  ct2.select('feFuncR').attr('tableValues', component_table(fetvr));
-  ct2.select('feFuncG').attr('tableValues', component_table(fetvg));
-  ct2.select('feFuncB').attr('tableValues', component_table(fetvb));
+  if (!interp.reverse) {
+    r.reverse();
+    g.reverse();
+    b.reverse();
+    color_options.colors.reverse();
+  }
 
-  color.range(all_the_color.colors);
+  ct2.select('feFuncR').attr('tableValues', r.join(' '));
+  ct2.select('feFuncG').attr('tableValues', g.join(' '));
+  ct2.select('feFuncB').attr('tableValues', b.join(' '));
+  color2.range(color_options.colors);
   update_data_fills();
   draw_color_legend(15);
 
@@ -66,8 +77,8 @@ var create_color_scheme = function create_color_scheme(interp, color_bins) {
 d3.selectAll('.color_scheme')
   .on('click', function() {
     Options.color_scheme = d3.select(this).attr('id');
-    create_color_scheme(all_the_color.schemes[Options.color_scheme],
-      all_the_color.bins);
+    create_color_scheme(color_options.schemes[Options.color_scheme],
+      color_options.bins);
   });
 
 var get_viewport_dimensions = function get_viewport_dimensions() {
@@ -142,7 +153,7 @@ var draw_color_legend = function color_legend(block_size) {
    Draw color legend in bottom right corner of map.
    */
   var top_margin = 15
-    , legend_height = color.range().length * block_size + (color.range().length-1) + 70
+    , legend_height = color2.range().length * block_size + (color2.range().length-1) + 70
     , gap = 3;
   d3.selectAll('.legend_bkgd').remove();
   d3.selectAll('.legend_region').remove();
@@ -157,10 +168,11 @@ var draw_color_legend = function color_legend(block_size) {
       y: height - (legend_height + 81),
       class: 'legend_bkgd'})
     .styles({
-      opacity: .8,
+      opacity: .9,
       fill: 'white'});
 
   legend_layer.append('text')
+  //TODO: Replace with variable name, units
     .text('GADM 0')
     .attrs({
       x: width - 240 + 15,
@@ -172,7 +184,7 @@ var draw_color_legend = function color_legend(block_size) {
       'font-weight': 600});
 
   legend_layer.selectAll('.legend-block')
-    .data(color.range())
+    .data(color2.range())
     .enter()
     .append('rect')
     .attrs({
@@ -181,30 +193,34 @@ var draw_color_legend = function color_legend(block_size) {
       class: 'legend-block',
       x: width - 240 + 15 })
     .attr('fill', function (d) { return d; })
-    .attr('y', function (d, i) { return height - (legend_height + 60) + top_margin + i * (block_size + gap); });
+    .attr('y', function (d, i) {
+      return height - (legend_height + 60) +
+        top_margin + i * (block_size + gap); });
 
   legend_layer.selectAll('.legend-data')
-    .data(color.domain())
+    .data(color2.range())
     .enter()
     .append('text')
     .attrs({
-      width: color.domain().length,
-      height: legend_height,
       x: width - 240 + 35,
       class: 'legend-data'})
-    .styles({
-      opacity: .75})
-    .text(function(d) {return d;})
+    .text(function (d, i) {
+      var q = color2.quantiles(),
+        r = color2.range().length
+      ;
+      if (i == 0) { return round2(color2.domain()[0]) + '–' + round2(q[i]); }
+      if (i == r - 1) { return round2(q[i-1]) + '–' + round2(color2.domain()[1]); }
+      return round2(q[i-1]) + '–' + round2(q[i]); })
     .attr('y', function (d, i) {
       return height - (legend_height + 60) + top_margin + (block_size - 3) +
-        (i * (all_the_color.bins - 1)) * (block_size + gap); });
+        (color_options.bins - i - 1) * (block_size + gap); });
 };
 
 d3.select('#input_buckets')
   .on('input', function(){
-    all_the_color.bins = d3.select("#input_buckets").node().value;
-    create_color_scheme(all_the_color['schemes'][Options.color_scheme],
-      all_the_color.bins)
+    color_options.bins = d3.select("#input_buckets").node().value;
+    create_color_scheme(color_options.schemes[Options.color_scheme],
+      color_options.bins)
   });
 
 d3.select('#legend_settings')
