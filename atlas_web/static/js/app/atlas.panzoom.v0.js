@@ -42,7 +42,7 @@ var zooming = function zooming() {
 
   }
 
-  svgroot.selectAll('path').attr('d', path);
+  svg_root.selectAll('path').attr('d', path);
 
 };
 

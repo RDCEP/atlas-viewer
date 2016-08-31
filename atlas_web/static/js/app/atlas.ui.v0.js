@@ -116,7 +116,7 @@ var new_resize = function new_resize() {
    */
   width = window.innerWidth;
   height = window.innerHeight;
-  svgroot.attrs({
+  svg_root.attrs({
     height: height,
     width: width,
     'viewBox': '0 0 ' + width + ' ' + height});

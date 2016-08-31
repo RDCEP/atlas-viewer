@@ -4,17 +4,17 @@ var get_map_scale = function get_map_scale() {
   return d3.max([height, width]) * Options.scale;
 };
 
-var svgwrap = d3.select('#map')
-  , svgroot = svgwrap.append('svg')
+var svg_wrap = d3.select('#map')
+  , svg_root = svg_wrap.append('svg')
     .attr('width', width)
     .attr('height', height)
     .attr('viewBox', '0 0 ' + width + ' ' + height)
-  , filter = svgroot.append('defs')
+  , filter = svg_root.append('defs')
     .append('filter')
     .attr('id', 'grid_filter')
     .attr('x', 0)
     .attr('y', 0)
-  , svg = svgroot.append('g')
+  , svg = svg_root.append('g')
   , ocean_layer = svg.append('g')
     .attr('id', 'ocean_layer')
   , grid_layer = svg.append('g')
@@ -35,10 +35,6 @@ var projection = d3.geoEquirectangular()
   , path = d3.geoPath()
     .projection(projection)
   , graticule = d3.geoGraticule()
-
-  , sphere = [
-
-    ]
   , ct2
 ;
 
