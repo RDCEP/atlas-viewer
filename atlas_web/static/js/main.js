@@ -29,14 +29,14 @@ var AtlasUI = (function (ui) {
       .data(data);
 
     grid_regions.enter().append('path')
-      .attr('class', 'grid-boundary boundary')
+      .attr('class', 'grid geo')
       .style('fill', function(d) {
         return d.properties.value.values[ui._time] == null
           ? 'transparent' : ui.color(d.properties.value.values[ui._time]);
       })
     ;
 
-    d3.selectAll('.boundary').attr('d', ui.path);
+    d3.selectAll('.geo').attr('d', ui.path);
     ui.hide_loader();
 
   };

@@ -58,20 +58,20 @@ var AtlasUI = (function (ui) {
       .datum({type: 'Sphere'})
       .attr('id', 'sphere')
       .attr('d', ui.path)
-      .attr('class', 'boundary');
+      .attr('class', 'geo');
     ocean_layer.append('use')
       .attr('class', 'stroke')
       .attr('xlink:href', '#sphere');
     ocean_layer.append('path')
       .datum(ui.graticule)
-      .attr('class', 'graticule boundary')
+      .attr('class', 'graticule geo')
       .attr('d', ui.path)
       .style('stroke', '#B4D5E5')
       .style('stroke-width', '1px')
       .style('fill', 'transparent');
 
     d3.request('/api/map')
-      .header("Content-Type", "application/json")
+      .header('Content-Type', 'application/json')
       .post(
         JSON.stringify({
           bbox: [ui.bbox.top_left[0], ui.bbox.top_left[1],
@@ -87,7 +87,7 @@ var AtlasUI = (function (ui) {
             .enter()
             .append('path')
             .attr('d', ui.path)
-            .attr('class', 'countries boundary')
+            .attr('class', 'countries geo')
             .style('stroke', 'none')
             .style('fill', '#dddddd');
 
@@ -96,7 +96,7 @@ var AtlasUI = (function (ui) {
             .enter()
             .append('path')
             .attr('d', ui.path)
-            .attr('class', 'countries boundary')
+            .attr('class', 'countries geo')
             .style('stroke', '#666')
             .style('stroke-width', 1)
             .style('stroke-line-join', 'round')

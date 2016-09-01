@@ -10,7 +10,7 @@ var AtlasUI = (function (ui) {
     /*
      Update color fills of pixels in data raster.
      */
-    d3.selectAll('.grid-boundary').style('fill', function(d) {
+    d3.selectAll('.grid.geo').style('fill', function(d) {
       return d.properties.value.values[ui._time] == null
         ? 'transparent' : ui.color(d.properties.value.values[ui._time]);
     });
@@ -43,7 +43,6 @@ var AtlasUI = (function (ui) {
      viewport.
      */
     ui.show_loader();
-    dims = ui.get_viewport_dimensions();
     d3.request('/api/aggregate')
       .header("Content-Type", "application/json")
       .post(

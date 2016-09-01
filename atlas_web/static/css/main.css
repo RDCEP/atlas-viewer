@@ -218,15 +218,14 @@ path {
 #sphere {
   fill: #C6EAFB; }
 
-.world-boundary {
+.geo.world {
   stroke: #eeeeee;
   stroke-width: 0.5;
   fill: #cccccc; }
-  .world-boundary.active {
+  .geo.world.active {
     stroke: red;
     stroke-width: 3px; }
-
-.grid-boundary {
+.geo.grid {
   fill: transparent;
   stroke: transparent;
   stroke-width: 0; }

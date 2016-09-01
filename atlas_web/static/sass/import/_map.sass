@@ -25,14 +25,15 @@
 #sphere
   fill: #C6EAFB
 
-.world-boundary
-  stroke: #eeeeee
-  stroke-width: .5
-  fill: #cccccc
-  &.active
-    stroke: red
-    stroke-width: 3px
-.grid-boundary
-  fill: transparent
-  stroke: transparent
-  stroke-width: 0
+.geo
+  &.world
+    stroke: #eeeeee
+    stroke-width: .5
+    fill: #cccccc
+    &.active
+      stroke: red
+      stroke-width: 3px
+  &.grid
+    fill: transparent
+    stroke: transparent
+    stroke-width: 0

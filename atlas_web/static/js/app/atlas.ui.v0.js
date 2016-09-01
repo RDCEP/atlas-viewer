@@ -86,8 +86,12 @@ var AtlasUI = (function (ui) {
     ui.bbox.top_left = ui.projection.invert([0, 0]);
     ui.bbox.bottom_right = ui.projection.invert([ui.width, ui.height]);
 
-    ui.bbox.top_left[0] = ui.bbox.bottom_right[0] > 180 ? ui.bbox.top_left[0] - 180 : ui.bbox.top_left[0];
-    ui.bbox.bottom_right[0] = ui.bbox.bottom_right[0] > 180 ? ui.bbox.bottom_right[0] - 180 : ui.bbox.bottom_right[0];
+    ui.bbox.top_left[0] = ui.bbox.bottom_right[0] > 180
+      ? ui.bbox.top_left[0] - 180
+      : ui.bbox.top_left[0];
+    ui.bbox.bottom_right[0] = ui.bbox.bottom_right[0] > 180
+      ? ui.bbox.bottom_right[0] - 180
+      : ui.bbox.bottom_right[0];
 
     ui.bbox.top_right = [ui.bbox.bottom_right[0], ui.bbox.top_left[1]];
     ui.bbox.bottom_left = [ui.bbox.top_left[0], ui.bbox.bottom_right[1]];
@@ -204,8 +208,10 @@ var AtlasUI = (function (ui) {
         var q = ui.color2.quantiles(),
           r = ui.color2.range().length
         ;
-        if (i == 0) { return ui.round1(ui.color2.domain()[0]) + '–' + ui.round1(q[i]); }
-        if (i == r - 1) { return ui.round1(q[i-1]) + '–' + ui.round1(ui.color2.domain()[1]); }
+        if (i == 0) {
+          return ui.round1(ui.color2.domain()[0]) + '–' + ui.round1(q[i]); }
+        if (i == r - 1) {
+          return ui.round1(q[i-1]) + '–' + ui.round1(ui.color2.domain()[1]); }
         return ui.round1(q[i-1]) + '–' + ui.round1(q[i]); })
       .attr('y', function (d, i) {
         return ui.height - (legend_height + 60) + top_margin + (block_size - 3) +
