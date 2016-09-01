@@ -24,24 +24,16 @@
           </ul>
           <h3>Parameters</h3>
           <dl>
-            <dt>Lat</dt><dd>-900</dd>
-            <dt>Long</dt><dd>500</dd>
-            <dt>Lat</dt><dd>-900</dd>
-            <dt>Long</dt><dd>500</dd>
-            <dt>Lat</dt><dd>-900</dd>
-            <dt>Long</dt><dd>500</dd>
+            <dt>Cli model</dt><dd>WFDEI.CRU</dd>
+            <dt>Ag model</dt><dd>pAPSIM</dd>
+            <dt>Irrigation</dt><dd>Full</dd>
           </dl>
           <br/>
           <h3>Dimensions</h3>
           <dl>
-            <dt>Lat</dt><dd>-900</dd>
-            <dt>Long</dt><dd>500</dd>
-            <dt>Lat</dt><dd>-900</dd>
-            <dt>Long</dt><dd>500</dd>
-            <dt>Lat</dt><dd>-900</dd>
-            <dt>Long</dt><dd>500</dd>
-            <dt>Lat</dt><dd>-900</dd>
-            <dt>Long</dt><dd>500</dd>
+            <dt>Lat</dt><dd>[-90, 90]</dd>
+            <dt>Lon</dt><dd>[–180, 180]</dd>
+            <dt>Time</dt><dd>[1979–2012]</dd>
           </dl>
         </li>
 
@@ -137,18 +129,20 @@
 {% endblock %}
 
 {% block jsoptions %}
-{{ super() }}
-Options.lat = {{ lat }};
-Options.lon = {{ lon }};
-Options.scale = 1.5;
-Options.var = '{{ var }}';
-Options.crop = '{{ crop }}';
-Options.datatype = '{{ datatype }}';
-Options.dataset = '{{ dataset }}';
-Options.regions = '{{ regions }}';
-Options.datatype = Options.datatype == 'null' ? null : Options.datatype;
-Options.color_scheme = 'spectral';
+  {{ super() }}
+  Options.lat = {{ lat }};
+  Options.lon = {{ lon }};
+  Options.scale = 1.5;
+  Options.var = '{{ var }}';
+  Options.crop = '{{ crop }}';
+  Options.datatype = '{{ datatype }}';
+  Options.dataset = '{{ dataset }}';
+  Options.regions = '{{ regions }}';
+  Options.datatype = Options.datatype == 'null' ? null : Options.datatype;
+  Options.color_scheme = 'spectral';
+  Options.color_bins = 9;
 {% endblock %}
+
 {% block bodyjs %}
   {% assets 'js_app' %}<script src="{{ ASSET_URL }}"></script>{% endassets %}
 {% endblock %}
