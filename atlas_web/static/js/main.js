@@ -36,6 +36,8 @@ var AtlasUI = (function (ui) {
       })
     ;
 
+    ui.update_regions();
+
     d3.selectAll('.geo').attr('d', ui.path);
     ui.hide_loader();
 
@@ -51,22 +53,24 @@ var AtlasUI = (function (ui) {
       +d3.select(this).property('value'));
   });
 
+  ui.upper_drag_limit = ui.projection([0, 89])[1];
+  ui.lower_drag_limit = ui.projection([0, -89])[1] - ui.height;
+
+  ui.bbox = ui.get_viewport_dimensions();
+  ui.draw_map_basics();
+
   if (Options.datatype == null) {
-    ui.get_agg_by_regions('default_firr_yield_whe', 'ne_110m_admin_0_countries');
+    ui.get_agg_by_regions(Options.dataset, Options.regions);
   } else if (Options.datatype == 'raster') {
     ui.get_grid_data_by_bbox(Options.dataset);
   } else if (Options.datatype == 'polygon') {
     ui.get_agg_by_regions(Options.dataset, Options.regions);
   }
 
-  ui.draw_map_basics();
-
-  ui.upper_drag_limit = ui.projection([0, 89])[1];
-  ui.lower_drag_limit = ui.projection([0, -89])[1] - ui.height;
-
   ui.atlas = function(error, queued_data) {
     return _atlas(error, queued_data);
   };
+
 
   return ui;
 

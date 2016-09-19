@@ -35,6 +35,7 @@ var AtlasUI = (function (ui) {
   ui.projection = d3.geoEquirectangular()
       .rotate([-Options.lon, 0])
       .center([0, Options.lat])
+      // .scale(ui.get_map_scale())
       .scale(ui.get_map_scale())
       .translate([ui.width / 2, ui.height / 2])
       .precision(.1);
@@ -54,8 +55,6 @@ var AtlasUI = (function (ui) {
     /*
      Draw ocean, land background, region boundaries, graticule.
      */
-    //FIXME: Replace dims with object's bbox
-    ui.bbox = ui.get_viewport_dimensions();
 
     ocean_layer.append('path')
       .datum({type: 'Sphere'})
@@ -72,6 +71,10 @@ var AtlasUI = (function (ui) {
       .style('stroke', '#B4D5E5')
       .style('stroke-width', '1px')
       .style('fill', 'transparent');
+
+  };
+
+  var update_regions = function update_regions() {
 
     d3.request('/api/map')
       .header('Content-Type', 'application/json')
@@ -106,9 +109,11 @@ var AtlasUI = (function (ui) {
             .style('fill', 'none');
 
         });
+
   };
 
   ui.svg = svg;
+  ui.update_regions = update_regions;
 
   return ui;
 

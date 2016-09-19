@@ -21,8 +21,6 @@ var AtlasUI = (function (ui) {
      Retrieve gridded data within bounding box of viewport.
      */
     ui.show_loader();
-    //FIXME: Replace dims with object's bbox
-    ui.bbox = ui.get_viewport_dimensions();
     d3.request('/api/griddata')
       .header("Content-Type", "application/json")
       .post(
@@ -30,11 +28,9 @@ var AtlasUI = (function (ui) {
           ui.bbox.bottom_right[0], ui.bbox.bottom_right[1]],
           dataset: dataset}),
         function(err, rawData){
-          //TODO: get datatype from Options object
           ui.atlas(err, {data_type: 'raster', data: JSON.parse(rawData['response'])});
         }
     );
-    //TODO: last_data_request()
   };
 
   var _get_agg_by_regions = function _get_agg_by_regions(dataset, regions) {
@@ -53,7 +49,6 @@ var AtlasUI = (function (ui) {
           atlas(err, {data_type: 'agg', data: JSON.parse(rawData['response'])});
         }
     );
-    //TODO: last_data_request()
   };
 
   var _process_raster_geometry = function _process_raster_geometry(data) {

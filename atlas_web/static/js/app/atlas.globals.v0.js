@@ -13,6 +13,8 @@ var AtlasUI = (function (ui) {
     },
     height: window.innerHeight,
     width: window.innerWidth,
+    min_zoom: d3.max([window.innerWidth / 4, window.innerHeight / 2]),
+    max_zoom: d3.max([window.innerHeight, window.innerWidth]) * Options.scale,
     _time: 0,
     upper_drag_limit: null,
     lower_drag_limit: null,

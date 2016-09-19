@@ -1,81 +1,93 @@
-'use strict';
 
-function mercatorBounds(projection, maxlat) {
-    var yaw = projection.rotate()[0],
-        xymax = projection([-yaw+180-1e-6,-maxlat]),
-        xymin = projection([-yaw-180+1e-6, maxlat]);
+var AtlasUI = (function (ui) {
 
-    return [xymin,xymax];
-}
+  'use strict';
 
-var zooming = function zooming() {
+  // ui.last
 
-  if (d3.event) {
-    var scale = d3.event.scale
-      , t = d3.event.translate
+  function projection_bounds() {
+    var yaw = ui.projection.rotate()[0]
+      , max_lat = 83
+      , xy_max = ui.projection([-yaw+180-1e-6, -max_lat])
+      , xy_min = ui.projection([-yaw-180+1e-6,  max_lat]);
+    return [xy_min, xy_max];
+  }
+
+  var last_x = 0
+    , last_y = 0
+    , last_k = 0
+    , total_x = 0
+    , total_y = 0
+    , scale_extent = [.33, 2]
+  ;
+
+  var zooming = function zooming() {
+
+    if (d3.event) {
+
+      var x = d3.event.transform.x
+        , y = d3.event.transform.y
+        , scale = d3.event.transform.k
       ;
 
-    if (scale != last_scale) {
+      if ((scale != last_k)
+        && (ui.projection.scale() * scale >= ui.min_zoom)
+        && (ui.projection.scale() * scale <= ui.max_zoom)
+      ) {
 
-      projection.scale(scale);
+        ui.projection.scale(ui.projection.scale() * scale);
 
-    } else {
+      } else {
 
-      var dx = t[0]-last_trans[0]
-        , dy = t[1]-last_trans[1]
-        , yaw = projection.rotate()[0]
-        , tp = projection.translate()
+        var dx = x - last_x
+          , dy = y - last_y
+          , yaw = ui.projection.rotate()[0]
+          , tp = ui.projection.translate()
+          , b = projection_bounds()
         ;
+        total_x += dx;
+        total_y += dy;
 
-        projection.rotate([yaw+360.*dx/width*scale_extent[0]/scale, 0, 0]);
-        var b = mercatorBounds(projection, maxlat);
-        if (b[0][1] + dy > 0) {
-          dy = -b[0][1];
-        } else if (b[1][1] + dy < height) {
-          dy = height-b[1][1];
+        if (Math.sqrt(total_x * total_x + total_y * total_y) > 5) {
+          d3.selectAll('.geo.grid').remove();
+          ui.projection.rotate([
+            yaw + 360. * dx / ui.width * scale_extent[0] / scale, 0, 0]);
+          if (b[0][1] + dy > 0) {
+            dy = -b[0][1];
+          } else if (b[1][1] + dy < ui.height) {
+            dy = ui.height - b[1][1];
+          }
+          ui.projection.translate([tp[0], tp[1] + dy]);
         }
-        projection.translate([tp[0],tp[1]+dy]);
+      }
+
+      last_x = x;
+      last_y = y;
+      last_k = scale;
+
     }
 
-    last_scale = scale;
-    last_trans = t;
+    if (Math.sqrt(total_x * total_x + total_y * total_y) > 5) {
+      d3.selectAll('.geo').attr('d', ui.path);
+    }
 
-  }
+  };
 
-  svg_root.selectAll('path').attr('d', path);
+  var zoomend = function zoomend() {
+    if (Math.sqrt(total_x * total_x + total_y * total_y) > 5) {
+      ui.bbox = ui.get_viewport_dimensions();
+      ui.get_grid_data_by_bbox(Options.dataset);
+    }
+    total_x = 0;
+    total_y = 0;
+  };
 
-};
+  d3.select('svg').call(d3.zoom()
+    .scaleExtent(scale_extent)
+    .on('zoom', zooming)
+    .on('end', zoomend)
+  );
 
-var zoomend = function zoomend() {
+  return ui;
 
-  draw_map_basics();
-
-  if (Options.datatype == 'raster') {
-    get_grid_data_by_bbox(Options.dataset);
-  } else if (Options.datatype == 'polygon') {
-    get_agg_by_regions(Options.dataset, Options.regions);
-  }
-
-  Options.scale = projection.scale() / d3.max([height, width]);
-  var new_center = projection.invert([width/2, height/2]);
-  Options.lon = new_center[0];
-  Options.lat = new_center[1];
-
-  upper_drag_limit = projection([0, 89])[1];
-  lower_drag_limit = projection([0, -89])[1] - height;
-
-};
-
-// var t = d3.transition()
-//     .duration(750)
-//     .ease(d3.easeLinear);
-
-// var zoom = d3.zoom()
-//     .translateBy(t, function() { console.log(projection.translate()); return projection.translate(); }, projection.translate()[1])
-//     .translateBy(t, projection.translate()[0], projection.translate()[1])
-//     .scaleBy(t, projection.scale())
-//     .scaleExtent(scale_extent)
-//     .on('zoom', zooming)
-//     .on('zoomend', zoomend)
-// ;
-
+})(AtlasUI || {});
