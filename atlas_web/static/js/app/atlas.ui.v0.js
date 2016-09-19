@@ -215,14 +215,14 @@ var AtlasUI = (function (ui) {
         return ui.round1(q[i-1]) + '–' + ui.round1(q[i]); })
       .attr('y', function (d, i) {
         return ui.height - (legend_height + 60) + top_margin + (block_size - 3) +
-          (color_options.bins - i - 1) * (block_size + gap); });
+          (Options.color_bins - i - 1) * (block_size + gap); });
   };
 
   d3.select('#input_buckets')
     .on('input', function() {
-      color_options.bins = d3.select("#input_buckets").node().value;
+      Options.color_bins = d3.select("#input_buckets").node().value;
       _create_color_scheme(Options.color_scheme,
-        color_options.bins)
+        Options.color_bins)
     });
 
   d3.select('#legend_settings')
@@ -240,7 +240,7 @@ var AtlasUI = (function (ui) {
   d3.selectAll('.color_scheme')
     .on('click', function() {
       Options.color_scheme = d3.select(this).attr('id');
-      _create_color_scheme(Options.color_scheme, color_options.bins);
+      _create_color_scheme(Options.color_scheme, Options.color_bins);
     });
 
   d3.select(window).on('resize', new_resize_wrapper);
@@ -265,7 +265,7 @@ var AtlasUI = (function (ui) {
     return _hide_loader();
   };
 
-  ui.draw_color_legend  = function(block_size) {
+  ui.draw_color_legend = function(block_size) {
     return _draw_color_legend(block_size);
   };
 
