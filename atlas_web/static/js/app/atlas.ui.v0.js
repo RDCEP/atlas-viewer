@@ -122,11 +122,7 @@ var AtlasUI = (function (ui) {
       // .scale(ui.get_map_scale())
     ;
 
-    if (Options.datatype == 'raster') {
-      ui.get_grid_data_by_bbox(Options.dataset);
-    } else if (Options.datatype == 'polygon') {
-      ui.get_agg_by_regions(Options.dataset, Options.regions);
-    }
+    ui.get_data(Options.datatype);
   };
 
   var _show_loader = function _show_loader() {

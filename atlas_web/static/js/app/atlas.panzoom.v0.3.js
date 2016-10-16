@@ -65,7 +65,8 @@ var AtlasUI = (function (ui) {
   };
 
   var zoomend = function zoomend() {
-    ui.get_grid_data_by_bbox(Options.dataset);
+    ui.bbox = ui.get_viewport_dimensions();
+    ui.get_data(Options.datatype);
   };
 
   d3.select('svg').call(d3.zoom()
