@@ -113,12 +113,14 @@ var AtlasUI = (function (ui) {
      */
     ui.width = window.innerWidth;
     ui.height = window.innerHeight;
+    ui.min_zoom = d3.max([ui.width / 6, ui.height / 3]);
     d3.select('svg').attrs({
       height: ui.height,
       width: ui.width,
       'viewBox': '0 0 ' + ui.width + ' ' + ui.height});
     ui.projection.translate([ui.width / 2, ui.height / 2])
-      .scale(ui.get_map_scale());
+      // .scale(ui.get_map_scale())
+    ;
 
     if (Options.datatype == 'raster') {
       ui.get_grid_data_by_bbox(Options.dataset);
@@ -219,9 +221,9 @@ var AtlasUI = (function (ui) {
   };
 
   d3.select('#input_buckets')
-    .on('input', function(){
+    .on('input', function() {
       color_options.bins = d3.select("#input_buckets").node().value;
-      create_color_scheme(color_options.schemes[Options.color_scheme],
+      _create_color_scheme(Options.color_scheme,
         color_options.bins)
     });
 

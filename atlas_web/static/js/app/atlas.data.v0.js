@@ -61,6 +61,26 @@ var AtlasUI = (function (ui) {
      Assuming the API returns centroids of data raster pixels as
      GeoJSON Point objects, turn them into Polygons.
      */
+
+    data.sort(function (a, b) {
+      d3.ascending(
+        [
+          d3.ascending(
+            a.properties.centroid.geometry.coordinates[0],
+            b.properties.centroid.geometry.coordinates[0]),
+          d3.ascending(
+            a.properties.centroid.geometry.coordinates[1],
+            b.properties.centroid.geometry.coordinates[1])
+        ], [
+          d3.ascending(
+            b.properties.centroid.geometry.coordinates[0],
+            a.properties.centroid.geometry.coordinates[0]),
+          d3.ascending(
+            b.properties.centroid.geometry.coordinates[1],
+            a.properties.centroid.geometry.coordinates[1])]
+      )
+    });
+
     data.forEach(function (d) {
 
       var x = d.properties.centroid.geometry.coordinates[0];

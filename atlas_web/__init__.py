@@ -23,7 +23,7 @@ js = Bundle('js/app/atlas.globals.v0.js',
             'js/app/atlas.map.v0.js',
             'js/app/atlas.data.v0.js',
             'js/app/atlas.ui.v0.js',
-            # 'js/app/atlas.panzoom.v0.js',
+            'js/app/atlas.panzoom.v0.3.js',
             'js/main.js',
             filters='jsmin', output='gen/atlas.app.v0.js')
 assets.register('js_app', js)

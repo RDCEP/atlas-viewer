@@ -20,11 +20,14 @@ var AtlasUI = (function (ui) {
     , svg = svg_root.append('g')
     , ocean_layer = svg.append('g')
       .attr('id', 'ocean_layer')
+      .classed('zoom', true)
     , grid_layer = svg.append('g')
       .attr('id', 'grid_layer')
+      .classed('zoom', true)
       .attr('filter', 'url(#grid_filter)')
     , boundary_layer = svg.append('g')
       .attr('id', 'boundary_layer')
+      .classed('zoom', true)
     , legend_layer = svg.append('g')
       .attrs({id: 'legend_layer'})
   ;
@@ -47,12 +50,51 @@ var AtlasUI = (function (ui) {
   ui.component_transfer_filter.append('feFuncG').attrs({type: 'discrete'});
   ui.component_transfer_filter.append('feFuncB').attrs({type: 'discrete'});
 
-  ui.draw_map_basics = function draw_map_basics() {
+  var _update_map_regions = function _update_map_regions() {
+
+    d3.selectAll('.geo.region').remove();
+
+    d3.request('/api/map')
+      .header('Content-Type', 'application/json')
+      .post(
+        JSON.stringify({
+          bbox: [ui.bbox.top_left[0], ui.bbox.top_left[1],
+            ui.bbox.bottom_right[0], ui.bbox.bottom_right[1]],
+          regions: Options.regions
+        }),
+        function (err, world) {
+
+          world = JSON.parse(world.response);
+
+          ocean_layer.selectAll('path.geo.region')
+            .data(world)
+            .enter()
+            .append('path')
+            .attr('d', ui.path)
+            .attr('class', 'geo region')
+            .style('stroke', 'none')
+            .style('fill', '#dddddd');
+
+          boundary_layer.selectAll('path.geo.region')
+            .data(world)
+            .enter()
+            .append('path')
+            .attr('d', ui.path)
+            .attr('class', 'geo region')
+            .style('stroke', '#666')
+            .style('stroke-width', 1)
+            .style('stroke-line-join', 'round')
+            .style('fill', 'none');
+
+        });
+  };
+
+  var _draw_map_basics = function draw_map_basics() {
     /*
      Draw ocean, land background, region boundaries, graticule.
      */
     //FIXME: Replace dims with object's bbox
-    ui.bbox = ui.get_viewport_dimensions();
+    // ui.bbox = ui.get_viewport_dimensions();
 
     ocean_layer.append('path')
       .datum({type: 'Sphere'})
@@ -70,42 +112,11 @@ var AtlasUI = (function (ui) {
       .style('stroke-width', '1px')
       .style('fill', 'transparent');
 
-    d3.request('/api/map')
-      .header('Content-Type', 'application/json')
-      .post(
-        JSON.stringify({
-          bbox: [ui.bbox.top_left[0], ui.bbox.top_left[1],
-            ui.bbox.bottom_right[0], ui.bbox.bottom_right[1]],
-          regions: Options.regions
-        }),
-        function (err, world) {
-
-          world = JSON.parse(world.response);
-
-          ocean_layer.selectAll('path.countries')
-            .data(world)
-            .enter()
-            .append('path')
-            .attr('d', ui.path)
-            .attr('class', 'countries geo')
-            .style('stroke', 'none')
-            .style('fill', '#dddddd');
-
-          boundary_layer.selectAll('path.countries')
-            .data(world)
-            .enter()
-            .append('path')
-            .attr('d', ui.path)
-            .attr('class', 'countries geo')
-            .style('stroke', '#666')
-            .style('stroke-width', 1)
-            .style('stroke-line-join', 'round')
-            .style('fill', 'none');
-
-        });
   };
 
   ui.svg = svg;
+  ui.update_map_regions = _update_map_regions;
+  ui.draw_map_basics = _draw_map_basics;
 
   return ui;
 

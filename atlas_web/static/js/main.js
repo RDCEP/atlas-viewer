@@ -8,8 +8,11 @@ var AtlasUI = (function (ui) {
     Options.datatype = queued_data['data_type'];
 
     var data = queued_data['data'];
-    data = Options.datatype == 'raster' ? ui.process_raster_geometry(data) : data;
+    data = Options.datatype == 'raster'
+      ? ui.process_raster_geometry(data)
+      : data;
     data.filter(function (d) { return d.properties.value != null; });
+
 
     var domain = [
       d3.min(data, function(d) {
@@ -24,7 +27,7 @@ var AtlasUI = (function (ui) {
     }
 
     var grid_layer = d3.select('#grid_layer');
-    grid_layer.selectAll('.grid-boundary').remove();
+    grid_layer.selectAll('.grid.geo').remove();
     var grid_regions = grid_layer.selectAll('.grid-boundary')
       .data(data);
 
@@ -37,6 +40,9 @@ var AtlasUI = (function (ui) {
     ;
 
     d3.selectAll('.geo').attr('d', ui.path);
+
+    ui.update_map_regions();
+
     ui.hide_loader();
 
   };
