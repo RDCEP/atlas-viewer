@@ -17,7 +17,7 @@ var AtlasUI = (function (ui) {
     , scale_extent = [.33, 2]
   ;
 
-  var zooming = function zooming() {
+  var _zooming = function _zooming() {
 
     if (d3.event) {
 
@@ -64,16 +64,26 @@ var AtlasUI = (function (ui) {
 
   };
 
-  var zoomend = function zoomend() {
+  var _zoomend = function _zoomend() {
     ui.bbox = ui.get_viewport_dimensions();
     ui.get_data(Options.datatype);
   };
 
-  d3.select('svg').call(d3.zoom()
-    .scaleExtent(scale_extent)
-    .on('zoom', zooming)
-    .on('end', zoomend)
-  );
+  var _toggle_zoom = function _toggle_zoom() {
+    if (ui.select_tool) {
+      d3.select('svg').on('.zoom', null); }
+    else {
+      d3.select('svg').call(d3.zoom()
+        .scaleExtent(scale_extent)
+        .on('zoom', _zooming)
+        .on('end', _zoomend)
+      );
+    }
+  };
+
+  ui.toggle_zoom = function() {
+    _toggle_zoom();
+  };
 
   return ui;
 

@@ -37,6 +37,9 @@ path {
   display: none;
   position: fixed; }
 
+.inactive {
+  color: #cccccc; }
+
 #main_nav, #title_legend_wrap {
   width: 100%;
   position: fixed;
@@ -229,6 +232,9 @@ path {
   fill: transparent;
   stroke: transparent;
   stroke-width: 0; }
+
+#map {
+  cursor: move; }
 
 .data-line {
   stroke: red;

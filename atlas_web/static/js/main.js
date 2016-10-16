@@ -26,7 +26,7 @@ var AtlasUI = (function (ui) {
       ui.create_color_scheme(Options.color_scheme, Options.color_bins);
     }
 
-    var grid_layer = d3.select('#grid_layer');
+    var grid_layer = d3.select('.grid.layer');
     grid_layer.selectAll('.grid.geo').remove();
     var grid_regions = grid_layer.selectAll('.grid-boundary')
       .data(data);
@@ -61,6 +61,7 @@ var AtlasUI = (function (ui) {
   ui.upper_drag_limit = ui.projection([0, 89])[1];
   ui.lower_drag_limit = ui.projection([0, -89])[1] - ui.height;
   ui.get_data(Options.datatype);
+  ui.toggle_zoom();
 
   ui.atlas = function(error, queued_data) {
     return _atlas(error, queued_data);

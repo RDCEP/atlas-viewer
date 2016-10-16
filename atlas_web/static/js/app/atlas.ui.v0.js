@@ -19,6 +19,7 @@ var AtlasUI = (function (ui) {
     colors: [],
     bins: Options.color_bins
   }
+    , ui_layer = d3.select('.ui.layer')
   ;
 
   ui.color2 = d3.scaleQuantile()
@@ -150,7 +151,7 @@ var AtlasUI = (function (ui) {
     var top_margin = 15
       , legend_height = ui.color2.range().length * block_size + (ui.color2.range().length-1) + 70
       , gap = 3
-      , legend_layer = d3.select('#legend_layer')
+      , legend_layer = ui_layer.append('g').attr('class', 'legend layer')
     ;
     d3.selectAll('.legend_bkgd').remove();
     d3.selectAll('.legend_region').remove();
@@ -216,6 +217,15 @@ var AtlasUI = (function (ui) {
           (color_options.bins - i - 1) * (block_size + gap); });
   };
 
+  d3.select('#pixel_pointer .iconswitch')
+    .on('click', function() {
+      var that = d3.select(this);
+      that.classed('inactive', !that.classed('inactive'));
+      ui.select_tool = !ui.select_tool;
+      d3.select('#map').style('cursor', ui.select_tool ? 'crosshair' : 'move');
+      ui.toggle_zoom();
+    });
+
   d3.select('#input_buckets')
     .on('input', function() {
       color_options.bins = d3.select("#input_buckets").node().value;
@@ -225,7 +235,7 @@ var AtlasUI = (function (ui) {
 
   d3.select('#legend_settings')
     .on('click', function() {
-      var l = d3.select('#legend_layer');
+      var l = d3.select('.legend.layer');
       var eye = d3.select('#iconSwitch');
       if (l.style('visibility') == 'visible') {
           l.style('visibility', 'hidden');
@@ -266,6 +276,8 @@ var AtlasUI = (function (ui) {
   ui.draw_color_legend  = function(block_size) {
     return _draw_color_legend(block_size);
   };
+
+
 
   return ui;
 
