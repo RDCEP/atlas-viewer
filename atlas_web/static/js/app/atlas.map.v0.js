@@ -1,153 +1,110 @@
 
-var get_map_scale = function get_map_scale() {
+var AtlasUI = (function (ui) {
 
-  return d3.max([height, width]) * Options.scale;
+  'use strict';
 
-};
+  ui.get_map_scale = function get_map_scale() {
+    return d3.max([ui.height, ui.width]) * Options.scale;
+  };
 
-var svgwrap = d3.select('#map')
-  , svgroot = svgwrap.append('svg')
-    .attr('width', width)
-    .attr('height', height)
-    .attr('viewBox', '0 0 ' + width + ' ' + height)
-  , filter = svgroot.append('defs')
-    .append('filter')
-    .attr('id', 'grid_filter')
-    .attr('x', 0)
-    .attr('y', 0)
-  , svg = svgroot.append('g')
-  , ocean_layer = svg.append('g')
-    .attr('id', 'ocean_layer')
-  , grid_layer = svg.append('g')
-    .attr('id', 'grid_layer')
-    .attr('filter', 'url(#grid_filter)')
-  , boundary_layer = svg.append('g')
-    .attr('id', 'boundary_layer');
-  
-var projection = d3.geoEquirectangular()
-    .rotate([-Options.lon, 0])
-    .center([0, Options.lat])
-    .scale(get_map_scale())
-    .translate([width / 2, height / 2])
-    .precision(.1)
-  , path = d3.geoPath()
-    .projection(projection)
-  , graticule = d3.geoGraticule()
-  
-  , hover_legend = d3.select('#hover_legend')
+  var svg_wrap = d3.select('#map')
+    , svg_root = svg_wrap.append('svg')
+      .attr('width', ui.width)
+      .attr('height', ui.height)
+      .attr('viewBox', '0 0 ' + ui.width + ' ' + ui.height)
+    , filter = svg_root.append('defs')
+      .append('filter')
+      .attr('id', 'grid_filter')
+      .attr('x', 0)
+      .attr('y', 0)
+    , svg = svg_root.append('g')
+    , ocean_layer = svg.append('g')
+      .attr('class', 'ocean layer zoom')
+    , grid_layer = svg.append('g')
+      .attr('class', 'grid layer zoom')
+      .attr('filter', 'url(#grid_filter)')
+    , boundary_layer = svg.append('g')
+    .attr('class', 'boundary layer zoom')
+      .classed('zoom', true)
+    , ui_layer = svg.append('g')
+      .attr('class', 'ui layer')
+  ;
 
-  , sphere = [
-      ocean_layer.append('path')
-        .datum({type: 'Sphere'})
-        .attr('id', 'sphere')
-        .attr('d', path)
-        .attr('class', 'boundary'),
-      ocean_layer.append('use')
-        .attr('class', 'stroke')
-        .attr('xlink:href', '#sphere')
-    ]
-  , region_boundaries
-  , region_fills
-;
+  ui.projection = d3.geoEquirectangular()
+      .rotate([-Options.lon, 0])
+      .center([0, Options.lat])
+      .scale(ui.get_map_scale())
+      .translate([ui.width / 2, ui.height / 2])
+      .precision(.1);
+  ui.path = d3.geoPath()
+    .projection(ui.projection);
+  ui.graticule = d3.geoGraticule();
 
-ocean_layer.append('path')
-  .datum(graticule)
-  .attr('class', 'graticule boundary')
-  .attr('d', path)
-  .style('stroke', '#B4D5E5')
-  .style('stroke-width', '1px')
-  .style('fill', 'transparent');
+  filter.append('feGaussianBlur')
+    .attr('stdDeviation', 0)
+    .attr('in', 'BackgroundImage');
+  var transfer = filter.append('feComponentTransfer')
+    .attr('in', 'BackgroundImage');
+  transfer.append('feFuncR').attr('type', 'discrete');
+  transfer.append('feFuncG').attr('type', 'discrete');
+  transfer.append('feFuncB').attr('type', 'discrete');
 
-/***************/
-/* SVG filters */
-/***************/
+  var _update_map_regions = function _update_map_regions() {
 
-var fetvr = [0.5, 0.65, 0.85, 0.95, 0.99, 0.99, 0.99, 0.99, 1, 1]
-  , fetvg = [0.15, 0.21, 0.28, 0.41, 0.55, 0.68, 0.82, 0.90, 0.96]
-  , fetvb = [0.02, 0.01, 0.00, 0.07, 0.24, 0.42, 0.64, 0.81, 0.92]
-  , ct2
-;
+    d3.selectAll('.geo.region').remove();
 
-filter
-  .append('feGaussianBlur').attr({in: 'SourceGraphic', stdDeviation: 0 });
+    d3.request('/api/map')
+      .header('Content-Type', 'application/json')
+      .post(
+        JSON.stringify({
+          bbox: [ui.bbox.top_left[0], ui.bbox.top_left[1],
+            ui.bbox.bottom_right[0], ui.bbox.bottom_right[1]],
+          regions: Options.regions
+        }),
+        function (err, world) {
 
-ct2 = filter.append('feComponentTransfer');
-ct2.append('feFuncR').attrs({type: 'discrete', tableValues: fetvr.join(' ')});
-ct2.append('feFuncG').attrs({type: 'discrete', tableValues: fetvg.join(' ')});
-ct2.append('feFuncB').attrs({type: 'discrete', tableValues: fetvb.join(' ')});
+          world = JSON.parse(world.response);
 
-/*****************/
-/* Map functions */
-/*****************/
+          ocean_layer.selectAll('path.geo.region')
+            .data(world)
+            .enter()
+            .append('path')
+            .attr('d', ui.path)
+            .attr('class', 'geo region fill');
+          boundary_layer.selectAll('path.geo.region')
+            .data(world)
+            .enter()
+            .append('path')
+            .attr('d', ui.path)
+            .attr('class', 'geo region boundary');
+        });
+  };
 
-var draw_map_basics = function draw_map_basics() {
+  var _draw_map_basics = function draw_map_basics() {
+    /*
+     Draw ocean, land background, region boundaries, graticule.
+     */
+    //FIXME: Replace dims with object's bbox
+    // ui.bbox = ui.get_viewport_dimensions();
 
-  dims = get_viewport_dimensions();
+    ocean_layer.append('path')
+      .datum({type: 'Sphere'})
+      .attr('id', 'sphere')
+      .attr('d', ui.path)
+      .attr('class', 'geo');
+    ocean_layer.append('use')
+      .attr('class', 'stroke')
+      .attr('xlink:href', '#sphere');
+    ocean_layer.append('path')
+      .datum(ui.graticule)
+      .attr('class', 'graticule geo')
+      .attr('d', ui.path)
+  };
 
-  d3.request('/api/map')
-    .header("Content-Type", "application/json")
-    .post(
-      JSON.stringify({bbox: [dims['top_left'][0], dims['top_left'][1],
-      dims['bottom_right'][0], dims['bottom_right'][1]],
-      regions: Options.regions}),
-      function(err, world) {
+  ui.svg = svg;
+  ui.update_map_regions = _update_map_regions;
+  ui.draw_map_basics = _draw_map_basics;
 
-        world = JSON.parse(world.response);
+  return ui;
 
-        ocean_layer.selectAll('path.countries')
-          .data(world)
-          .enter()
-          .append('path')
-          .attr('d', path)
-          .attr('class', 'countries boundary')
-          .style('stroke', 'none')
-          .style('fill', '#dddddd');
-
-
-
-        boundary_layer.selectAll('path.countries')
-          .data(world)
-          .enter()
-          .append('path')
-          .attr('d', path)
-          .attr('class', 'countries boundary')
-          .style('stroke', '#666')
-          .style('stroke-width', 1)
-          .style('stroke-line-join', 'round')
-          .style('fill', 'none');
-
-      });
-};
-
-var draw_map_countries = function draw_map_countries() {
-
-  //This is unused.
-
-  d3.json('/static/json/ne_50m_admin_0_countries.geojson', function(world) {
-
-    region_fills = ocean_layer.selectAll('path.countries')
-      .data(world.features);
-    region_fills.enter()
-      .append('path')
-      .attr('d', path)
-      .attr('class', 'countries boundary')
-      .style('stroke', 'none')
-      .style('fill', '#dddddd');
-
-    region_fills.exit().remove();
-
-    region_boundaries = boundary_layer.selectAll('path.countries')
-      .data(world.features);
-    region_boundaries.enter()
-      .append('path')
-      .attr('d', path)
-      .attr('class', 'countries boundary')
-      .style('stroke', 'black')
-      .style('stroke-width', 1)
-      .style('stroke-line-join', 'round')
-      .style('fill', 'none');
-
-    region_boundaries.exit().remove();
-  });
-
-};
+})(AtlasUI || {});

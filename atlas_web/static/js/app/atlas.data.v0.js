@@ -1,110 +1,98 @@
 
-var update_data_fills = function update_data_fills() {
-  grid_regions.each(function(d, i) {
-    d3.select(this).style('fill', function() {
-      return d.properties.value.values[_time] == null
-        ? 'transparent' : color(d.properties.value.values[_time]);
+var AtlasUI = (function (ui) {
+
+  'use strict';
+
+  ui.color = d3.scaleLinear()
+    .range([d3.rgb('white'), d3.rgb('black')]);
+
+  var _update_data_fills = function _update_data_fills() {
+    /*
+     Update color fills of pixels in data raster.
+     */
+    d3.selectAll('.grid.geo').style('fill', function(d) {
+      return d.properties.value.values[ui._time] == null
+        ? 'transparent' : ui.color(d.properties.value.values[ui._time]);
     });
-  });
-};
+  };
 
-var grid_hover = function grid_hover(d) {
-  var q = '[' + (d.geometry.coordinates[0][0][0] +.25) + ', ';
-  q += (d.geometry.coordinates[0][0][1] +.25) + '] <b>';
-  q += (Math.round(d.properties.value.values[_time] * 100) / 100) + '</b>' ;
-  hover_legend.select('p').html(q);
-  hover_legend.style({
-    left: d3.mouse(this)[0] + 'px',
-    top: d3.mouse(this)[1] + 'px',
-    display: 'block'
-  });
-  hover_legend.classed('hovered', true);
-};
+  var _process_raster_geometry = function _process_raster_geometry(data) {
+    /*
+     Assuming the API returns centroids of data raster pixels as
+     GeoJSON Point objects, turn them into Polygons.
+     */
 
-var get_dataset_for_viewport = function get_dataset_for_viewport(url, f) {
-  d3.request(url)
-    .send('post', JSON.stringify({
-      tlx: dims['top_left'][0],
-      tly: dims['top_left'][1],
-      brx: dims['bottom_right'][0],
-      bry: dims['bottom_right'][1]}), function(err, data) {
-      f(null, JSON.parse(data.response)); })
-};
+    data.sort(function (a, b) {
+      d3.ascending(
+        [
+          d3.ascending(
+            a.properties.centroid.geometry.coordinates[0],
+            b.properties.centroid.geometry.coordinates[0]),
+          d3.ascending(
+            a.properties.centroid.geometry.coordinates[1],
+            b.properties.centroid.geometry.coordinates[1])
+        ], [
+          d3.ascending(
+            b.properties.centroid.geometry.coordinates[0],
+            a.properties.centroid.geometry.coordinates[0]),
+          d3.ascending(
+            b.properties.centroid.geometry.coordinates[1],
+            a.properties.centroid.geometry.coordinates[1])]
+      )
+    });
 
-var get_grid_data_by_bbox = function get_grid_data_by_bbox(dataset) {
-  show_loader();
-  dims = get_viewport_dimensions();
-  d3.request('/api/griddata')
-    .header("Content-Type", "application/json")
-    .post(
-      JSON.stringify({bbox: [dims['top_left'][0], dims['top_left'][1],
-        dims['bottom_right'][0], dims['bottom_right'][1]],
-        dataset: dataset}),
-      function(err, rawData){
-        //TODO: get datatype from Options object
-        atlas(err, {data_type: 'raster', data: JSON.parse(rawData['response'])});
-      }
-  );
-  //TODO: last_data_request()
-};
+    data.forEach(function (d) {
 
-var get_agg_by_regions = function get_agg_by_regions(dataset, regions) {
-  show_loader();
-  dims = get_viewport_dimensions();
-  d3.xhr('/api/aggregate')
-    .header("Content-Type", "application/json")
-    .post(
-      JSON.stringify({bbox: [dims['top_left'][0], dims['top_left'][1],
-        dims['bottom_right'][0], dims['bottom_right'][1]],
-        dataset: dataset, regions: regions}),
-      function(err, rawData){
-        atlas(err, {data_type: 'agg', data: JSON.parse(rawData['response'])});
-      }
-  );
-  //TODO: last_data_request()
-};
+      var x = d.properties.centroid.geometry.coordinates[0];
+      var y = d.properties.centroid.geometry.coordinates[1];
 
-var draw_areas_by_time = function draw_areas_by_time(data, idx) {
+      // TODO: Need dynamic resolution
+      var s = 0.25;
 
-  var grouped_data = new Array(color.range().length);
-  color.range().forEach( function(d, i) {
-    grouped_data[i] = {'type': 'Feature', 'geometry': {
-      'type': 'MultiPolygon', 'coordinates': []
-    }, 'properties': {'values': []}}
-  });
+      d.geometry = {
+        type: 'Polygon',
+        coordinates: [[
+          [x - s, y + s], // top left
+          [x + s, y + s], // top right
+          [x + s, y - s], // bottom right
+          [x - s, y - s], // bottom left
+          [x - s, y + s]
+        ]]}
+    });
+    return data;
 
-  data.forEach(function(d) {
+  };
 
-    var x = d.properties.centroid.geometry.coordinates[0];
-    var y = d.properties.centroid.geometry.coordinates[1];
-
-    // TODO: Need dynamic resolution
-    var s = .25;
-
-    idx = color.range().indexOf(color(d.properties.value.values[_time]));
-    grouped_data[idx].geometry.coordinates.push(
-      [[[x-s, y+s], [x+s, y+s], [x+s, y-s], [x-s, y-s], [x-s, y+s]]]
+  var _get_data = function _get_data(data_type) {
+    if (data_type == null) { return false; }
+    var endpoint = data_type == 'raster'
+      ? 'griddata'
+      : 'aggregate';
+    ui.show_loader();
+    d3.request('/api/' + endpoint)
+      .header('Content-Type', 'application/json')
+      .post(
+        JSON.stringify({bbox: [ui.bbox.top_left[0], ui.bbox.top_left[1],
+          ui.bbox.bottom_right[0], ui.bbox.bottom_right[1]],
+          dataset: Options.dataset, regions: Options.regions}),
+        function(err, rawData){
+          ui.atlas(err, {data_type: data_type, data: JSON.parse(rawData['response'])});
+        }
     );
-    grouped_data[idx].properties.values.push(d.properties.value.values[_time]);
-  });
+  };
 
-  return grouped_data;
+  ui.update_data_fills = function() {
+    return _update_data_fills();
+  };
 
-};
+  ui.process_raster_geometry = function(data) {
+    return _process_raster_geometry(data);
+  };
 
-var process_raster_geometry = function process_raster_geometry(data) {
-  data.forEach(function (d) {
+  ui.get_data = function(endpoint) {
+    return _get_data(endpoint);
+  };
 
-    var x = d.properties.centroid.geometry.coordinates[0];
-    var y = d.properties.centroid.geometry.coordinates[1];
+  return ui;
 
-    // TODO: Need dynamic resolution
-    var s = 0.25;
-
-    d.geometry = {
-      type: 'Polygon',
-      coordinates: [[[x - s, y + s], [x + s, y + s], [x + s, y - s],
-        [x - s, y - s], [x - s, y + s]]]}
-  });
-  return data;
-};
+})(AtlasUI || {});

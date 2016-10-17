@@ -1,67 +1,73 @@
 
-var group_data_test = false;
+var AtlasUI = (function (ui) {
 
-var atlas = function atlas(error, queued_data) {
+  'use strict';
 
-  Options.datatype = queued_data['data_type'];
+  var _atlas = function _atlas(error, queued_data) {
 
-  var data = queued_data['data'];
-  data = Options.datatype == 'raster' ? process_raster_geometry(data) : data;
-  data.filter(function (d) { return d.properties.value != null; });
+    Options.datatype = queued_data['data_type'];
 
-  // color.domain([
-  //   d3.min(data, function(d) {
-  //     return d3.min(d.properties.value.values,
-  //       function(dd) {return dd; }); }),
-  //   d3.max(data, function(d) {
-  //     return d3.max(d.properties.value.values, function(dd) {return dd; }); })]);
-  color.domain([0, 1000]);
+    var data = queued_data['data'];
+    data = Options.datatype == 'raster'
+      ? ui.process_raster_geometry(data)
+      : data;
+    data.filter(function (d) { return d.properties.value != null; });
 
-  grid_regions = grid_layer.selectAll('.grid-boundary')
-    .data(data);
-  grid_regions.exit().remove();
-  grid_regions.enter().append('path')
-    .attr('class', 'grid-boundary boundary')
-    .attr('d', path)
-    .style('fill', function(d) {
-      return d.properties.value.values[_time] == null
-        ? 'transparent' : color(d.properties.value.values[_time]);
-    })
-  ;
 
-  // update_data_fills();
-  // svgroot.call(drag_rotate);
-  // svgroot.call(zoom);
+    var domain = [
+      d3.min(data, function(d) {
+        return d3.min(d.properties.value.values, function(dd) { return dd; }); }),
+      d3.max(data, function(d) {
+        return d3.max(d.properties.value.values, function(dd) {return dd; }); })];
+    ui.color.domain(domain);
+    ui.color2.domain(domain);
 
-  svg.selectAll('.boundary').attr('d', path);
-  hide_loader();
+    if (Options.datatype != null) {
+      ui.create_color_scheme(Options.color_scheme, Options.color_bins);
+    }
 
-};
+    var grid_layer = d3.select('.grid.layer');
+    grid_layer.selectAll('.grid.geo').remove();
+    var grid_regions = grid_layer.selectAll('.grid-boundary')
+      .data(data);
 
-var time_opt = d3.select('#time_select');
-var time_label = d3.select('#menu_time label');
-time_opt.on('input', function() {
-  _time = +d3.select(this).property('value');
-  update_data_fills();
-});
+    grid_regions.enter().append('path')
+      .attr('class', 'grid geo')
+      .style('fill', function(d) {
+        return d.properties.value.values[ui._time] == null
+          ? 'transparent' : ui.color(d.properties.value.values[ui._time]);
+      })
+    ;
 
-var smooth_opt = d3.select('#smooth_select');
-smooth_opt.on('input', function() {
-  d3.select('feGaussianBlur').attr('stdDeviation',
-    +d3.select(this).property('value'));
-});
+    d3.selectAll('.geo').attr('d', ui.path);
 
-d3.select(window).on('resize', new_resize_wrapper);
+    ui.update_map_regions();
+    ui.update_map_events();
+    ui.hide_loader();
 
-if (Options.datatype == null) {
-  get_agg_by_regions('default_firr_yield_whe', 'ne_110m_admin_0_countries');
-} else if (Options.datatype == 'raster') {
-  get_grid_data_by_bbox(Options.dataset);
-} else if (Options.datatype == 'polygon') {
-  get_agg_by_regions(Options.dataset, Options.regions);
-}
+  };
 
-draw_map_basics();
+  d3.select('#time_select').on('input', function() {
+    ui._time = +d3.select(this).property('value');
+    ui.update_data_fills();
+  });
 
-upper_drag_limit = projection([0, 89])[1];
-lower_drag_limit = projection([0, -89])[1] - height;
+  d3.select('#smooth_select').on('input', function() {
+    d3.select('feGaussianBlur').attr('stdDeviation',
+      +d3.select(this).property('value'));
+  });
+
+  ui.bbox = ui.get_viewport_dimensions();
+  ui.draw_map_basics();
+  ui.upper_drag_limit = ui.projection([0, 89])[1];
+  ui.lower_drag_limit = ui.projection([0, -89])[1] - ui.height;
+  ui.get_data(Options.datatype);
+  ui.toggle_zoom();
+
+  ui.atlas = function(error, queued_data) {
+    return _atlas(error, queued_data);
+  };
+
+  return ui;
+
+})(AtlasUI || {});

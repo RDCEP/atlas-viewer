@@ -20,19 +20,44 @@
 .svg-content-responsive
   display: inline-block
   position: absolute
-  //top: 10px
   left: 0
 #sphere
   fill: #C6EAFB
 
-.world-boundary
-  stroke: #eeeeee
-  stroke-width: .5
-  fill: #cccccc
-  &.active
-    stroke: red
-    stroke-width: 3px
-.grid-boundary
-  fill: transparent
-  stroke: transparent
-  stroke-width: 0
+.geo
+  &.graticule
+    stroke: #ffffff
+    stroke-width: 1px
+    fill: transparent
+  &.world
+    stroke: #eeeeee
+    stroke-width: .5
+    fill: #cccccc
+    &.active
+      stroke: red
+      stroke-width: 3px
+  &.region
+    &.fill
+      fill: #dddddd
+      stroke: transparent
+    &.boundary
+      fill: transparent
+      stroke-linejoin: round
+      stroke-width: 2
+      stroke: white
+  &.grid
+    fill: transparent
+    stroke: transparent
+    stroke-width: 0
+    //cursor: crosshair
+  &.select
+    stroke: white
+    stroke-width: 3
+.boundary
+  pointer-events: none
+svg
+  cursor: move
+  &.select_tool
+    cursor: default
+    .geo.grid
+      cursor: crosshair

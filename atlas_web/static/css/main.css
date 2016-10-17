@@ -37,6 +37,9 @@ path {
   display: none;
   position: fixed; }
 
+.inactive {
+  color: #cccccc; }
+
 #main_nav, #title_legend_wrap {
   width: 100%;
   position: fixed;
@@ -218,18 +221,42 @@ path {
 #sphere {
   fill: #C6EAFB; }
 
-.world-boundary {
+.geo.graticule {
+  stroke: #ffffff;
+  stroke-width: 1px;
+  fill: transparent; }
+.geo.world {
   stroke: #eeeeee;
   stroke-width: 0.5;
   fill: #cccccc; }
-  .world-boundary.active {
+  .geo.world.active {
     stroke: red;
     stroke-width: 3px; }
-
-.grid-boundary {
+.geo.region.fill {
+  fill: #dddddd;
+  stroke: transparent; }
+.geo.region.boundary {
+  fill: transparent;
+  stroke-linejoin: round;
+  stroke-width: 2;
+  stroke: white; }
+.geo.grid {
   fill: transparent;
   stroke: transparent;
   stroke-width: 0; }
+.geo.select {
+  stroke: white;
+  stroke-width: 3; }
+
+.boundary {
+  pointer-events: none; }
+
+svg {
+  cursor: move; }
+  svg.select_tool {
+    cursor: default; }
+    svg.select_tool .geo.grid {
+      cursor: crosshair; }
 
 .data-line {
   stroke: red;
@@ -275,228 +302,11 @@ path {
   stroke: transparent;
   fill: transparent; }
 
-#parameters_outerwrap {
-  position: relative;
-  width: 900px;
-  margin: 0 auto;
-  padding: 2em 0; }
-
-#parameters {
-  width: 100%;
-  overflow: auto; }
-  #parameters #parameter_tabs_wrap {
-    width: 870px;
-    margin: 0 45px;
-    position: fixed;
-    z-index: 900;
-    background-color: white; }
-    #parameters #parameter_tabs_wrap #parameter_tabs {
-      margin: 0 0 0 0; }
-      #parameters #parameter_tabs_wrap #parameter_tabs li {
-        display: block;
-        float: left;
-        padding: 0.8em;
-        cursor: pointer; }
-        #parameters #parameter_tabs_wrap #parameter_tabs li.selected {
-          background-color: #eeeeee; }
-  #parameters #parameter_form {
-    clear: both;
-    width: 870px;
-    padding: 60px 30px 15px;
-    margin: 0 auto;
-    position: relative;
-    z-index: 800; }
-    #parameters #parameter_form li, #parameters #parameter_form .range-wrap {
-      position: relative; }
-    #parameters #parameter_form .parameter-pane-intro {
-      width: 810px;
-      margin: 0 auto 30px;
-      font-size: 1.5em;
-      color: #999999; }
-    #parameters #parameter_form .parameter-pane {
-      float: left;
-      margin: 0 30px 30px; }
-      #parameters #parameter_form .parameter-pane.halfs {
-        width: 375px; }
-      #parameters #parameter_form .parameter-pane.thirds {
-        width: 230px; }
-      #parameters #parameter_form .parameter-pane.fourths {
-        width: 157.5px; }
-      #parameters #parameter_form .parameter-pane > label {
-        display: block;
-        margin-bottom: 1em;
-        font-weight: bold; }
-      #parameters #parameter_form .parameter-pane > .range-wrap > label {
-        font-weight: bold; }
-      #parameters #parameter_form .parameter-pane .parameter-pane {
-        margin: 0; }
-        #parameters #parameter_form .parameter-pane .parameter-pane + .parameter-pane {
-          margin-left: 60px; }
-      #parameters #parameter_form .parameter-pane h4 {
-        margin-bottom: 1em;
-        font-weight: bold; }
-        #parameters #parameter_form .parameter-pane h4 .unit {
-          font-weight: normal; }
-      #parameters #parameter_form .parameter-pane li {
-        margin-bottom: 2em; }
-      #parameters #parameter_form .parameter-pane input[type=range] {
-        width: 100%;
-        margin-top: 0.5em; }
-      #parameters #parameter_form .parameter-pane .max-range-val, #parameters #parameter_form .parameter-pane .min-range-val {
-        position: absolute;
-        bottom: 0.6em;
-        font-size: 0.6em; }
-      #parameters #parameter_form .parameter-pane .current-range-val {
-        padding: 2px 4px;
-        font-weight: bold;
-        color: white;
-        background-color: #ccc; }
-      #parameters #parameter_form .parameter-pane .max-range-val {
-        left: 102%; }
-      #parameters #parameter_form .parameter-pane .min-range-val {
-        right: 102%; }
-      #parameters #parameter_form .parameter-pane .parameter-help {
-        margin-top: 2em;
-        font-size: 0.9em; }
-      #parameters #parameter_form .parameter-pane .parameter-previews {
-        clear: left; }
-      #parameters #parameter_form .parameter-pane .parameter-preview {
-        height: 100px;
-        margin-top: 30px;
-        border: 1px solid #cccccc; }
-        #parameters #parameter_form .parameter-pane .parameter-preview figcaption {
-          font-size: 0.8em;
-          text-transform: uppercase;
-          letter-spacing: 0.03em;
-          font-weight: bold;
-          color: #666666; }
-        #parameters #parameter_form .parameter-pane .parameter-preview .parameter-preview-line {
-          stroke: #0072b2;
-          stroke-width: 3; }
-
-#parameter_form.standard #climate_parameters .max-range-val, #parameter_form.standard #climate_parameters .min-range-val, #parameter_form.standard #economy_parameters .max-range-val, #parameter_form.standard #economy_parameters .min-range-val {
-  position: absolute;
-  bottom: auto;
-  top: 100%; }
-#parameter_form.standard #climate_parameters .max-range-val, #parameter_form.standard #economy_parameters .max-range-val {
-  right: 0;
-  left: auto !important;
-  text-align: right; }
-#parameter_form.standard #climate_parameters .min-range-val, #parameter_form.standard #economy_parameters .min-range-val {
-  left: 0;
-  right: auto !important;
-  text-align: left; }
-
-#run_clear {
-  position: absolute;
-  right: 15px; }
-  #run_clear #run_model, #run_clear #clear_model {
-    border: none;
-    padding: 0.25em 15px;
-    color: #ffffff;
-    font-weight: bold;
-    font-size: 1em;
-    font-family: Helveltica, Arial, sans-serif;
-    z-index: 999;
-    cursor: pointer; }
-  #run_clear #run_model {
-    background-color: #d55e00; }
-  #run_clear #clear_model {
-    background-color: #56b4e9; }
-
-.select-wrap h3 {
-  font-weight: bold;
-  margin-bottom: 10px; }
-.select-wrap label {
-  display: block;
-  position: relative;
-  margin-bottom: 5px; }
-  .select-wrap label input {
-    position: absolute;
-    right: 102%;
-    top: 0;
-    padding: 0 10px 0 0; }
-
-.disabled {
-  color: #dddddd !important; }
-  .disabled .label, .disabled text, .disabled figcaption {
-    color: #dddddd !important; }
-  .disabled path {
-    stroke: #dddddd !important; }
-  .disabled .parameter-preview {
-    border: 1px solid #dddddd; }
-  .disabled .current-range-val {
-    background-color: #eee !important; }
-
-#parameters_wrap {
-  z-index: 997;
-  font-size: 0.8em; }
-
-#parameters_bkgd, #graphs_bkgd, #runs_bkgd, #text_bkgd {
-  background-color: #ffffff;
-  opacity: 0.95;
-  height: 100%;
-  width: 100%;
-  position: absolute; }
-
-.pane {
-  z-index: 3;
-  display: none; }
-  .pane.selected {
-    display: block;
-    z-index: 2; }
-  .pane.graph-pane {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0; }
-    .pane.graph-pane .graph {
-      overflow: visible; }
-    .pane.graph-pane .small-graph {
-      float: left;
-      position: relative;
-      width: 435px;
-      margin: 7.5px; }
-      .pane.graph-pane .small-graph .bkgd {
-        position: absolute;
-        height: 100%;
-        width: 100%;
-        z-index: -1; }
-      .pane.graph-pane .small-graph h3, .pane.graph-pane .small-graph h4 {
-        font-size: 1em;
-        font-weight: bold;
-        position: absolute;
-        top: 0;
-        padding: 15px 0 0 60px; }
-      .pane.graph-pane .small-graph h4 {
-        font-size: 0.8em;
-        font-weight: normal;
-        top: 1.4em; }
-    .pane.graph-pane .large-graph {
-      position: absolute;
-      top: 0;
-      height: 0;
-      pointer-events: none; }
-      .pane.graph-pane .large-graph * {
-        pointer-events: none; }
-      .pane.graph-pane .large-graph h3, .pane.graph-pane .large-graph h4 {
-        font-size: 1em;
-        font-weight: bold;
-        position: absolute;
-        top: 0;
-        padding: 15px 0 0 60px; }
-        .pane.graph-pane .large-graph h3.twin, .pane.graph-pane .large-graph h4.twin {
-          right: 0;
-          padding: 15px 0 0 0; }
-      .pane.graph-pane .large-graph h4 {
-        font-size: 0.8em;
-        font-weight: normal;
-        top: 1.4em; }
-
-#editor {
-  width: 100%;
-  height: 20em; }
+.foo {
+  color: #9e0142;
+  color: #d6424b;
+  color: #438fb4;
+  color: #5e4fa2; }
 
 .ir {
   background-color: transparent;
@@ -588,29 +398,179 @@ path {
 
   h2, h3 {
     page-break-after: avoid; } }
-#metadata_list {
+#metadata_list_bkgd {
+  opacity: 0.85;
   background-color: white;
-  padding: 2rem;
-  position: relative;
-  width: 900px;
-  margin: 6em auto 2em;
-  z-index: 999; }
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0; }
+
+#metadata_list {
+  z-index: 999;
+  width: 750px;
+  top: 1em;
+  left: 15px;
+  right: 15px;
+  bottom: 30px;
+  position: absolute;
+  margin: 5.5em auto 6.5em;
+  padding: 2.5rem 3rem;
+  overflow: auto; }
   #metadata_list h3 {
-    margin-bottom: 0.5em; }
+    margin-bottom: 0.25em; }
+  #metadata_list p {
+    width: 700px;
+    font-size: 0.8em; }
   #metadata_list li {
     margin-bottom: 0.5em;
     list-style-type: none; }
   #metadata_list dt, #metadata_list dd {
     display: inline-block;
     font-size: 0.8em; }
+  #metadata_list dd {
+    margin-right: 1em; }
   #metadata_list dt {
     margin-right: 0.2em;
     background-color: #eeeeee;
     color: #666666;
     padding: 0.1em 0.2em 0.1em 0.2em;
     border-radius: 2px; }
-  #metadata_list dd {
-    margin-right: 1em; }
+
+#metadata {
+  width: 100%;
+  overflow: auto;
+  clear: both;
+  margin: 25px;
+  position: relative;
+  z-index: 800; }
+
+#search {
+  position: relative;
+  padding-left: 125px;
+  padding-bottom: 1em; }
+
+#search_input {
+  width: 450px;
+  padding: 0.25em;
+  font-size: 1.25em; }
+
+#search_button {
+  height: 3em;
+  width: 25px; }
+
+#search_input, #search_button {
+  border: 1px solid #cccccc;
+  border-radius: 3px;
+  background-color: #eeeeee; }
+
+.metadata_list_section {
+  padding-bottom: 1.5em; }
+
+.data {
+  padding-bottom: 0.5em; }
+  .data h2 {
+    font-size: 1.5em;
+    margin-top: 0.25em;
+    margin-bottom: -0.15em;
+    font-weight: 400; }
+  .data h2 + h3 {
+    padding-top: 0; }
+  .data h3 {
+    font-size: 0.8em;
+    font-weight: 600;
+    display: inline; }
+  .data a {
+    font-weight: 600;
+    background-color: #ccc;
+    color: white;
+    font-size: 1em;
+    letter-spacing: 0.02em;
+    padding: 0.1em 0.2em;
+    border-radius: 1px; }
+  .data ul li {
+    display: inline-block;
+    padding-top: 0.5em; }
+  .data dl {
+    display: inline-block; }
+  .data dl + h3 {
+    display: inline; }
+  .data dt:after {
+    content: ":"; }
+  .data dd:after {
+    content: ""; }
+
+#select {
+  color: #666666;
+  font-weight: 400;
+  font-size: 1em;
+  opacity: 0.65;
+  padding-top: 0.75em;
+  padding-bottom: -0.25em; }
+
+.legend-data {
+  font-size: 0.8em; }
+
+.legend_region {
+  font-size: 0.9em; }
+
+.nav_dropdown {
+  display: inline-block;
+  position: relative;
+  padding: 0 1em; }
+  .nav_dropdown ul {
+    background-color: #fff;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    display: none;
+    list-style-type: none; }
+  .nav_dropdown:hover ul {
+    display: inline; }
+  .nav_dropdown input[type=range] {
+    position: relative;
+    top: 0.5em;
+    margin: 0.5em 0.5em 0; }
+
+.drop {
+  padding: 0 1em 0.5em;
+  color: #666666; }
+  .drop.special {
+    margin-top: 0.5em; }
+  .drop.slide label span {
+    display: block; }
+  .drop input[type=range] {
+    margin: 0 0.1em 0 0;
+    padding-top: 0; }
+  .drop label {
+    padding: 0 0 0.3em; }
+
+#pixel_pointer {
+  padding-left: 15em; }
+
+#legend_settings {
+  padding-left: 0;
+  cursor: pointer; }
+
+.legend.layer {
+  visibility: hidden; }
+
+.color_scheme {
+  cursor: pointer;
+  color: #666666;
+  opacity: 100; }
+  .color_scheme:hover img {
+    opacity: 0.5; }
+  .color_scheme:hover li {
+    color: #ccc; }
+
+#input_buckets {
+  margin-left: 0.5em;
+  border: 1px solid lightgrey;
+  text-align: right; }
+  #input_buckets:focus {
+    border: 1px solid darkgray; }
 
 .nowrap {
   white-space: nowrap; }
