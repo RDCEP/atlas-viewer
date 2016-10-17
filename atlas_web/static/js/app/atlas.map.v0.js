@@ -41,12 +41,13 @@ var AtlasUI = (function (ui) {
   ui.graticule = d3.geoGraticule();
 
   filter.append('feGaussianBlur')
-    .attrs({stdDeviation: 0, result: 'gaussian_blur'});
-  ui.component_transfer_filter = filter.append('feComponentTransfer')
-    .attr('in', 'gaussian_blur');
-  ui.component_transfer_filter.append('feFuncR').attrs({type: 'discrete'});
-  ui.component_transfer_filter.append('feFuncG').attrs({type: 'discrete'});
-  ui.component_transfer_filter.append('feFuncB').attrs({type: 'discrete'});
+    .attr('stdDeviation', 0)
+    .attr('in', 'BackgroundImage');
+  var transfer = filter.append('feComponentTransfer')
+    .attr('in', 'BackgroundImage');
+  transfer.append('feFuncR').attr('type', 'discrete');
+  transfer.append('feFuncG').attr('type', 'discrete');
+  transfer.append('feFuncB').attr('type', 'discrete');
 
   var _update_map_regions = function _update_map_regions() {
 
@@ -69,21 +70,13 @@ var AtlasUI = (function (ui) {
             .enter()
             .append('path')
             .attr('d', ui.path)
-            .attr('class', 'geo region')
-            .style('stroke', 'none')
-            .style('fill', '#dddddd');
-
+            .attr('class', 'geo region fill');
           boundary_layer.selectAll('path.geo.region')
             .data(world)
             .enter()
             .append('path')
             .attr('d', ui.path)
-            .attr('class', 'geo region')
-            .style('stroke', '#666')
-            .style('stroke-width', 1)
-            .style('stroke-line-join', 'round')
-            .style('fill', 'none');
-
+            .attr('class', 'geo region boundary');
         });
   };
 
@@ -106,10 +99,6 @@ var AtlasUI = (function (ui) {
       .datum(ui.graticule)
       .attr('class', 'graticule geo')
       .attr('d', ui.path)
-      .style('stroke', '#B4D5E5')
-      .style('stroke-width', '1px')
-      .style('fill', 'transparent');
-
   };
 
   ui.svg = svg;
