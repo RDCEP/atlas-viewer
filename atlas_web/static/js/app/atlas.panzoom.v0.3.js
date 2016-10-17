@@ -73,14 +73,15 @@ var AtlasUI = (function (ui) {
     if (ui.select_tool) {
       d3.select('svg')
         .on('.zoom', null)
-        .style('cursor', 'crosshair');
+        .classed('select_tool', true);
     } else {
       d3.select('svg').call(d3.zoom()
         .scaleExtent(scale_extent)
         .on('zoom', _zooming)
         .on('end', _zoomend))
-        .style('cursor', 'move');
+        .classed('select_tool', false);
     }
+    ui.update_map_events();
   };
 
   ui.toggle_zoom = function() {

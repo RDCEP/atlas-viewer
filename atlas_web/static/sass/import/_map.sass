@@ -49,7 +49,15 @@
     fill: transparent
     stroke: transparent
     stroke-width: 0
-    cursor: crosshair
-    &.selected
-      stroke: white
-      stroke-width: 3
+    //cursor: crosshair
+  &.select
+    stroke: white
+    stroke-width: 3
+.boundary
+  pointer-events: none
+svg
+  cursor: move
+  &.select_tool
+    cursor: default
+    .geo.grid
+      cursor: crosshair
