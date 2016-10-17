@@ -42,6 +42,7 @@ var AtlasUI = (function (ui) {
     d3.selectAll('.geo').attr('d', ui.path);
 
     ui.update_map_regions();
+    ui.update_map_events();
     ui.hide_loader();
 
   };

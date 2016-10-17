@@ -71,13 +71,15 @@ var AtlasUI = (function (ui) {
 
   var _toggle_zoom = function _toggle_zoom() {
     if (ui.select_tool) {
-      d3.select('svg').on('.zoom', null); }
-    else {
+      d3.select('svg')
+        .on('.zoom', null)
+        .style('cursor', 'crosshair');
+    } else {
       d3.select('svg').call(d3.zoom()
         .scaleExtent(scale_extent)
         .on('zoom', _zooming)
-        .on('end', _zoomend)
-      );
+        .on('end', _zoomend))
+        .style('cursor', 'move');
     }
   };
 
