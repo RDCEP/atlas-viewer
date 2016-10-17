@@ -14,8 +14,7 @@ var AtlasUI = (function (ui) {
         reverse: false },
       spectral: {
         interp: d3.interpolateSpectral,
-        // interp: d3.interpolateGreys,
-        reverse: false}
+        reverse: true}
     },
     colors: [],
     bins: Options.color_bins
@@ -44,6 +43,10 @@ var AtlasUI = (function (ui) {
     return arr.splice(0, 100).join(' ');
   };
 
+  var _gamma_correct = function _gamma_correct(v) {
+    return Math.round(Math.pow((v / 255 + .055) / 1.055, 2.4) * 100) / 100;
+  };
+
   var _create_color_scheme = function _create_color_scheme(name, bins) {
     /*
      Update UI color given scheme and number of bins.
@@ -59,9 +62,9 @@ var AtlasUI = (function (ui) {
     for (var i=0; i < bins; ++i) {
       c = d3.rgb(interp.interp(i / (bins - 1)));
       color_options.colors.push(c);
-      r.push(Math.round(c.r / 255 * 100) / 100);
-      g.push(Math.round(c.g / 255 * 100) / 100);
-      b.push(Math.round(c.b / 255 * 100) / 100);
+      r.push(_gamma_correct(c.r));
+      g.push(_gamma_correct(c.g));
+      b.push(_gamma_correct(c.b));
     }
 
     if (!interp.reverse) {
