@@ -70,7 +70,6 @@ var AtlasUI = (function (ui) {
       b.reverse();
       color_options.colors.reverse();
     }
-    console.log(r, g, b);
     d3.select('feFuncR').attr('tableValues', r.join(', '));
     d3.select('feFuncG').attr('tableValues', g.join(', '));
     d3.select('feFuncB').attr('tableValues', b.join(', '));
@@ -149,15 +148,12 @@ var AtlasUI = (function (ui) {
     /*
      Draw color legend in bottom right corner of map.
      */
+    d3.select('.legend.layer').remove();
     var top_margin = 15
       , legend_height = ui.color2.range().length * block_size + (ui.color2.range().length-1) + 70
       , gap = 3
       , legend_layer = ui_layer.append('g').attr('class', 'legend layer')
     ;
-    d3.selectAll('.legend_bkgd').remove();
-    d3.selectAll('.legend_region').remove();
-    d3.selectAll('.legend-block').remove();
-    d3.selectAll('.legend-data').remove();
 
     //TODO: Is legend_layer an attribute of AtlasUI—Or just select it in this function?
     legend_layer.append('rect')
@@ -173,7 +169,7 @@ var AtlasUI = (function (ui) {
 
     legend_layer.append('text')
     //TODO: Replace with variable name, units
-      .text('GADM 0')
+      .text(Options.units[Options.dataset])
       .attrs({
         x: ui.width - 240 + 15,
         y: ui.height - (legend_height + 58),
@@ -239,10 +235,12 @@ var AtlasUI = (function (ui) {
       var eye = d3.select('#legend_settings .iconswitch');
       if (l.style('visibility') == 'visible') {
           l.style('visibility', 'hidden');
-          eye.attrs({class: 'fa fa-eye fa-lg'});
+          eye.classed('fa-eye', true);
+          eye.classed('fa-eye-slash', false);
         } else {
           l.style('visibility', 'visible');
-          eye.attrs({class: 'fa fa-eye-slash fa-lg'});
+          eye.classed('fa-eye-slash', true);
+          eye.classed('fa-eye', false);
         }});
 
   d3.selectAll('.color_scheme')
