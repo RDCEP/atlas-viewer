@@ -550,8 +550,11 @@ svg {
   padding-left: 15em; }
 
 #legend_settings {
-  padding-left: 2em;
+  padding-left: 0;
   cursor: pointer; }
+
+.legend.layer {
+  visibility: hidden; }
 
 .color_scheme {
   cursor: pointer;

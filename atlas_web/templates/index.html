@@ -6,17 +6,17 @@
     <div id="metadata_list_bkgd"></div>
     <div id="metadata">
 
-      <div id="search">
-        <input id="search_input" type="text" placeholder="search">
+{#      <div id="search">#}
+{#        <input id="search_input" type="text" placeholder="search">#}
         <!--button id="search_button"><i id="search_icon" class="fa fa-search fa-lg" aria-hidden="true"></i></button-->
-      </div>
-
+{#      </div>#}
+      <h2>Available datasets</h2>
       <ul class="metadata_list_section">
 
 
         <li class="data">
 
-          <h2>WHEAT</h2>
+          <h2>pSIMS wheat</h2>
           <ul>
             <li><a href=/map/default_firr_aet_whe>AET</a></li>
             <li><a href=/map/default_firr_biom_whe>BIOM</a></li>
@@ -95,6 +95,14 @@
   </ul>
 </div>
 
+  <div class="nav_dropdown">
+  <h4 id="legend_units"></h4>
+  </div>
+  <label id=legend_settings>
+    [<i class="fa fa-eye fa-lg iconswitch" aria-hidden=true ></i>]
+  </label>
+
+<!--
 <div class=nav_dropdown>
   <h4>Regions</h4>
   <ul>
@@ -103,13 +111,14 @@
     <li class="drop last"> <a>GADM 2</a></li>
   </ul>
 </div>
-
+-->
 {% endif %}
 {% endblock %}
 
 {% block agg_button %}
 {% if datatype == 'raster' %}
-  <div class=nav_dropdown>
+<!--
+<div class=nav_dropdown>
 	<h4>Aggregate</h4>
 	{# TODO: Get available aggregation regions from API #}
 	<ul>
@@ -117,14 +126,12 @@
 	  <li class="drop last"><a href=/agg/{{ dataset }}/ne_50m_admin_0_countries>NE50</a></li>
 	</ul>
   </div>
-
+-->
   <label id=pixel_pointer>
-    <i id=icon class="fa fa-mouse-pointer fa-lg" aria-hidden=true ></i>
+    <i class="fa fa-mouse-pointer fa-lg iconswitch inactive" aria-hidden=true ></i>
   </label>
 
-  <label id=legend_settings>
-    <i id=iconSwitch class="fa fa-eye-slash fa-lg" aria-hidden=true ></i>
-  </label>
+
 {% endif %}
 {% endblock %}
 
@@ -141,6 +148,11 @@
   Options.datatype = Options.datatype == 'null' ? null : Options.datatype;
   Options.color_scheme = 'spectral';
   Options.color_bins = 9;
+  Options.units = {
+    'default_firr_aet_whe': 'Actual ET mm/yr',
+    'default_firr_yield_whe': 'Yield t/ha/yr',
+    'default_firr_aet_whe': 'Biomass t/ha/yr'
+  };
 {% endblock %}
 
 {% block bodyjs %}

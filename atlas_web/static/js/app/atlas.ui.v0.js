@@ -153,9 +153,12 @@ var AtlasUI = (function (ui) {
      */
     d3.select('.legend.layer').remove();
     var top_margin = 15
-      , legend_height = ui.color2.range().length * block_size + (ui.color2.range().length-1) + 70
+      , legend_height = ui.color2.range().length * block_size + (ui.color2.range().length-1) + 40
       , gap = 3
       , legend_layer = ui_layer.append('g').attr('class', 'legend layer')
+      , legend_units = d3.select('#legend_units')
+      , yl = d3.select('#main_nav').node().offsetHeight + d3.select('#title_legend_wrap').node().offsetHeight
+      , xl = d3.select('#title_legend').node().offsetLeft + legend_units.node().parentNode.offsetLeft
     ;
 
     //TODO: Is legend_layer an attribute of AtlasUI—Or just select it in this function?
@@ -163,24 +166,28 @@ var AtlasUI = (function (ui) {
       .attrs({
         height: legend_height,
         width: 160,
-        x: ui.width - 240,
-        y: ui.height - (legend_height + 81),
+        // x: ui.width - 240,
+        // y: ui.height - (legend_height + 81),
+        x: xl,
+        y: yl,
         class: 'legend_bkgd'})
       .styles({
         opacity: .9,
         fill: 'white'});
+    console.log(xl);
+    legend_units.text(Options.units[Options.dataset]);
 
-    legend_layer.append('text')
+    // legend_layer.append('text')
     //TODO: Replace with variable name, units
-      .text(Options.units[Options.dataset])
-      .attrs({
-        x: ui.width - 240 + 15,
-        y: ui.height - (legend_height + 58),
-        class: 'legend_region'})
-      .styles({
-        fill: 'black',
-        opacity: .65,
-        'font-weight': 600});
+    //   .text(Options.units[Options.dataset])
+    //   .attrs({
+    //     x: ui.width - 240 + 15,
+    //     y: ui.height - (legend_height + 58),
+    //     class: 'legend_region'})
+    //   .styles({
+    //     fill: 'black',
+    //     opacity: .65,
+    //     'font-weight': 600});
 
     legend_layer.selectAll('.legend-block')
       .data(ui.color2.range())
@@ -190,18 +197,21 @@ var AtlasUI = (function (ui) {
         width: block_size,
         height: block_size,
         class: 'legend-block',
-        x: ui.width - 240 + 15 })
+        // x: ui.width - 240 + 15 })
+        x: xl + 15 })
       .attr('fill', function (d) { return d; })
       .attr('y', function (d, i) {
-        return ui.height - (legend_height + 60) +
-          top_margin + i * (block_size + gap); });
+        // return ui.height - (legend_height + 60) +
+        //   top_margin + i * (block_size + gap); });
+        return yl + 10 + i * (block_size + gap); });
 
     legend_layer.selectAll('.legend-data')
       .data(ui.color2.range())
       .enter()
       .append('text')
       .attrs({
-        x: ui.width - 240 + 35,
+        // x: ui.width - 240 + 35,
+        x: xl + 35,
         class: 'legend-data'})
       .text(function (d, i) {
         var q = ui.color2.quantiles(),
@@ -213,8 +223,9 @@ var AtlasUI = (function (ui) {
           return ui.round1(q[i-1]) + '–' + ui.round1(ui.color2.domain()[1]); }
         return ui.round1(q[i-1]) + '–' + ui.round1(q[i]); })
       .attr('y', function (d, i) {
-        return ui.height - (legend_height + 60) + top_margin + (block_size - 3) +
-          (Options.color_bins - i - 1) * (block_size + gap); });
+        // return ui.height - (legend_height + 60) + top_margin + (block_size - 3) +
+        //   (Options.color_bins - i - 1) * (block_size + gap); });
+        return yl + 10 + (block_size - 3) + (Options.color_bins - i - 1) * (block_size + gap); });
   };
 
   d3.select('#pixel_pointer .iconswitch')
