@@ -20,12 +20,15 @@
 .svg-content-responsive
   display: inline-block
   position: absolute
-  //top: 10px
   left: 0
 #sphere
   fill: #C6EAFB
 
 .geo
+  &.graticule
+    stroke: #ffffff
+    stroke-width: 1px
+    fill: transparent
   &.world
     stroke: #eeeeee
     stroke-width: .5
@@ -33,7 +36,20 @@
     &.active
       stroke: red
       stroke-width: 3px
+  &.region
+    &.fill
+      fill: #dddddd
+      stroke: transparent
+    &.boundary
+      fill: transparent
+      stroke-linejoin: round
+      stroke-width: 2
+      stroke: white
   &.grid
     fill: transparent
     stroke: transparent
     stroke-width: 0
+    cursor: crosshair
+    &.selected
+      stroke: white
+      stroke-width: 3

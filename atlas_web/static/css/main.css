@@ -37,6 +37,9 @@ path {
   display: none;
   position: fixed; }
 
+.inactive {
+  color: #cccccc; }
+
 #main_nav, #title_legend_wrap {
   width: 100%;
   position: fixed;
@@ -218,6 +221,10 @@ path {
 #sphere {
   fill: #C6EAFB; }
 
+.geo.graticule {
+  stroke: #ffffff;
+  stroke-width: 1px;
+  fill: transparent; }
 .geo.world {
   stroke: #eeeeee;
   stroke-width: 0.5;
@@ -225,10 +232,22 @@ path {
   .geo.world.active {
     stroke: red;
     stroke-width: 3px; }
+.geo.region.fill {
+  fill: #dddddd;
+  stroke: transparent; }
+.geo.region.boundary {
+  fill: transparent;
+  stroke-linejoin: round;
+  stroke-width: 2;
+  stroke: white; }
 .geo.grid {
   fill: transparent;
   stroke: transparent;
-  stroke-width: 0; }
+  stroke-width: 0;
+  cursor: crosshair; }
+  .geo.grid.selected {
+    stroke: white;
+    stroke-width: 3; }
 
 .data-line {
   stroke: red;
@@ -273,6 +292,12 @@ path {
 .domain {
   stroke: transparent;
   fill: transparent; }
+
+.foo {
+  color: #9e0142;
+  color: #d6424b;
+  color: #438fb4;
+  color: #5e4fa2; }
 
 .ir {
   background-color: transparent;

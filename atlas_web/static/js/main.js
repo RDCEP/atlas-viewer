@@ -8,8 +8,11 @@ var AtlasUI = (function (ui) {
     Options.datatype = queued_data['data_type'];
 
     var data = queued_data['data'];
-    data = Options.datatype == 'raster' ? ui.process_raster_geometry(data) : data;
+    data = Options.datatype == 'raster'
+      ? ui.process_raster_geometry(data)
+      : data;
     data.filter(function (d) { return d.properties.value != null; });
+
 
     var domain = [
       d3.min(data, function(d) {
@@ -23,8 +26,8 @@ var AtlasUI = (function (ui) {
       ui.create_color_scheme(Options.color_scheme, Options.color_bins);
     }
 
-    var grid_layer = d3.select('#grid_layer');
-    grid_layer.selectAll('.grid-boundary').remove();
+    var grid_layer = d3.select('.grid.layer');
+    grid_layer.selectAll('.grid.geo').remove();
     var grid_regions = grid_layer.selectAll('.grid-boundary')
       .data(data);
 
@@ -36,9 +39,10 @@ var AtlasUI = (function (ui) {
       })
     ;
 
-    ui.update_regions();
-
     d3.selectAll('.geo').attr('d', ui.path);
+
+    ui.update_map_regions();
+    ui.update_map_events();
     ui.hide_loader();
 
   };
@@ -53,24 +57,16 @@ var AtlasUI = (function (ui) {
       +d3.select(this).property('value'));
   });
 
-  ui.upper_drag_limit = ui.projection([0, 89])[1];
-  ui.lower_drag_limit = ui.projection([0, -89])[1] - ui.height;
-
   ui.bbox = ui.get_viewport_dimensions();
   ui.draw_map_basics();
-
-  if (Options.datatype == null) {
-    ui.get_agg_by_regions(Options.dataset, Options.regions);
-  } else if (Options.datatype == 'raster') {
-    ui.get_grid_data_by_bbox(Options.dataset);
-  } else if (Options.datatype == 'polygon') {
-    ui.get_agg_by_regions(Options.dataset, Options.regions);
-  }
+  ui.upper_drag_limit = ui.projection([0, 89])[1];
+  ui.lower_drag_limit = ui.projection([0, -89])[1] - ui.height;
+  ui.get_data(Options.datatype);
+  ui.toggle_zoom();
 
   ui.atlas = function(error, queued_data) {
     return _atlas(error, queued_data);
   };
-
 
   return ui;
 

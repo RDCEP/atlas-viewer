@@ -16,46 +16,31 @@ var AtlasUI = (function (ui) {
     });
   };
 
-  var _get_grid_data_by_bbox = function _get_grid_data_by_bbox(dataset) {
-    /*
-     Retrieve gridded data within bounding box of viewport.
-     */
-    ui.show_loader();
-    d3.request('/api/griddata')
-      .header("Content-Type", "application/json")
-      .post(
-        JSON.stringify({bbox: [ui.bbox.top_left[0], ui.bbox.top_left[1],
-          ui.bbox.bottom_right[0], ui.bbox.bottom_right[1]],
-          dataset: dataset}),
-        function(err, rawData){
-          ui.atlas(err, {data_type: 'raster', data: JSON.parse(rawData['response'])});
-        }
-    );
-  };
-
-  var _get_agg_by_regions = function _get_agg_by_regions(dataset, regions) {
-    /*
-     Retrieve spatially aggregated polygons that intersect bounding box of
-     viewport.
-     */
-    ui.show_loader();
-    d3.request('/api/aggregate')
-      .header("Content-Type", "application/json")
-      .post(
-        JSON.stringify({bbox: [ui.bbox.top_left[0], ui.bbox.top_left[1],
-          ui.bbox.bottom_right[0], ui.bbox.bottom_right[1]],
-          dataset: dataset, regions: regions}),
-        function(err, rawData){
-          atlas(err, {data_type: 'agg', data: JSON.parse(rawData['response'])});
-        }
-    );
-  };
-
   var _process_raster_geometry = function _process_raster_geometry(data) {
     /*
      Assuming the API returns centroids of data raster pixels as
      GeoJSON Point objects, turn them into Polygons.
      */
+
+    data.sort(function (a, b) {
+      d3.ascending(
+        [
+          d3.ascending(
+            a.properties.centroid.geometry.coordinates[0],
+            b.properties.centroid.geometry.coordinates[0]),
+          d3.ascending(
+            a.properties.centroid.geometry.coordinates[1],
+            b.properties.centroid.geometry.coordinates[1])
+        ], [
+          d3.ascending(
+            b.properties.centroid.geometry.coordinates[0],
+            a.properties.centroid.geometry.coordinates[0]),
+          d3.ascending(
+            b.properties.centroid.geometry.coordinates[1],
+            a.properties.centroid.geometry.coordinates[1])]
+      )
+    });
+
     data.forEach(function (d) {
 
       var x = d.properties.centroid.geometry.coordinates[0];
@@ -66,27 +51,46 @@ var AtlasUI = (function (ui) {
 
       d.geometry = {
         type: 'Polygon',
-        coordinates: [[[x - s, y + s], [x + s, y + s], [x + s, y - s],
-          [x - s, y - s], [x - s, y + s]]]}
+        coordinates: [[
+          [x - s, y + s], // top left
+          [x + s, y + s], // top right
+          [x + s, y - s], // bottom right
+          [x - s, y - s], // bottom left
+          [x - s, y + s]
+        ]]}
     });
     return data;
 
+  };
+
+  var _get_data = function _get_data(data_type) {
+    if (data_type == null) { return false; }
+    var endpoint = data_type == 'raster'
+      ? 'griddata'
+      : 'aggregate';
+    ui.show_loader();
+    d3.request('/api/' + endpoint)
+      .header('Content-Type', 'application/json')
+      .post(
+        JSON.stringify({bbox: [ui.bbox.top_left[0], ui.bbox.top_left[1],
+          ui.bbox.bottom_right[0], ui.bbox.bottom_right[1]],
+          dataset: Options.dataset, regions: Options.regions}),
+        function(err, rawData){
+          ui.atlas(err, {data_type: data_type, data: JSON.parse(rawData['response'])});
+        }
+    );
   };
 
   ui.update_data_fills = function() {
     return _update_data_fills();
   };
 
-  ui.get_grid_data_by_bbox = function(dataset) {
-    return _get_grid_data_by_bbox(dataset)
-  };
-
-  ui.get_agg_by_regions = function (dataset, regions) {
-    return _get_agg_by_regions(dataset, regions)
-  };
-
   ui.process_raster_geometry = function(data) {
     return _process_raster_geometry(data);
+  };
+
+  ui.get_data = function(endpoint) {
+    return _get_data(endpoint);
   };
 
   return ui;

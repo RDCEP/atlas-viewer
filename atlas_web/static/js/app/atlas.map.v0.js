@@ -19,23 +19,20 @@ var AtlasUI = (function (ui) {
       .attr('y', 0)
     , svg = svg_root.append('g')
     , ocean_layer = svg.append('g')
-      .attr('id', 'ocean_layer')
-      .classed('zoom', true)
+      .attr('class', 'ocean layer zoom')
     , grid_layer = svg.append('g')
-      .attr('id', 'grid_layer')
-      .classed('zoom', true)
+      .attr('class', 'grid layer zoom')
       .attr('filter', 'url(#grid_filter)')
     , boundary_layer = svg.append('g')
-      .attr('id', 'boundary_layer')
+    .attr('class', 'boundary layer zoom')
       .classed('zoom', true)
-    , legend_layer = svg.append('g')
-      .attrs({id: 'legend_layer'})
+    , ui_layer = svg.append('g')
+      .attr('class', 'ui layer')
   ;
 
   ui.projection = d3.geoEquirectangular()
       .rotate([-Options.lon, 0])
       .center([0, Options.lat])
-      // .scale(ui.get_map_scale())
       .scale(ui.get_map_scale())
       .translate([ui.width / 2, ui.height / 2])
       .precision(.1);
@@ -44,37 +41,17 @@ var AtlasUI = (function (ui) {
   ui.graticule = d3.geoGraticule();
 
   filter.append('feGaussianBlur')
-    .attrs({stdDeviation: 0, result: 'gaussian_blur'});
-  ui.component_transfer_filter = filter.append('feComponentTransfer')
-    .attr('in', 'gaussian_blur');
-  ui.component_transfer_filter.append('feFuncR').attrs({type: 'discrete'});
-  ui.component_transfer_filter.append('feFuncG').attrs({type: 'discrete'});
-  ui.component_transfer_filter.append('feFuncB').attrs({type: 'discrete'});
+    .attr('stdDeviation', 0)
+    .attr('in', 'BackgroundImage');
+  var transfer = filter.append('feComponentTransfer')
+    .attr('in', 'BackgroundImage');
+  transfer.append('feFuncR').attr('type', 'discrete');
+  transfer.append('feFuncG').attr('type', 'discrete');
+  transfer.append('feFuncB').attr('type', 'discrete');
 
-  ui.draw_map_basics = function draw_map_basics() {
-    /*
-     Draw ocean, land background, region boundaries, graticule.
-     */
+  var _update_map_regions = function _update_map_regions() {
 
-    ocean_layer.append('path')
-      .datum({type: 'Sphere'})
-      .attr('id', 'sphere')
-      .attr('d', ui.path)
-      .attr('class', 'geo');
-    ocean_layer.append('use')
-      .attr('class', 'stroke')
-      .attr('xlink:href', '#sphere');
-    ocean_layer.append('path')
-      .datum(ui.graticule)
-      .attr('class', 'graticule geo')
-      .attr('d', ui.path)
-      .style('stroke', '#B4D5E5')
-      .style('stroke-width', '1px')
-      .style('fill', 'transparent');
-
-  };
-
-  var update_regions = function update_regions() {
+    d3.selectAll('.geo.region').remove();
 
     d3.request('/api/map')
       .header('Content-Type', 'application/json')
@@ -88,32 +65,45 @@ var AtlasUI = (function (ui) {
 
           world = JSON.parse(world.response);
 
-          ocean_layer.selectAll('path.countries')
+          ocean_layer.selectAll('path.geo.region')
             .data(world)
             .enter()
             .append('path')
             .attr('d', ui.path)
-            .attr('class', 'countries geo')
-            .style('stroke', 'none')
-            .style('fill', '#dddddd');
-
-          boundary_layer.selectAll('path.countries')
+            .attr('class', 'geo region fill');
+          boundary_layer.selectAll('path.geo.region')
             .data(world)
             .enter()
             .append('path')
             .attr('d', ui.path)
-            .attr('class', 'countries geo')
-            .style('stroke', '#666')
-            .style('stroke-width', 1)
-            .style('stroke-line-join', 'round')
-            .style('fill', 'none');
-
+            .attr('class', 'geo region boundary');
         });
+  };
 
+  var _draw_map_basics = function draw_map_basics() {
+    /*
+     Draw ocean, land background, region boundaries, graticule.
+     */
+    //FIXME: Replace dims with object's bbox
+    // ui.bbox = ui.get_viewport_dimensions();
+
+    ocean_layer.append('path')
+      .datum({type: 'Sphere'})
+      .attr('id', 'sphere')
+      .attr('d', ui.path)
+      .attr('class', 'geo');
+    ocean_layer.append('use')
+      .attr('class', 'stroke')
+      .attr('xlink:href', '#sphere');
+    ocean_layer.append('path')
+      .datum(ui.graticule)
+      .attr('class', 'graticule geo')
+      .attr('d', ui.path)
   };
 
   ui.svg = svg;
-  ui.update_regions = update_regions;
+  ui.update_map_regions = _update_map_regions;
+  ui.draw_map_basics = _draw_map_basics;
 
   return ui;
 
