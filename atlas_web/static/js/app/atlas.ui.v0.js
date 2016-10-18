@@ -5,20 +5,20 @@ var AtlasUI = (function (ui) {
 
   var resize_event
     , color_options = {
-    /*
-     Object for storing application's color state.
-     */
-    schemes: {
-      orange: {
-        interp: d3.interpolateOranges,
-        reverse: false },
-      spectral: {
-        interp: d3.interpolateSpectral,
-        reverse: true}
-    },
-    colors: [],
-    bins: Options.color_bins
-  }
+      /*
+       Object for storing application's color state.
+       */
+      schemes: {
+        orange: {
+          interp: d3.interpolateOranges,
+          reverse: false },
+        spectral: {
+          interp: d3.interpolateSpectral,
+          reverse: true}
+      },
+      colors: [],
+      bins: Options.color_bins
+    }
     , ui_layer = d3.select('.ui.layer')
   ;
 
@@ -43,8 +43,8 @@ var AtlasUI = (function (ui) {
     return arr.splice(0, 100).join(' ');
   };
 
-  var _gamma_correct = function _gamma_correct(v) {
-    return Math.round(Math.pow((v / 255 + .055) / 1.055, 2.4) * 100) / 100;
+  var _s2l = function _gamma_correct(v) {
+    return Math.round(v / 255 * 100) / 100;
   };
 
   var _create_color_scheme = function _create_color_scheme(name, bins) {
@@ -62,9 +62,9 @@ var AtlasUI = (function (ui) {
     for (var i=0; i < bins; ++i) {
       c = d3.rgb(interp.interp(i / (bins - 1)));
       color_options.colors.push(c);
-      r.push(_gamma_correct(c.r));
-      g.push(_gamma_correct(c.g));
-      b.push(_gamma_correct(c.b));
+      r.push(_s2l(c.r));
+      g.push(_s2l(c.g));
+      b.push(_s2l(c.b));
     }
 
     if (!interp.reverse) {

@@ -44,6 +44,7 @@ var AtlasUI = (function (ui) {
     .attr('stdDeviation', 0)
     .attr('in', 'BackgroundImage');
   var transfer = filter.append('feComponentTransfer')
+    .attr('color-interpolation-filters', 'sRGB')
     .attr('in', 'BackgroundImage');
   transfer.append('feFuncR').attr('type', 'discrete');
   transfer.append('feFuncG').attr('type', 'discrete');
