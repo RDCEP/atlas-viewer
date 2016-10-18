@@ -553,9 +553,6 @@ svg {
   padding-left: 0;
   cursor: pointer; }
 
-.legend.layer {
-  visibility: hidden; }
-
 .color_scheme {
   cursor: pointer;
   color: #666666;
