@@ -155,13 +155,11 @@ class NetCDFToMongo(object):
         """Represent null values from netCDF as '--' and numeric values
         as floats.
         """
-        print(arr)
-        if np.ma.getmask(arr):
-            if arr.count() == 0:
-                return None
-            arr = np.ma.filled(arr, None)
         try:
-            return round_to_n(arr, self.sigfigs)
+            if np.ma.getmask(arr).any():
+                if arr.count() == 0:
+                    return None
+                return np.ma.filled(arr, np.nan)
         except ValueError:
             print(
             '\n*** Encountered uncoercible non-numeric ***\n{}\n\n'.format(
