@@ -25,7 +25,7 @@ uri = "mongodb://{}:{}@{}/{}?authMechanism=SCRAM-SHA-1".format(
 )
 client = MongoClient(uri) if not MONGO['local'] \
     else MongoClient('localhost', MONGO['port'])
-db = client['atlas']
+db = client[MONGO['database']]
 
 
 class NetCDFToMongo(object):
