@@ -1,6 +1,6 @@
 from __future__ import division
 import sys
-import datetime
+from datetime import datetime
 import itertools
 import ntpath
 import multiprocessing as mp
@@ -119,6 +119,38 @@ class NetCDFToMongo(object):
         """
         return abs(np.diff(self.lons[:2])[0]), abs(np.diff(self.lats[:2])[0])
 
+    @property
+    def metadata(self):
+        return {
+            'name': self.name,
+            'human_name': self.human_name,
+            'date_created': datetime.now(),
+            'date_inserted': datetime.now(),
+            'dimensions': [
+                {'name': self.nc_dataset.variables[d].name,
+                 'human_name': self.nc_dataset.variables[d].long_name,
+                 'min': np.min(self.nc_dataset.variables[d][:]),
+                 'max': np.max(self.nc_dataset.variables[d][:]),
+                 'size': self.nc_dataset.variables[d].size,
+                 'unit': self.nc_dataset.variables[d].units,
+                 } for d in self.dimensions],
+            'variables': [
+                {'name': self.nc_dataset.variables[v].name,
+                 'human_name': self.nc_dataset.variables[v].long_name,
+                 'min': float(np.min(self.nc_dataset.variables[v][:])),
+                 'max': float(np.max(self.nc_dataset.variables[v][:])),
+                 'unit': self.nc_dataset.variables[v].units,
+                 'dimension_idxs': [i for i, d in enumerate(self.dimensions)
+                                    if d in self.nc_dataset.variables[v].dimensions],
+                 'dimensions': [d for i, d in enumerate(self.dimensions)
+                                if d in self.nc_dataset.variables[v].dimensions],
+                 } for v in self.variables],
+            'parameters': [
+                {'name': p[0],
+                 'value': p[1],
+                 } for p in self.parameters]
+        }
+
     def num_or_null(self, arr):
         """Represent null values from netCDF as '--' and numeric values
         as floats.
@@ -131,14 +163,11 @@ class NetCDFToMongo(object):
         try:
             return round_to_n(arr, self.sigfigs)
         except ValueError:
-            print('\n*** Encountered uncoercible non-numeric ***\n{}\n\n'.format(
+            print(
+            '\n*** Encountered uncoercible non-numeric ***\n{}\n\n'.format(
                 arr
             ))
             pass
-
-    @property
-    def metadata(self):
-        return {}
 
     def parallel_ingest(self):
         self.ingest_metadata()
