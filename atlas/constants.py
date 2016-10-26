@@ -27,3 +27,10 @@ MONGO = dict(
         cf.get('nc4', 'variable'), cf.get('nc4', 'crop'), ),
     port=int(cf.get('server', 'port')),
     variable_name='{}_{}'.format(cf.get('nc4', 'variable'), cf.get('nc4', 'crop')))
+
+ELASTICSEARCH = dict(
+    meta_index='atlas_meta',
+    meta_type='gridmeta',
+    grid_index='atlas_grid',
+    grid_type='griddata',
+)
