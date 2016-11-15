@@ -1,35 +1,35 @@
 {
-  "type": "Feature",
-  "centroid_x": "longitude_center",
-  "centroid_y": "latitude_center",
-  "geometry": {
-    "type": "Polygon",
-    "coordinates": [
-      [
-        "lon_point_a",
-        "lat_point_a"
-      ],
-      [
-        "lon_point_b",
-        "lat_point_b"
-      ],
-      [
-        "lon_point_c",
-        "lat_point_c"
-      ],
-      [
-        "lon_point_d",
-        "lat_point_d"
-      ],
-      [
-        "lon_point_a",
-        "lat_point_a"
-      ]
-    ]
-  },
-  "properties": {
-    "simulation": "aet",
-    "timestamp": "2013-10-02T01:11:18.965Z",
-    "1984": 0.0
-  }
+    "_id" : ObjectId("56649b87a54d75221dd3ac45"),
+    "geometry" : {
+        "type" : "Polygon",
+        "coordinates" : [
+            [
+                [-124.0,45.0],[-123.5,45.0],[-123.5,44.5],[-124.0,44.5],[-124.0,45.0]
+            ]
+        ]
+    },
+    "type" : "Feature",
+    "properties" : {
+        "source" : "papsim_wfdei.cru_hist_default_firr_aet_whe_annual_1979_2012.nc4",
+        "centroid" : {
+            "geometry" : {
+                "type" : "Point",
+                "coordinates" : [
+                    -123.75,
+                    44.75
+                ]
+            }
+        },
+        "value" : {
+            "start" : [
+                NumberInt(1979)
+            ],
+            "step" : NumberInt(1),
+            "values" : [298.6,292.7,311.6,305.6,291.1,346.5,323.4,337.3,328.2,310.8,298.1,316.1,326.0,289.5,332.5,
+                302.6,281.7,310.7,272.9,320.7,271.6,370.3,303.9,286.7,295.7,298.2,307.7,307.6,309.9,321.0,273.3,
+                290.7,314.2,null]
+        },
+        "timestamp" : "2015-12-06T14:33:11.030204",
+        "simulation" : "aet_whe"
+    }
 }
