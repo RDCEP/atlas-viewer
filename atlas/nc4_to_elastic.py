@@ -159,33 +159,31 @@ class NetCDFToElastic(object):
             pass
 
     def create_indices(self):
-        r = db.indices.delete(index=ES['meta_index'], ignore=[400, 404])
-        r = db.indices.delete(index=ES['grid_index'], ignore=[400, 404])
+        pass
 
-        db.indices.create(index=ES['meta_index'], body={
-            'settings': {
-                'number_of_shards': 1,
-                'number_of_replicas': 0,
-            }})
-
-        db.indices.create(index=ES['grid_index'], body={
-            'mappings': {
-                'griddata': {
-                    'properties': {
-                        'location': {
-                            'type': 'geo_point'
-                        }}}},
-            'settings': {
-                'number_of_shards': 1,
-                'number_of_replicas': 0,
-            }})
 
     def parallel_ingest(self):
-        self.create_indices()
+
+        db.indices.delete(index=ES['meta_index'], ignore=[400, 404])
+        db.indices.delete(index=self.name, ignore=[400, 404])
 
         self.ingest_metadata()
 
         for variable in self.variables:
+
+            db.indices.create(index=self.name, body={
+                'mappings': {
+                    '{}'.format(variable): {
+                        'properties': {
+                            'coordinates': {
+                                'type': 'geo_point'
+                            }}}},
+                'settings': {
+                    'number_of_shards': 1,
+                    'number_of_replicas': 0,
+                }})
+
+
             values = self.nc_dataset[variable][:]
             jobs = []
             n = 1
@@ -204,6 +202,13 @@ class NetCDFToElastic(object):
             # print('\n*** Elapsed ***\n{}\n'.format(end_index - start_index))
 
     def ingest_metadata(self):
+
+        db.indices.create(index=ES['meta_index'], body={
+            'settings': {
+                'number_of_shards': 1,
+                'number_of_replicas': 0,
+            }})
+
         db.index(
             index=ES['meta_index'], doc_type=ES['meta_type'],
             body=self.metadata)
@@ -255,7 +260,7 @@ class NetCDFToElastic(object):
                     if idx % 500 == 0 or idx == len(lons_lats):
 
                         helpers.bulk(db, bulk,
-                            index=ES['grid_index'], doc_type=ES['grid_type'],)
+                            index=self.name, doc_type=variable,)
 
                         bulk = []
 
@@ -305,9 +310,9 @@ class GenerateDocument(object):
         """
 
         document = {
-            'location': [self.x, self.y],
+            'coordinates': [self.x, self.y],
             'values': self.value,
-            'dimensions': self.dimensions,
+            # 'dimensions': self.dimensions,
         }
 
         return document
