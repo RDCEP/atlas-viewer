@@ -1,34 +1,49 @@
+
 var AtlasUI = (function (ui) {
 
   'use strict';
 
   var select_layer = d3.select('.ui.layer').append('g')
-    .attr('class', 'select layer');
+      .attr('class', 'select layer')
+    , graph_layer = d3.select('.ui.layer').append('g')
+      .attr('class', 'graph layer')
+  ;
 
-  var _update_map_events = function _update_map_events() {
-    d3.selectAll('.grid.geo')
-    .on('click', function() {
-      console.log(1);
-      select_layer.selectAll('.outline').remove();
-      var that = d3.select(this);
-      select_layer.append('path')
-        .attr('class', 'select geo outline')
-        .attr('d', that.attr('d'));
-      that.classed('selected', !that.classed('selected'));
-      // console.log(that.classed('selected'));
-      // if (that.classed('selected')) {}
-    });
+  graph_layer.append('rect').attr('class', 'bkgd');
+
+  var _time_series = function _time_series(pixel) {
+
+
+
   };
 
+  var _update_map_events = function _update_map_events() {
 
+    if (ui.select_tool) {
 
-  var _clear_selection;
+      d3.selectAll('.geo.grid')
+        .on('click', function () {
+          select_layer.selectAll('.outline').remove();
+          var that = d3.select(this);
+          select_layer.append('path')
+            .attr('class', 'select geo outline')
+            .attr('d', that.attr('d'));
 
-  ui.update_map_events = function update_map_events() {
-    console.log(1);
+        });
+
+    } else {
+
+      d3.selectAll('.geo.grid')
+        .on('click', null);
+
+    }
+  };
+
+  ui.update_map_events = function() {
     _update_map_events();
   };
 
   return ui;
 
 })(AtlasUI || {});
+
