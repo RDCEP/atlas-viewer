@@ -398,9 +398,10 @@ svg {
 
   h2, h3 {
     page-break-after: avoid; } }
+
 #metadata_list_bkgd {
   opacity: 0.85;
-  background-color: white;
+  background: #ffffff;
   position: absolute;
   top: 0;
   bottom: 0;

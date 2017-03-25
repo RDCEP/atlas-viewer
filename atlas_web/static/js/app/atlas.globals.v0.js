@@ -23,7 +23,6 @@ var AtlasUI = (function (ui) {
     scale_extent: [window.innerWidth, 8 * window.innerHeight],
 
     select_tool: false,
-
     _time: 0,
 
     round1: function round1(x) {

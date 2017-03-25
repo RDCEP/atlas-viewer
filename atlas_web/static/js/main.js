@@ -8,12 +8,13 @@ var AtlasUI = (function (ui) {
     Options.datatype = queued_data['data_type'];
 
     var data = queued_data['data'];
+    // console.log(data); LOGS DATA in CONSOLE
     data = Options.datatype == 'raster'
       ? ui.process_raster_geometry(data)
       : data;
     data.filter(function (d) { return d.properties.value != null; });
-
-
+    
+    
     var domain = [
       d3.min(data, function(d) {
         return d3.min(d.properties.value.values, function(dd) { return dd; }); }),
@@ -36,8 +37,7 @@ var AtlasUI = (function (ui) {
       .style('fill', function(d) {
         return d.properties.value.values[ui._time] == null
           ? 'transparent' : ui.color(d.properties.value.values[ui._time]);
-      })
-    ;
+      });
 
     d3.selectAll('.geo').attr('d', ui.path);
 
@@ -51,6 +51,7 @@ var AtlasUI = (function (ui) {
     ui._time = +d3.select(this).property('value');
     ui.update_data_fills();
   });
+
 
   d3.select('#smooth_select').on('input', function() {
     d3.select('feGaussianBlur').attr('stdDeviation',
