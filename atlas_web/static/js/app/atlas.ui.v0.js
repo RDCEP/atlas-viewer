@@ -172,7 +172,7 @@ var AtlasUI = (function (ui) {
         y: yl,
         class: 'legend_bkgd'})
       .styles({
-        opacity: .9,
+        //opacity: .9,
         fill: 'white'});
     //console.log(xl);
     legend_units.text(Options.units[Options.dataset]);

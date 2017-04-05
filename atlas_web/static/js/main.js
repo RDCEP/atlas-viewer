@@ -14,7 +14,6 @@ var AtlasUI = (function (ui) {
       : data;
     data.filter(function (d) { return d.properties.value != null; });
     
-    
     var domain = [
       d3.min(data, function(d) {
         return d3.min(d.properties.value.values, function(dd) { return dd; }); }),
@@ -51,8 +50,7 @@ var AtlasUI = (function (ui) {
     ui._time = +d3.select(this).property('value');
     ui.update_data_fills();
   });
-
-
+  
   d3.select('#smooth_select').on('input', function() {
     d3.select('feGaussianBlur').attr('stdDeviation',
       +d3.select(this).property('value'));
