@@ -1,5 +1,11 @@
 {% extends 'base.html' %}
-
+{% block headcss %}
+{% if datatype == 'null' %}
+    <style type="text/css">
+    .ui.layer { display: none; }
+    </style>
+{% endif %}
+{% endblock %}
 {% block metadata_list %}
 {% if metadata %}
   <div id="metadata_list">

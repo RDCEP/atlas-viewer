@@ -1,5 +1,6 @@
 Flask==0.10.1
 Flask-Compress==1.3.0
+Flask-Assets
 Jinja2==2.8
 Markdown==2.6.2
 MarkupSafe==0.23

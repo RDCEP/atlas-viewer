@@ -173,6 +173,16 @@ path {
   #title_legend span {
     margin: 0 1em 0 0; }
 
+  #current_year {
+    position: relative;
+    height: 1em;
+    width: 3em;
+    padding: 2px 4px;
+    font-weight: bold;
+    color: white;
+    background-color: #ccc;
+  }
+
 #aggregation_regions {
   display: inline-block;
   position: relative;
@@ -521,10 +531,11 @@ svg {
   .nav_dropdown ul {
     background-color: #fff;
     position: absolute;
+    margin-left: -3em;
     top: 100%;
     left: 0;
     display: none;
-    list-style-type: none; }
+    list-style-type: none;  }
   .nav_dropdown:hover ul {
     display: inline; }
   .nav_dropdown input[type=range] {
@@ -546,12 +557,16 @@ svg {
     padding: 0 0 0.3em; }
 
 #pixel_pointer {
-  padding-left: 15em;
-  cursor: pointer;}
+  padding-left: 5em;
+  cursor: pointer; }
 
 #legend_settings {
-  padding-left: 0;
+  padding-left: 1em;
   cursor: pointer; }
+
+#appearance {
+  margin-left: 17em;
+  padding-right: 3em;}
 
 .color_scheme {
   cursor: pointer;

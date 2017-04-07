@@ -43,12 +43,12 @@ var AtlasUI = (function (ui) {
     ui.update_map_regions();
     ui.update_map_events();
     ui.hide_loader();
-
   };
 
   d3.select('#time_select').on('input', function() {
     ui._time = +d3.select(this).property('value');
     ui.update_data_fills();
+    d3.select('#current_year').text(1979 + ui._time);
   });
   
   d3.select('#smooth_select').on('input', function() {

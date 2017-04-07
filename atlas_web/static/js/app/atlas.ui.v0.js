@@ -235,7 +235,6 @@ var AtlasUI = (function (ui) {
       ui.select_tool = !ui.select_tool;
       ui.toggle_zoom();
     });
-   
 
   d3.select('#input_buckets')
     .on('input', function() {
@@ -249,7 +248,7 @@ var AtlasUI = (function (ui) {
       var l = d3.select('.legend.layer');
       var eye = d3.select('#legend_settings .iconswitch');
       if (l.style('visibility') == 'visible') {
-          l.style('visibility', 'hidden'); 
+          l.style('visibility', 'hidden');
           eye.classed('fa-eye', true);
           eye.classed('fa-eye-slash', false);
         } else {

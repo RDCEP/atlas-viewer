@@ -5,6 +5,8 @@
   <title></title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.min.css') }}">
   <link rel=stylesheet href="{{ url_for('static', filename='css/main.css') }}?1">
+  {% block headcss %}
+  {% endblock %}
 </head>
 <body>
 <div id=wrapper>
@@ -20,6 +22,7 @@
           <span>1979</span>
           <input id=time_select type=range min=0 max=33 step=1 value=0>
           <span>2012</span>
+          <span id="current_year">1979</span>
         </label>
 
         {% block smoothing_slider %}
