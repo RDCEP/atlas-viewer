@@ -3,8 +3,12 @@ var AtlasUI = (function (ui) {
 
   'use strict';
 
-  ui.color = d3.scaleLinear()
-    .range([d3.rgb('white'), d3.rgb('black')]);
+  /*
+  color
+  update_data_fills()
+  process_raster_geometry()
+  get_data()
+   */
 
   var _update_data_fills = function _update_data_fills() {
     /*
@@ -16,11 +20,7 @@ var AtlasUI = (function (ui) {
     });
   };
 
-  var _process_raster_geometry = function _process_raster_geometry(data) {
-    /*
-     Assuming the API returns centroids of data raster pixels as
-     GeoJSON Point objects, turn them into Polygons.
-     */
+  var _sort_data_by_values = function _sort_data_by_values(data) {
 
     data.sort(function (a, b) {
       d3.ascending(
@@ -41,6 +41,18 @@ var AtlasUI = (function (ui) {
       )
     });
 
+    return data;
+
+  };
+
+  var _process_raster_geometry = function _process_raster_geometry(data) {
+    /*
+     Assuming the API returns centroids of data raster pixels as
+     GeoJSON Point objects, turn them into Polygons.
+     */
+
+    ui.sort_data_by_values(data);
+
     data.forEach(function (d) {
 
       var x = d.properties.centroid.geometry.coordinates[0];
@@ -57,18 +69,23 @@ var AtlasUI = (function (ui) {
           [x + s, y - s], // bottom right
           [x - s, y - s], // bottom left
           [x - s, y + s]
-        ]]}
+        ]]};
     });
+
     return data;
 
   };
 
   var _get_data = function _get_data(data_type) {
-    if (data_type == null) { return false; }
-    var endpoint = data_type == 'raster'
+
+    if (data_type === null) { return false; }
+
+    var endpoint = data_type === 'raster'
       ? 'griddata'
       : 'aggregate';
+
     ui.show_loader();
+
     d3.request('/api/' + endpoint)
       .header('Content-Type', 'application/json')
       .post(
@@ -76,7 +93,8 @@ var AtlasUI = (function (ui) {
           ui.bbox.bottom_right[0], ui.bbox.bottom_right[1]],
           dataset: Options.dataset, regions: Options.regions}),
         function(err, rawData){
-          ui.atlas(err, {data_type: data_type, data: JSON.parse(rawData['response'])});
+          ui.atlas(err, {data_type: data_type,
+            data: JSON.parse(rawData['response'])});
         }
     );
   };
@@ -91,6 +109,10 @@ var AtlasUI = (function (ui) {
 
   ui.get_data = function(endpoint) {
     return _get_data(endpoint);
+  };
+
+  ui.sort_data_by_values = function(data) {
+    return _sort_data_by_values(data);
   };
 
   return ui;

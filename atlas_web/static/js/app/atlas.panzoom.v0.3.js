@@ -3,11 +3,21 @@ var AtlasUI = (function (ui) {
 
   'use strict';
 
-  function projection_bounds() {
+  /*
+  _projection_bounds()
+  _zooming()
+    Called on zoom event of SVG
+  _zoom_end()
+    Called on zoomend event of SVG
+  toggle_zoom()
+    Toggle between pixel selection and pan/zoom cursors
+   */
+
+  function _projection_bounds() {
     var yaw = ui.projection.rotate()[0]
       , max_lat = 83
-      , xy_max = ui.projection([-yaw+180-1e-6, -max_lat])
-      , xy_min = ui.projection([-yaw-180+1e-6,  max_lat]);
+      , xy_max = ui.projection([-yaw + 180 - 1e-6, -max_lat])
+      , xy_min = ui.projection([-yaw - 180 + 1e-6,  max_lat]);
     return [xy_min, xy_max];
   }
 
@@ -26,7 +36,7 @@ var AtlasUI = (function (ui) {
         , scale = d3.event.transform.k
       ;
 
-      if ((scale != last_k)
+      if ((scale !== last_k)
         && (ui.projection.scale() * scale > ui.min_zoom)
         && (ui.projection.scale() * scale < ui.max_zoom)
       ) {
@@ -41,7 +51,7 @@ var AtlasUI = (function (ui) {
           , yaw = ui.projection.rotate()[0]
           , pitch = ui.projection.center()[1]
           , tp = ui.projection.translate()
-          , b = projection_bounds()
+          , b = _projection_bounds()
         ;
 
         ui.projection.rotate([

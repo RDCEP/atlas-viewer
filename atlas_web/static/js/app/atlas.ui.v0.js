@@ -3,6 +3,27 @@ var AtlasUI = (function (ui) {
 
   'use strict';
 
+  /*
+    component_table(arr)
+      Colors for SVG smoothing
+    _s2l(v)
+      gamma correction
+    create_color_scheme(name, bins)
+      Update UI's color scheme
+    get_viewport_dimensions()
+      Return corners of viewport as lon lat coordinates
+    _new_resize_wrapper()
+      Debouncing for resize events
+    _new_resize()
+      Redraw SVG map on browser resize
+    show_loader()
+      Show SVG loader icon
+    hide_loader()
+      Hide SVG loader icon
+    draw_color_legend(block_size)
+
+   */
+
   var resize_event
     , color_options = {
       /*
@@ -84,7 +105,7 @@ var AtlasUI = (function (ui) {
 
   var _get_viewport_dimensions = function _get_viewport_dimensions() {
     /*
-     Return coordinates of viewport bounding box
+     Return coordinates of viewport bounding box as [lon, lat] coordinates
      */
     //FIXME: Use AtlasUI object's bbox
     ui.bbox.top_left = ui.projection.invert([0, 0]);
@@ -103,15 +124,15 @@ var AtlasUI = (function (ui) {
     return ui.bbox;
   };
 
-  var new_resize_wrapper = function new_resize_wrapper() {
+  var _new_resize_wrapper = function _new_resize_wrapper() {
     /*
      Wrapper function for debouncing resize events.
      */
     clearTimeout(resize_event);
-    resize_event = setTimeout(new_resize, 1000);
+    resize_event = setTimeout(_new_resize, 1000);
   };
 
-  var new_resize = function new_resize() {
+  var _new_resize = function _new_resize() {
     /*
      Resize SVG when browser resizes.
      */
@@ -263,7 +284,7 @@ var AtlasUI = (function (ui) {
       _create_color_scheme(Options.color_scheme, Options.color_bins);
     });
 
-  d3.select(window).on('resize', new_resize_wrapper);
+  d3.select(window).on('resize', _new_resize_wrapper);
 
   ui.component_table = function(arr) {
     return _component_table(arr);

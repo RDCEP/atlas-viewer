@@ -3,9 +3,17 @@ var AtlasUI = (function (ui) {
 
   'use strict';
 
-  ui.get_map_scale = function get_map_scale() {
-    return d3.max([ui.height, ui.width]) * Options.scale;
-  };
+  /*
+  svg
+  projection
+  path
+  graticule
+  update_map_regions()
+    Update boundaries of map overlay
+  draw_map_basics()
+    Draw ocean, empty land, region boundaries, graticule
+  get_map_scale()
+   */
 
   var svg_wrap = d3.select('#map')
     , svg_root = svg_wrap.append('svg')
@@ -24,22 +32,13 @@ var AtlasUI = (function (ui) {
       .attr('class', 'grid layer zoom')
       .attr('filter', 'url(#grid_filter)')
     , boundary_layer = svg.append('g')
-    .attr('class', 'boundary layer zoom')
+      .attr('class', 'boundary layer zoom')
       .classed('zoom', true)
     , ui_layer = svg.append('g')
       .attr('class', 'ui layer')
   ;
 
-  ui.projection = d3.geoEquirectangular()
-      .rotate([-Options.lon, 0])
-      .center([0, Options.lat])
-      .scale(ui.get_map_scale())
-      .translate([ui.width / 2, ui.height / 2])
-      .precision(.1);
-  ui.path = d3.geoPath()
-    .projection(ui.projection);
-  ui.graticule = d3.geoGraticule();
-
+  // These filters are used for browser-based color smoothing
   filter.append('feGaussianBlur')
     .attr('stdDeviation', 0)
     .attr('in', 'BackgroundImage');
@@ -49,6 +48,10 @@ var AtlasUI = (function (ui) {
   transfer.append('feFuncR').attr('type', 'discrete');
   transfer.append('feFuncG').attr('type', 'discrete');
   transfer.append('feFuncB').attr('type', 'discrete');
+
+  var _get_map_scale = function _get_map_scale() {
+    return d3.max([ui.height, ui.width]) * Options.scale;
+  };
 
   var _update_map_regions = function _update_map_regions() {
 
@@ -102,9 +105,31 @@ var AtlasUI = (function (ui) {
       .attr('d', ui.path)
   };
 
+  ui.update_map_regions = function() {
+    return _update_map_regions();
+  };
+  ui.draw_map_basics = function() {
+    return _draw_map_basics;
+  };
+  ui.get_map_scale = function() {
+    return _get_map_scale;
+  };
+
+  // Black/white color scale for map. SVG filters create colors using
+  // component replacement.
+  ui.color = d3.scaleLinear()
+    .range([d3.rgb('white'), d3.rgb('black')]);
+
   ui.svg = svg;
-  ui.update_map_regions = _update_map_regions;
-  ui.draw_map_basics = _draw_map_basics;
+  ui.projection = d3.geoEquirectangular()
+      .rotate([-Options.lon, 0])
+      .center([0, Options.lat])
+      .scale(ui.get_map_scale())
+      .translate([ui.width / 2, ui.height / 2])
+      .precision(.1);
+  ui.path = d3.geoPath()
+    .projection(ui.projection);
+  ui.graticule = d3.geoGraticule();
 
   return ui;
 
