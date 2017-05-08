@@ -1,5 +1,5 @@
 
-var AtlasUI = (function (ui) {
+var AtlasApp = (function (atlas) {
 
   'use strict';
   
@@ -32,8 +32,12 @@ var AtlasUI = (function (ui) {
     },
     roundn: function roundn(x, n) {
       return Math.round(x * Math.pow(10, n)) / Math.pow(10, n);
-    }
+    },
+    API_URL: 'http://atlas.rdcep.org/api/',
+    GRID_ENDPOINT: 'grid_data/',
+    META_ENDPOINT: 'meta_data/'
+
   };
 
-})(AtlasUI || {});
+})(AtlasApp || {});
 

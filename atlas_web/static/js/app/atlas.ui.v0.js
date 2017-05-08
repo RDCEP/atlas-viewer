@@ -1,5 +1,5 @@
 
-var AtlasUI = (function (ui) {
+var AtlasApp = (function (atlas) {
 
   'use strict';
 
@@ -43,7 +43,7 @@ var AtlasUI = (function (ui) {
     , ui_layer = d3.select('.ui.layer')
   ;
 
-  ui.color2 = d3.scaleQuantile()
+  atlas.color2 = d3.scaleQuantile()
     .range(color_options.colors);
 
   var _component_table = function _component_table(arr) {
@@ -97,8 +97,8 @@ var AtlasUI = (function (ui) {
     d3.select('feFuncR').attr('tableValues', r.join(', '));
     d3.select('feFuncG').attr('tableValues', g.join(', '));
     d3.select('feFuncB').attr('tableValues', b.join(', '));
-    ui.color2.range(color_options.colors);
-    ui.update_data_fills();
+    atlas.color2.range(color_options.colors);
+    atlas.update_data_fills();
     _draw_color_legend(15);
 
   };
@@ -107,21 +107,21 @@ var AtlasUI = (function (ui) {
     /*
      Return coordinates of viewport bounding box as [lon, lat] coordinates
      */
-    //FIXME: Use AtlasUI object's bbox
-    ui.bbox.top_left = ui.projection.invert([0, 0]);
-    ui.bbox.bottom_right = ui.projection.invert([ui.width, ui.height]);
+    //FIXME: Use AtlasApp object's bbox
+    atlas.bbox.top_left = atlas.projection.invert([0, 0]);
+    atlas.bbox.bottom_right = atlas.projection.invert([atlas.width, atlas.height]);
 
-    ui.bbox.top_left[0] = ui.bbox.bottom_right[0] > 180
-      ? ui.bbox.top_left[0] - 180
-      : ui.bbox.top_left[0];
-    ui.bbox.bottom_right[0] = ui.bbox.bottom_right[0] > 180
-      ? ui.bbox.bottom_right[0] - 180
-      : ui.bbox.bottom_right[0];
+    atlas.bbox.top_left[0] = atlas.bbox.bottom_right[0] > 180
+      ? atlas.bbox.top_left[0] - 180
+      : atlas.bbox.top_left[0];
+    atlas.bbox.bottom_right[0] = atlas.bbox.bottom_right[0] > 180
+      ? atlas.bbox.bottom_right[0] - 180
+      : atlas.bbox.bottom_right[0];
 
-    ui.bbox.top_right = [ui.bbox.bottom_right[0], ui.bbox.top_left[1]];
-    ui.bbox.bottom_left = [ui.bbox.top_left[0], ui.bbox.bottom_right[1]];
+    atlas.bbox.top_right = [atlas.bbox.bottom_right[0], atlas.bbox.top_left[1]];
+    atlas.bbox.bottom_left = [atlas.bbox.top_left[0], atlas.bbox.bottom_right[1]];
 
-    return ui.bbox;
+    return atlas.bbox;
   };
 
   var _new_resize_wrapper = function _new_resize_wrapper() {
@@ -136,18 +136,18 @@ var AtlasUI = (function (ui) {
     /*
      Resize SVG when browser resizes.
      */
-    ui.width = window.innerWidth;
-    ui.height = window.innerHeight;
-    ui.min_zoom = d3.max([ui.width / 6, ui.height / 3]);
+    atlas.width = window.innerWidth;
+    atlas.height = window.innerHeight;
+    atlas.min_zoom = d3.max([atlas.width / 6, atlas.height / 3]);
     d3.select('svg').attrs({
-      height: ui.height,
-      width: ui.width,
-      'viewBox': '0 0 ' + ui.width + ' ' + ui.height});
-    ui.projection.translate([ui.width / 2, ui.height / 2])
-      // .scale(ui.get_map_scale())
+      height: atlas.height,
+      width: atlas.width,
+      'viewBox': '0 0 ' + atlas.width + ' ' + atlas.height});
+    atlas.projection.translate([atlas.width / 2, atlas.height / 2])
+      // .scale(atlas.get_map_scale())
     ;
 
-    ui.get_data(Options.datatype);
+    atlas.get_data(Options.datatype);
   };
 
   var _show_loader = function _show_loader() {
@@ -156,8 +156,8 @@ var AtlasUI = (function (ui) {
      */
     var loader = d3.select('#loader');
     loader.style('display', 'block')
-      .style('top', (ui.height - loader.node().getBoundingClientRect().height) / 2 + 'px')
-      .style('left', (ui.width - loader.node().getBoundingClientRect().width) / 2 + 'px');
+      .style('top', (atlas.height - loader.node().getBoundingClientRect().height) / 2 + 'px')
+      .style('left', (atlas.width - loader.node().getBoundingClientRect().width) / 2 + 'px');
   };
 
   var _hide_loader = function _hide_loader() {
@@ -174,7 +174,7 @@ var AtlasUI = (function (ui) {
      */
     d3.select('.legend.layer').remove();
     var top_margin = 15
-      , legend_height = ui.color2.range().length * block_size + (ui.color2.range().length-1) + 40
+      , legend_height = atlas.color2.range().length * block_size + (atlas.color2.range().length-1) + 40
       , gap = 3
       , legend_layer = ui_layer.append('g').attr('class', 'legend layer')
       , legend_units = d3.select('#legend_units')
@@ -182,13 +182,13 @@ var AtlasUI = (function (ui) {
       , xl = d3.select('#title_legend').node().offsetLeft + legend_units.node().parentNode.offsetLeft
     ;
 
-    //TODO: Is legend_layer an attribute of AtlasUI—Or just select it in this function?
+    //TODO: Is legend_layer an attribute of AtlasApp—Or just select it in this function?
     legend_layer.append('rect')
       .attrs({
         height: legend_height,
         width: 160,
-        // x: ui.width - 240,
-        // y: ui.height - (legend_height + 81),
+        // x: atlas.width - 240,
+        // y: atlas.height - (legend_height + 81),
         x: xl,
         y: yl,
         class: 'legend_bkgd'})
@@ -202,8 +202,8 @@ var AtlasUI = (function (ui) {
     //TODO: Replace with variable name, units
     //   .text(Options.units[Options.dataset])
     //   .attrs({
-    //     x: ui.width - 240 + 15,
-    //     y: ui.height - (legend_height + 58),
+    //     x: atlas.width - 240 + 15,
+    //     y: atlas.height - (legend_height + 58),
     //     class: 'legend_region'})
     //   .styles({
     //     fill: 'black',
@@ -211,40 +211,40 @@ var AtlasUI = (function (ui) {
     //     'font-weight': 600});
 
     legend_layer.selectAll('.legend-block')
-      .data(ui.color2.range())
+      .data(atlas.color2.range())
       .enter()
       .append('rect')
       .attrs({
         width: block_size,
         height: block_size,
         class: 'legend-block',
-        // x: ui.width - 240 + 15 })
+        // x: atlas.width - 240 + 15 })
         x: xl + 15 })
       .attr('fill', function (d) { return d; })
       .attr('y', function (d, i) {
-        // return ui.height - (legend_height + 60) +
+        // return atlas.height - (legend_height + 60) +
         //   top_margin + i * (block_size + gap); });
         return yl + 10 + i * (block_size + gap); });
 
     legend_layer.selectAll('.legend-data')
-      .data(ui.color2.range())
+      .data(atlas.color2.range())
       .enter()
       .append('text')
       .attrs({
-        // x: ui.width - 240 + 35,
+        // x: atlas.width - 240 + 35,
         x: xl + 35,
         class: 'legend-data'})
       .text(function (d, i) {
-        var q = ui.color2.quantiles(),
-          r = ui.color2.range().length
+        var q = atlas.color2.quantiles(),
+          r = atlas.color2.range().length
         ;
         if (i == 0) {
-          return ui.round1(ui.color2.domain()[0]) + '–' + ui.round1(q[i]); }
+          return atlas.round1(atlas.color2.domain()[0]) + '–' + atlas.round1(q[i]); }
         if (i == r - 1) {
-          return ui.round1(q[i-1]) + '–' + ui.round1(ui.color2.domain()[1]); }
-        return ui.round1(q[i-1]) + '–' + ui.round1(q[i]); })
+          return atlas.round1(q[i-1]) + '–' + atlas.round1(atlas.color2.domain()[1]); }
+        return atlas.round1(q[i-1]) + '–' + atlas.round1(q[i]); })
       .attr('y', function (d, i) {
-        // return ui.height - (legend_height + 60) + top_margin + (block_size - 3) +
+        // return atlas.height - (legend_height + 60) + top_margin + (block_size - 3) +
         //   (Options.color_bins - i - 1) * (block_size + gap); });
         return yl + 10 + (block_size - 3) + (Options.color_bins - i - 1) * (block_size + gap); });
   };
@@ -253,8 +253,8 @@ var AtlasUI = (function (ui) {
     .on('click', function() {
       var that = d3.select(this);
       that.classed('inactive', !that.classed('inactive'));
-      ui.select_tool = !ui.select_tool;
-      ui.toggle_zoom();
+      atlas.select_tool = !atlas.select_tool;
+      atlas.toggle_zoom();
     });
 
   d3.select('#input_buckets')
@@ -286,32 +286,32 @@ var AtlasUI = (function (ui) {
 
   d3.select(window).on('resize', _new_resize_wrapper);
 
-  ui.component_table = function(arr) {
+  atlas.component_table = function(arr) {
     return _component_table(arr);
   };
 
-  ui.create_color_scheme = function(interp, color_bins) {
+  atlas.create_color_scheme = function(interp, color_bins) {
     return _create_color_scheme(interp, color_bins);
   };
 
-  ui.get_viewport_dimensions = function() {
+  atlas.get_viewport_dimensions = function() {
     return _get_viewport_dimensions();
   };
 
-  ui.show_loader = function() {
+  atlas.show_loader = function() {
     return _show_loader();
   };
 
-  ui.hide_loader = function() {
+  atlas.hide_loader = function() {
     return _hide_loader();
   };
 
-  ui.draw_color_legend  = function(block_size) {
+  atlas.draw_color_legend  = function(block_size) {
     return _draw_color_legend(block_size);
   };
 
 
 
-  return ui;
+  return atlas;
 
-})(AtlasUI || {});
+})(AtlasApp || {});

@@ -1,5 +1,5 @@
 
-var AtlasUI = (function (ui) {
+var AtlasApp = (function (atlas) {
 
   'use strict';
 
@@ -19,7 +19,7 @@ var AtlasUI = (function (ui) {
 
   var _update_map_events = function _update_map_events() {
 
-    if (ui.select_tool) {
+    if (atlas.select_tool) {
 
       d3.selectAll('.geo.grid')
         .on('click', function () {
@@ -39,11 +39,11 @@ var AtlasUI = (function (ui) {
     }
   };
 
-  ui.update_map_events = function() {
+  atlas.update_map_events = function() {
     _update_map_events();
   };
 
-  return ui;
+  return atlas;
 
-})(AtlasUI || {});
+})(AtlasApp || {});
 

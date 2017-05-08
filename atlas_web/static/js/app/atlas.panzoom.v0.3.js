@@ -1,5 +1,5 @@
 
-var AtlasUI = (function (ui) {
+var AtlasApp = (function (atlas) {
 
   'use strict';
 
@@ -14,10 +14,10 @@ var AtlasUI = (function (ui) {
    */
 
   function _projection_bounds() {
-    var yaw = ui.projection.rotate()[0]
+    var yaw = atlas.projection.rotate()[0]
       , max_lat = 83
-      , xy_max = ui.projection([-yaw + 180 - 1e-6, -max_lat])
-      , xy_min = ui.projection([-yaw - 180 + 1e-6,  max_lat]);
+      , xy_max = atlas.projection([-yaw + 180 - 1e-6, -max_lat])
+      , xy_min = atlas.projection([-yaw - 180 + 1e-6,  max_lat]);
     return [xy_min, xy_max];
   }
 
@@ -37,31 +37,31 @@ var AtlasUI = (function (ui) {
       ;
 
       if ((scale !== last_k)
-        && (ui.projection.scale() * scale > ui.min_zoom)
-        && (ui.projection.scale() * scale < ui.max_zoom)
+        && (atlas.projection.scale() * scale > atlas.min_zoom)
+        && (atlas.projection.scale() * scale < atlas.max_zoom)
       ) {
 
-        ui.projection.scale(ui.projection.scale() * scale);
+        atlas.projection.scale(atlas.projection.scale() * scale);
 
       } else {
 
         var dx = x - last_x
           , dy = y - last_y
           , dk = d3.event.transform.k / last_k
-          , yaw = ui.projection.rotate()[0]
-          , pitch = ui.projection.center()[1]
-          , tp = ui.projection.translate()
+          , yaw = atlas.projection.rotate()[0]
+          , pitch = atlas.projection.center()[1]
+          , tp = atlas.projection.translate()
           , b = _projection_bounds()
         ;
 
-        ui.projection.rotate([
-          yaw + 360. * dx / ui.width * scale_extent[0] / scale, 0, 0]);
+        atlas.projection.rotate([
+          yaw + 360. * dx / atlas.width * scale_extent[0] / scale, 0, 0]);
         if (b[0][1] + dy > 0) {
           dy = -b[0][1];
-        } else if (b[1][1] + dy < ui.height) {
-          dy = ui.height - b[1][1];
+        } else if (b[1][1] + dy < atlas.height) {
+          dy = atlas.height - b[1][1];
         }
-        ui.projection.translate([tp[0], tp[1] + dy]);
+        atlas.projection.translate([tp[0], tp[1] + dy]);
       }
 
       last_x = x;
@@ -70,17 +70,17 @@ var AtlasUI = (function (ui) {
 
     }
 
-    d3.selectAll('.geo').attr('d', ui.path);
+    d3.selectAll('.geo').attr('d', atlas.path);
 
   };
 
   var _zoomend = function _zoomend() {
-    ui.bbox = ui.get_viewport_dimensions();
-    ui.get_data(Options.datatype);
+    atlas.bbox = atlas.get_viewport_dimensions();
+    atlas.get_data(Options.datatype);
   };
 
   var _toggle_zoom = function _toggle_zoom() {
-    if (ui.select_tool) {
+    if (atlas.select_tool) {
       d3.select('svg')
         .on('.zoom', null)
         .classed('select_tool', true);
@@ -91,13 +91,13 @@ var AtlasUI = (function (ui) {
         .on('end', _zoomend))
         .classed('select_tool', false);
     }
-    ui.update_map_events();
+    atlas.update_map_events();
   };
 
-  ui.toggle_zoom = function() {
+  atlas.toggle_zoom = function() {
     _toggle_zoom();
   };
 
-  return ui;
+  return atlas;
 
-})(AtlasUI || {});
+})(AtlasApp || {});

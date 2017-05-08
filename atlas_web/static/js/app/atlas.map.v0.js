@@ -1,5 +1,5 @@
 
-var AtlasUI = (function (ui) {
+var AtlasApp = (function (atlas) {
 
   'use strict';
 
@@ -17,9 +17,9 @@ var AtlasUI = (function (ui) {
 
   var svg_wrap = d3.select('#map')
     , svg_root = svg_wrap.append('svg')
-      .attr('width', ui.width)
-      .attr('height', ui.height)
-      .attr('viewBox', '0 0 ' + ui.width + ' ' + ui.height)
+      .attr('width', atlas.width)
+      .attr('height', atlas.height)
+      .attr('viewBox', '0 0 ' + atlas.width + ' ' + atlas.height)
     , filter = svg_root.append('defs')
       .append('filter')
       .attr('id', 'grid_filter')
@@ -50,7 +50,7 @@ var AtlasUI = (function (ui) {
   transfer.append('feFuncB').attr('type', 'discrete');
 
   var _get_map_scale = function _get_map_scale() {
-    return d3.max([ui.height, ui.width]) * Options.scale;
+    return d3.max([atlas.height, atlas.width]) * Options.scale;
   };
 
   var _update_map_regions = function _update_map_regions() {
@@ -61,8 +61,8 @@ var AtlasUI = (function (ui) {
       .header('Content-Type', 'application/json')
       .post(
         JSON.stringify({
-          bbox: [ui.bbox.top_left[0], ui.bbox.top_left[1],
-            ui.bbox.bottom_right[0], ui.bbox.bottom_right[1]],
+          bbox: [atlas.bbox.top_left[0], atlas.bbox.top_left[1],
+            atlas.bbox.bottom_right[0], atlas.bbox.bottom_right[1]],
           regions: Options.regions
         }),
         function (err, world) {
@@ -73,13 +73,13 @@ var AtlasUI = (function (ui) {
             .data(world)
             .enter()
             .append('path')
-            .attr('d', ui.path)
+            .attr('d', atlas.path)
             .attr('class', 'geo region fill');
           boundary_layer.selectAll('path.geo.region')
             .data(world)
             .enter()
             .append('path')
-            .attr('d', ui.path)
+            .attr('d', atlas.path)
             .attr('class', 'geo region boundary');
         });
   };
@@ -89,48 +89,48 @@ var AtlasUI = (function (ui) {
      Draw ocean, land background, region boundaries, graticule.
      */
     //FIXME: Replace dims with object's bbox
-    // ui.bbox = ui.get_viewport_dimensions();
+    // atlas.bbox = atlas.get_viewport_dimensions();
 
     ocean_layer.append('path')
       .datum({type: 'Sphere'})
       .attr('id', 'sphere')
-      .attr('d', ui.path)
+      .attr('d', atlas.path)
       .attr('class', 'geo');
     ocean_layer.append('use')
       .attr('class', 'stroke')
       .attr('xlink:href', '#sphere');
     ocean_layer.append('path')
-      .datum(ui.graticule)
+      .datum(atlas.graticule)
       .attr('class', 'graticule geo')
-      .attr('d', ui.path)
+      .attr('d', atlas.path)
   };
 
-  ui.update_map_regions = function() {
+  atlas.update_map_regions = function() {
     return _update_map_regions();
   };
-  ui.draw_map_basics = function() {
+  atlas.draw_map_basics = function() {
     return _draw_map_basics;
   };
-  ui.get_map_scale = function() {
+  atlas.get_map_scale = function() {
     return _get_map_scale;
   };
 
   // Black/white color scale for map. SVG filters create colors using
   // component replacement.
-  ui.color = d3.scaleLinear()
+  atlas.color = d3.scaleLinear()
     .range([d3.rgb('white'), d3.rgb('black')]);
 
-  ui.svg = svg;
-  ui.projection = d3.geoEquirectangular()
+  atlas.svg = svg;
+  atlas.projection = d3.geoEquirectangular()
       .rotate([-Options.lon, 0])
       .center([0, Options.lat])
-      .scale(ui.get_map_scale())
-      .translate([ui.width / 2, ui.height / 2])
+      .scale(atlas.get_map_scale())
+      .translate([atlas.width / 2, atlas.height / 2])
       .precision(.1);
-  ui.path = d3.geoPath()
-    .projection(ui.projection);
-  ui.graticule = d3.geoGraticule();
+  atlas.path = d3.geoPath()
+    .projection(atlas.projection);
+  atlas.graticule = d3.geoGraticule();
 
-  return ui;
+  return atlas;
 
-})(AtlasUI || {});
+})(AtlasApp || {});

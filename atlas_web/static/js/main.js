@@ -1,5 +1,5 @@
 
-var AtlasUI = (function (ui) {
+var AtlasApp = (function (atlas) {
 
   'use strict';
 
@@ -30,7 +30,7 @@ var AtlasUI = (function (ui) {
 
     var data = queued_data['data'];
     data = queued_data['data_type']
-      ? ui.process_raster_geometry(data)
+      ? atlas.process_raster_geometry(data)
       : data;
 
     data.filter(function (d) { return d.properties.value !== null; });
@@ -41,11 +41,11 @@ var AtlasUI = (function (ui) {
     // might choose to let the user whether they want a static or
     // dynamic (domain changes upon panning) domain.
     var domain = _get_domain_of_data(data);
-    ui.color.domain(domain);
-    ui.color2.domain(domain);
+    atlas.color.domain(domain);
+    atlas.color2.domain(domain);
 
     if (Options.datatype !== null) {
-      ui.create_color_scheme(Options.color_scheme, Options.color_bins);
+      atlas.create_color_scheme(Options.color_scheme, Options.color_bins);
     }
 
     var grid_layer = d3.select('.grid.layer');
@@ -56,22 +56,22 @@ var AtlasUI = (function (ui) {
     grid_regions.enter().append('path')
       .attr('class', 'grid geo')
       .style('fill', function(d) {
-        return d.properties.value.values[ui._time] == null
-          ? 'transparent' : ui.color(d.properties.value.values[ui._time]);
+        return d.properties.value.values[atlas._time] == null
+          ? 'transparent' : atlas.color(d.properties.value.values[atlas._time]);
       })
     ;
 
-    d3.selectAll('.geo').attr('d', ui.path);
+    d3.selectAll('.geo').attr('d', atlas.path);
 
-    ui.update_map_regions();
-    ui.update_map_events();
-    ui.hide_loader();
+    atlas.update_map_regions();
+    atlas.update_map_events();
+    atlas.hide_loader();
 
   };
 
   d3.select('#time_select').on('input', function() {
-    ui._time = +d3.select(this).property('value');
-    ui.update_data_fills();
+    atlas._time = +d3.select(this).property('value');
+    atlas.update_data_fills();
   });
 
   d3.select('#smooth_select').on('input', function() {
@@ -79,21 +79,21 @@ var AtlasUI = (function (ui) {
       +d3.select(this).property('value'));
   });
 
-  // TODO: Set ui.bbox in ui.js
-  ui.bbox = ui.get_viewport_dimensions();
+  // TODO: Set atlas.bbox in atlas.js
+  atlas.bbox = atlas.get_viewport_dimensions();
 
   // TODO: Set drag_limits in map.js
-  ui.upper_drag_limit = ui.projection([0, 89])[1];
-  ui.lower_drag_limit = ui.projection([0, -89])[1] - ui.height;
+  atlas.upper_drag_limit = atlas.projection([0, 89])[1];
+  atlas.lower_drag_limit = atlas.projection([0, -89])[1] - atlas.height;
 
-  ui.draw_map_basics();
-  ui.get_data(Options.datatype);
-  ui.toggle_zoom();
+  atlas.draw_map_basics();
+  atlas.get_data(Options.datatype);
+  atlas.toggle_zoom();
 
-  ui.atlas = function(error, queued_data) {
+  atlas.atlas = function(error, queued_data) {
     return _atlas(error, queued_data);
   };
 
-  return ui;
+  return atlas;
 
-})(AtlasUI || {});
+})(AtlasApp || {});
