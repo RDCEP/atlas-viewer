@@ -88,7 +88,7 @@ def mongo_test():
     initial_session()
     data = json.loads(request.data)
     collection = data['dataset']
-    if not 'bbox' in data.keys():
+    if 'bbox' not in data.keys():
         tlx = -180
         tly = 90
         brx = 180
@@ -128,6 +128,7 @@ def get_dataset():
         mimetype='application/json',
     )
 
+
 @mod.route('/api/map', methods=['POST',])
 def get_map():
     initial_session()
@@ -144,6 +145,20 @@ def get_map():
     data = mr.regions(
         float(tlx), float(tly), float(brx), float(tly), float(brx),
         float(bry), float(tlx), float(bry))
+    return Response(
+        json.dumps(data),
+        mimetype='application/json',
+    )
+
+
+@mod.route('/api/metadata/map', methods=['POST', ])
+def metadata_map():
+    initial_session()
+    data = json.loads(request.data)
+    collection = 'grid_meta'
+    dataset = data['dataset']
+    mr = MongoRead(4, str(collection))
+    data = mr.metadata(dataset)
     return Response(
         json.dumps(data),
         mimetype='application/json',

@@ -22,8 +22,5 @@ MONGO = dict(
     password=cf.get('user', 'password'),
     domain=cf.get('server', 'domain'),
     database=cf.get('server', 'database'),
-    collection='{}_{}_{}_{}'.format(
-        cf.get('nc4', 'harms'), cf.get('nc4', 'irrigation'),
-        cf.get('nc4', 'variable'), cf.get('nc4', 'crop'), ),
     port=int(cf.get('server', 'port')),
-    variable_name='{}_{}'.format(cf.get('nc4', 'variable'), cf.get('nc4', 'crop')))
+)

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from flask import Flask
+from flask import Flask
 from flask.ext.compress import Compress
 from flask_assets import Bundle, Environment
 from atlas_web.filters import safe_markdown, format_currency, smartypants, \

@@ -43,7 +43,7 @@ class MongoRead(object):
         client = MongoClient(uri) if not MONGO['local'] \
             else MongoClient('localhost', MONGO['port'])
 
-        self.db = client['atlas']
+        self.db = client[MONGO['database']]
 
         if collection is None:
             collection = self.db[MONGO['collection']]
