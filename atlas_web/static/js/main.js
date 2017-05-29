@@ -20,6 +20,24 @@ var AtlasApp = (function (atlas) {
     ];
   };
 
+  var _get_ui_metadata = function _get_ui_metadata() {
+    d3.request('/api/metadata/map')
+      .header('Content-Type', 'application/json')
+      .post(
+        JSON.stringify({name: Options.dataset}),
+        function(err, rawData){
+          var response = JSON.parse(rawData['response']['variables']);
+          response = response.filter(function(d) {
+            return d.name === Options.var;
+          })[0];
+          // Options.min = response['min'];
+          // Options.max = response['max'];
+          // Options.unit = response['unit'];
+          // Options.
+        }
+    );
+  };
+
   var _atlas = function _atlas(error, queued_data) {
     /*
      Draw the map to the viewport.

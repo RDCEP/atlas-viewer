@@ -97,6 +97,12 @@ class MongoRead(object):
 
         return list(cursor)
 
+    def metadata(self, dataset):
+        self.collection = self.db['grid_meta']
+        cursor = self.collection.findOne(
+            {'name': dataset}, projection={'_id': False})
+        return list(cursor)
+
     def all_metadata(self):
         self.collection = self.db['grid_meta']
         cursor = self.collection.find({}, projection={'_id': False})
