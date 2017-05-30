@@ -17,8 +17,8 @@ Version 0.1 - Implantation
 * Alison Brizius <abrizius@uchicago.edu>
 * Ian Foster <foster@anl.gov>
 * Joshua Elliott <jelliott@ci.uchicago.edu>
-* Nathan Matteson <matteson@obstructures.org>
-* Ricardo Barros Lourenço <rlourenc@mail.depaul.edu>
+* Nathan Matteson <nmatteso@cdm.depaul.edu>
+* Ricardo Barros Lourenço <rlourenc@uchicago.edu>
 
 
 ## License
