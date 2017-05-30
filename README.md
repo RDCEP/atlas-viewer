@@ -1,6 +1,6 @@
 # Atlas Viewer
 
-Due to the internationalization of agricultural markets and the relevance of global change drivers (climate, population, consumption, and regulation), food security and land-use change dynamics must be evaluated at the global scale. The effects of food insecurity and environmental impacts, however, are largely experienced locally and confronted by decision-makers at national or regional scales. The ATLAS viewer (Agro-Economic Dynamics and Trade-offs of Land Use and Sustainability) is designed to support data management, retrieval, analysis and visualization to enable users explore interactions across scales. We are beginning with visualizations of pSIMS model outputs and will be extending ATLAS for use with many more models and other multi-scale data products. More detailed information about the project status on the [wiki](https://github.com/RDCEP/atlas-viewer/wiki).
+Due to the internationalization of agricultural markets and the relevance of global change drivers (climate, population, consumption, and regulation), food security and land-use change dynamics must be evaluated at the global scale. The effects of food insecurity and environmental impacts, however, are largely experienced locally and confronted by decision-makers at national or regional scales. The ATLAS viewer (Agro-Economic Dynamics and Trade-offs of Land Use and Sustainability) is designed to support data management, retrieval, analysis and visualization to enable users explore interactions across scales. We are beginning with visualizations of pSIMS model outputs and will be extending ATLAS for use with many more models and other multi-scale data products.
 
 ## Installation
 
@@ -15,10 +15,10 @@ Version 0.1 - Implantation
 
 ## Credits
 * Alison Brizius <abrizius@uchicago.edu>
-* Ian Foster <foster@anl.gov>
+* Ian Foster <foster@cs.uchicago.edu>
 * Joshua Elliott <jelliott@ci.uchicago.edu>
-* Nathan Matteson <matteson@obstructures.org>
-* Ricardo Barros Lourenço <rlourenc@mail.depaul.edu>
+* Nathan Matteson <nmatteso@cdm.depaul.edu>
+* Ricardo Barros Lourenço <rlourenco@cs.uchicago.edu>
 
 
 ## License
